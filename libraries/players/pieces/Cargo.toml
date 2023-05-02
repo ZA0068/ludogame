@@ -1,0 +1,11 @@
+[package]
+name = "pieces"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pieces"
+path = "src/pieces.rs"
+
+
+[dependencies]

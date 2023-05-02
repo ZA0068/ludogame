@@ -4,10 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[workspace]
-members = [
-    "libraries/board",
-    "libraries/dice",
-]
-
 [dependencies]
+board = { path = "libraries/board" }
+dice = { path = "libraries/dice" }
+players = { path = "libraries/players" }
