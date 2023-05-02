@@ -1,11 +1,11 @@
 mod pieces {
 
     pub struct State {
+        position: i8,
         home: bool,
-        goal: bool,
         safe: bool,
-        invincible: bool,        
-        position: u8,
+        dangerous: bool,        
+        goal: bool,
     }
     pub struct Piece {
         id: u8,
@@ -19,12 +19,54 @@ mod pieces {
                 state: State {
                     home: true,
                     goal: false,
-                    safe: false,
-                    invincible: false,
-                    position: 0,
+                    safe: true,
+                    dangerous: false,
+                    position: -1,
                 }
             }
         }
+
+        pub fn id(&self) -> u8 {
+            self.id
+        }
+
+        pub fn is_home(&self) -> bool {
+            self.state.home
+        }
+
+        pub fn is_goal(&self) -> bool {
+            self.state.goal
+        }
+
+        pub fn is_safe(&self) -> bool {
+            self.state.safe
+        }
+
+        pub fn is_dangerous(&self) -> bool {
+            self.state.dangerous
+        }
+
+        pub fn position(&self) -> i8 {
+            self.state.position
+        }
+
+        pub fn set_position(&mut self, position: i8) {
+            self.state.position = position;
+        }
+
+        pub fn free(&mut self) {
+            self.state.position = 0;
+            self.state.home = false;
+        }
+
+        pub fn dead(&mut self) {
+            self.state.position = -1;
+            self.state.home = true;
+            self.state.goal = false;
+            self.state.safe = true;
+            self.state.dangerous = false;
+        }
+
     }
 }
 

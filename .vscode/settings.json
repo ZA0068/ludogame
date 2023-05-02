@@ -2,6 +2,10 @@
     "rust-analyzer.linkedProjects": [
         ".\\libraries\\board\\Cargo.toml",
         ".\\libraries\\board\\Cargo.toml",
-        ".\\libraries\\dice\\Cargo.toml"
+        ".\\libraries\\dice\\Cargo.toml",
+        ".\\libraries\\players\\Cargo.toml",
+        ".\\libraries\\players\\Cargo.toml",
+        ".\\libraries\\players\\Cargo.toml",
+        ".\\libraries\\players\\Cargo.toml"
     ]
 }

@@ -42,12 +42,18 @@ version = "0.1.0"
 dependencies = [
  "board",
  "dice",
- "players",
 ]
 
 [[package]]
+name = "pieces"
+version = "0.1.1"
+
+[[package]]
 name = "players"
-version = "0.1.0"
+version = "0.1.1"
+dependencies = [
+ "pieces",
+]
 
 [[package]]
 name = "ppv-lite86"

@@ -4,11 +4,11 @@ version = 3
 
 [[package]]
 name = "pieces"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "players"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "pieces",
 ]
