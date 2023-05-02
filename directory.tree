@@ -1,0 +1,28 @@
+ludogame
+├── Cargo.toml
+├── libraries
+│   ├── board
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   └── tests
+│   │       └── board_test.rs
+│   ├── dice
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   └── tests
+│   │       └── dice_test.rs
+│   └── players
+│       ├── Cargo.toml
+│       ├── pieces
+│       │   ├── Cargo.toml
+│       │   ├── src
+│       │   └── tests
+│       │       └── pieces_test.rs
+│       ├── src
+│       └── tests
+│           └── players_test.rs
+├── src
+│   ├── ludogame.rs
+│   └── main.rs
+└── tests
+    └── ludogame_test.rs
