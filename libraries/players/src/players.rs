@@ -1,10 +1,8 @@
-use crate::piece::Piece;
-
-mod players
-{
+mod players {
+    use pieces::Piece;
     pub struct Player {
         id: u8,
-        pieces: Vec<u8>,
+        pieces: Vec<Piece>,
     }
 
     impl Player {
@@ -13,6 +11,14 @@ mod players
                 id,
                 pieces: (0..4).map(|i| Piece::new(i)).collect(),
             }
+        }
+
+        pub fn id(&self) -> u8 {
+            self.id
+        }
+
+        pub fn pieces(&self) -> &Vec<Piece> {
+            &self.pieces
         }
     }
 }
