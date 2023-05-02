@@ -9,17 +9,16 @@ A Rust implementation of the classic board game Ludo.
 
 ## Installation
 
-1. Clone the repo:
-   ```sh
-   git clone https://github.com/your_username/ludo-game.git
-   ```
+Clone the repo:
 
-2. Build the project:
-   ```sh
-   cargo build
-   ```
+    git clone https://github.com/your_username/ludo-game.git
+
+Build the project:
+
+    cargo build
 
 ## Usage
+
 Run the game:
 
     cargo run
@@ -34,15 +33,15 @@ Game board displayed in the terminal. Rolling of dice and movement of pieces. Mu
 
 Contributions are welcome and appreciated! Please follow the steps below to contribute:
 
-* Fork the repo.
-* Create a new branch (git checkout -b new-feature)
-* Make your changes and commit them (git commit -m "Add new feature")
-* Push to the branch (git push origin new-feature)
-* Create a pull request.
+- Fork the repo.
+- Create a new branch (git checkout -b new-feature)
+- Make your changes and commit them (git commit -m "Add new feature")
+- Push to the branch (git push origin new-feature)
+- Create a pull request.
 
 ## License
 
 Distributed under the MIT License. See LICENSE for more information.
 Contact zaahm18@student.sdu.dk
 
-Repository: https://github.com/ZA0068/ludogame
+Repository: <https://github.com/ZA0068/ludogame>
