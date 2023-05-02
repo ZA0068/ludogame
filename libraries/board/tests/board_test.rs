@@ -42,4 +42,16 @@ mod tests {
                           .collect::<Vec<i8>>())
                           .unwrap());
     }
+
+    #[test]
+    fn board_globe_spaces_test() {
+        let board = Board::new();
+        assert_eq!(board.globe(), [0, 8, 13, 21, 26, 34, 39, 47]);
+    }
+
+    #[test]
+    fn board_star_spaces_test() {
+        let board = Board::new();
+        assert_eq!(board.star(), [5, 12, 18, 25, 31, 38, 44, 51]);
+    }
 }
