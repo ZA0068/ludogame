@@ -47,4 +47,16 @@ mod pieces_test {
         assert_eq!(piece.is_safe(), true);
         assert_eq!(piece.is_dangerous(), false);
     }
+
+    #[test]
+    fn goal_piece_test() {
+        let mut piece = Piece::new(1);
+        assert_eq!(piece.id(), 1);
+        piece.goal();
+        assert_eq!(piece.position(), 99);
+        assert_eq!(piece.is_home(), false);
+        assert_eq!(piece.is_goal(), true);
+        assert_eq!(piece.is_safe(), true);
+        assert_eq!(piece.is_dangerous(), false);
+    }
 }

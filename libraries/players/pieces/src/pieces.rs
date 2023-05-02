@@ -66,7 +66,14 @@ mod pieces {
             self.state.safe = true;
             self.state.dangerous = false;
         }
-
+        
+        pub fn goal(&mut self){
+            self.state.position = 99;
+            self.state.goal = true;
+            self.state.safe = true;
+            self.state.dangerous = false;
+            self.state.home = false;
+        }
     }
 }
 
