@@ -1,27 +1,24 @@
-use rand;
+mod dice {
+    use rand::Rng;
+    use rand::distributions::Uniform;
 
-mod dice
-{
-    pub struct Dice
-    {
-        value: u8
+    pub struct Dice {
+        value: u8,
+        dist: Uniform<u8>,
     }
 
-    impl Dice
-    {
-        pub fn new() -> Dice
-        {
-            Dice { value: 0 }
+    impl Dice {
+        pub fn new() -> Dice {
+            let dist = Uniform::new_inclusive(1, 6);
+            Dice { value: 0, dist }
         }
 
-        pub fn roll(&mut self) -> u8
-        {
-            self.value = rand::random::<u8>() % 6 + 1;
-            self.value
+        pub fn roll(&mut self) {
+            let mut rng = rand::thread_rng();
+            self.value = rng.sample(self.dist);
         }
 
-        pub fn get_value(&self) -> u8
-        {
+        pub fn get_value(&self) -> u8 {
             self.value
         }
     }
