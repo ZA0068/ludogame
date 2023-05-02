@@ -36,6 +36,39 @@ mod pieces_test {
     }
 
     #[test]
+    fn dangerous_piece_test() {
+        let mut piece = Piece::new(1);
+        assert_eq!(piece.id(), 1);
+        piece.dangerous();
+        assert_eq!(piece.is_home(), false);
+        assert_eq!(piece.is_goal(), false);
+        assert_eq!(piece.is_safe(), true);
+        assert_eq!(piece.is_dangerous(), true);
+    }
+
+    #[test]
+    fn unsafe_piece_test() {
+        let mut piece = Piece::new(1);
+        assert_eq!(piece.id(), 1);
+        piece.not_safe();
+        assert_eq!(piece.is_home(), false);
+        assert_eq!(piece.is_goal(), false);
+        assert_eq!(piece.is_safe(), false);
+        assert_eq!(piece.is_dangerous(), false);
+    }
+
+    #[test]
+    fn safe_piece_test() {
+        let mut piece = Piece::new(1);
+        assert_eq!(piece.id(), 1);
+        piece.safe();
+        assert_eq!(piece.is_home(), false);
+        assert_eq!(piece.is_goal(), false);
+        assert_eq!(piece.is_safe(), true);
+        assert_eq!(piece.is_dangerous(), false);
+    }
+
+    #[test]
     fn death_pieces_test()
     {
         let mut piece = Piece::new(1);
