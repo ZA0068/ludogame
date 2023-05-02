@@ -1,10 +1,8 @@
 use board::Board;
-use std::any::TypeId;
+use std::any::{TypeId, Any};
 
 #[cfg(test)]
-mod tests {
-    use std::any::Any;
-
+mod board_instantiation_test {
     use super::*;
 
     #[test]

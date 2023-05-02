@@ -1,9 +1,6 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
 
 #[cfg(test)]
-mod tests {
+mod dice_tests {
     use super::*;
 
     #[test]
