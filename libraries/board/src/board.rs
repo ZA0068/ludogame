@@ -1,5 +1,5 @@
 mod board {
-    struct Board {
+    pub struct Board {
         home: [i8; 16],
         goal: [i8; 4],
         outside: [i8; 52],
@@ -9,7 +9,7 @@ mod board {
     }
 
     impl Board {
-        pub fn new() -> Board {
+        pub fn new() -> Self {
             let outside: [i8; 52] = (0..52)
                 .map(|i| i as i8)
                 .collect::<Vec<i8>>()
@@ -21,7 +21,7 @@ mod board {
                 .try_into()
                 .unwrap();
 
-            Board {
+            Self {
                 home: [-1; 16],
                 goal: [99; 4],
                 outside,
@@ -34,7 +34,7 @@ mod board {
         pub fn home(&self) -> [i8; 16] {
             self.home
         }
-        
+
         pub fn goal(&self) -> [i8; 4] {
             self.goal
         }
@@ -51,14 +51,10 @@ mod board {
             self.globe
         }
 
-        // pub fn get_start(&self, player: i8) -> i8 {
-        //     match player {
-        //         0 => 0,
-        //         1 => 13,
-        //         2 => 26,
-        //         3 => 39,
-        //         _ => panic!("Invalid player number"),
-        //     }
-        // }
+        pub fn star(&self) -> [i8; 8] {
+            self.star
+        }
     }
 }
+
+pub use board::Board;
