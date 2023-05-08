@@ -1,5 +1,5 @@
 use dice::Dice;
-use std::any::{TypeId, Any};
+use std::any::{Any, TypeId};
 
 #[cfg(test)]
 mod dice_test {
@@ -12,8 +12,7 @@ mod dice_test {
     }
 
     #[test]
-    fn rolling_the_dice()
-    {
+    fn rolling_the_dice() {
         let mut dice = Dice::new();
         dice.roll();
         let value = dice.get_value();

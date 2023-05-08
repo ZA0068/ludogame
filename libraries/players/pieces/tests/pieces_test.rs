@@ -69,8 +69,7 @@ mod pieces_test {
     }
 
     #[test]
-    fn death_pieces_test()
-    {
+    fn death_pieces_test() {
         let mut piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
         piece.dead();

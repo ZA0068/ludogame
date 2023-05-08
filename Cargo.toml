@@ -9,6 +9,11 @@ members = [
     "libraries/players",
 ]
 
+[lib]
+name = "game"
+path = "src/game.rs"
+
 [dependencies]
 board = { path = "libraries/board" }
-dice = { path = "libraries/dice" }
+players = { path = "libraries/players" }
+yew = "0.20.0"

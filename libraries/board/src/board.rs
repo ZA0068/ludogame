@@ -1,7 +1,7 @@
 mod board {
     pub struct Board {
-        home: [i8; 16],
-        goal: [i8; 4],
+        home: i8,
+        goal: i8,
         outside: [i8; 52],
         inside: [i8; 20],
         globe: [i8; 8],
@@ -22,20 +22,20 @@ mod board {
                 .unwrap();
 
             Self {
-                home: [-1; 16],
-                goal: [99; 4],
+                home: -1,
+                goal: 99,
                 outside,
                 inside,
                 globe: [0, 8, 13, 21, 26, 34, 39, 47],
-                star: [5, 12, 18, 25, 31, 38, 44, 51],
+                star: [5, 11, 18, 25, 31, 38, 44, 51],
             }
         }
 
-        pub fn home(&self) -> [i8; 16] {
+        pub fn home(&self) -> i8 {
             self.home
         }
 
-        pub fn goal(&self) -> [i8; 4] {
+        pub fn goal(&self) -> i8 {
             self.goal
         }
 
