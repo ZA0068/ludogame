@@ -31,19 +31,19 @@ mod player_tests {
     fn get_piece_test() {
         let mut player = Player::new(0);
         let pieces = player.pieces();
-        assert_eq!(pieces[0].is_home(), true);
-        assert_eq!(pieces[1].is_home(), true);
-        assert_eq!(pieces[2].is_home(), true);
-        assert_eq!(pieces[3].is_home(), true);
-        assert_eq!(player.piece(0).is_safe(), true);
+        assert!(pieces[0].is_home());
+        assert!(pieces[1].is_home());
+        assert!(pieces[2].is_home());
+        assert!(pieces[3].is_home());
+        assert!(player.piece(0).is_safe());
     }
 
     #[test]
     fn free_piece_test() {
         let mut player = Player::new(0);
         player.free_piece(0);
-        assert_eq!(player.piece(0).is_home(), false);
-        assert_eq!(player.piece(0).is_safe(), true);
+        assert!(!player.piece(0).is_home());
+        assert!(player.piece(0).is_safe());
     }
 
     #[test]
@@ -91,10 +91,10 @@ mod move_piece_test {
         assert!(player.piece(0).is_safe());
 
         player.make_move(0, 5);
-        assert_eq!(player.piece(0).is_safe(), false);
+        assert!(!player.piece(0).is_safe());
 
         player.piece(0).set_position(50);
-        assert_eq!(player.piece(0).is_goal(), false);
+        assert!(!player.piece(0).is_goal());
 
         player.make_move(0, 1);
         assert_eq!(player.piece(0).position(), 52);
