@@ -21,7 +21,7 @@ mod players {
         pub fn new(id: i8) -> Player {
             Player {
                 id,
-                pieces: (0..4).map(|i| Piece::new(i)).collect(),
+                pieces: (0..4).map(Piece::new).collect(),
                 turn: false,
                 dice: Dice::new(),
                 board: Board::new(),
@@ -60,10 +60,10 @@ mod players {
         fn update_position(&mut self, id: i8, dice_number: i8) -> i8 {
             let initial_position = self.pieces[id as usize].position();
             let pos = initial_position + dice_number;
-            self.adjust_position(pos, dice_number)
+            self.adjust_position(pos)
         }
 
-        fn adjust_position(&mut self, pos: i8, dice: i8) -> i8 {
+        fn adjust_position(&mut self, pos: i8) -> i8 {
             let pos = match (pos, self.id) {
                 (51..=56, 0) => pos + 1,
                 _ => pos,
@@ -138,9 +138,7 @@ mod players {
                         self.piece(id).home();
                     } else if self.board.invincible()[self.id() as usize] == pos {
                         self.piece(id).dangerous();
-                    } else if self.board.globe().contains(&pos) {
-                        self.piece(id).safe();
-                    } else if self.board.inside().contains(&pos) {
+                    } else if self.board.globe().contains(&pos) || self.board.inside().contains(&pos) {
                         self.piece(id).safe();
                     } else if self.board.goal().contains(&pos) {
                         self.piece(id).goal();

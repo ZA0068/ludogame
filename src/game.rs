@@ -14,7 +14,7 @@ mod game {
             }
         }
 
-        pub fn new_with_players(players: u8) -> Game {
+        pub fn new_with_players(players: i8) -> Game {
             Game {
                 players: (0..players).map(|i| Player::new(i)).collect(),
                 board: Board::new(),

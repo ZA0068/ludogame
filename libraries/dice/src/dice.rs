@@ -22,6 +22,12 @@ mod dice {
             self.value
         }
     }
+
+impl Default for Dice {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 }
 
 pub use dice::Dice;
