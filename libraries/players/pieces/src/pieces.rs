@@ -15,7 +15,7 @@ mod pieces {
     impl Piece {
         pub fn new(id: u8) -> Piece {
             Piece {
-                id: id,
+                id,
                 state: State {
                     home: true,
                     goal: false,
