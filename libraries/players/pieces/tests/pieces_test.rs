@@ -8,10 +8,10 @@ mod pieces_test {
     fn creating_a_piece_test() {
         let piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
-        assert_eq!(piece.is_home(), true);
-        assert_eq!(piece.is_goal(), false);
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
         assert_eq!(piece.position(), -1);
     }
 
@@ -29,8 +29,8 @@ mod pieces_test {
         assert_eq!(piece.id(), 1);
         piece.free();
         assert_eq!(piece.position(), 0);
-        assert_eq!(piece.is_home(), false);
-        assert_eq!(piece.is_goal(), false);
+        assert!(!piece.is_home());
+        assert!(!piece.is_goal());
         assert_eq!(piece.is_safe(), true);
         assert_eq!(piece.is_dangerous(), false);
     }
