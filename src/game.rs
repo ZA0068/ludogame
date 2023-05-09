@@ -9,14 +9,14 @@ mod game {
     impl Game {
         pub fn new_default() -> Game {
             Game {
-                players: (0..4).map(|i| Player::new(i)).collect(),
+                players: (0..4).map(Player::new).collect(),
                 board: Board::new(),
             }
         }
 
         pub fn new_with_players(players: i8) -> Game {
             Game {
-                players: (0..players).map(|i| Player::new(i)).collect(),
+                players: (0..players).map(Player::new).collect(),
                 board: Board::new(),
             }
         }
@@ -36,7 +36,7 @@ mod game {
                 players.push(Player::new(3));
             }
             Game {
-                players: players,
+                players,
                 board: Board::new(),
             }
         }
