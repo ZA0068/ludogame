@@ -14,13 +14,13 @@ mod board_instantiation_test {
     #[test]
     fn board_home_spaces_test() {
         let board = Board::new();
-        assert_eq!(board.home(), -1);
+        assert_eq!(board.home(), [-1; 16]);
     }
 
     #[test]
     fn board_goal_spaces_test() {
         let board = Board::new();
-        assert_eq!(board.goal(), 99);
+        assert_eq!(board.goal(), [99; 4]);
     }
 
     #[test]
@@ -50,7 +50,13 @@ mod board_instantiation_test {
     #[test]
     fn board_globe_spaces_test() {
         let board = Board::new();
-        assert_eq!(board.globe(), [0, 8, 13, 21, 26, 34, 39, 47]);
+        assert_eq!(board.globe(), [8, 21, 34, 47]);
+    }
+
+    #[test]
+    fn invincible_test() {
+        let board = Board::new();
+        assert_eq!(board.invincible(), [0, 13, 26, 39]);
     }
 
     #[test]
