@@ -62,7 +62,7 @@ mod move_piece_test {
     fn move_piece_test() {
         let mut player = Player::new(0);
         player.free_piece(0);
-        assert_eq!(player.piece(0).is_home(), false);
+        assert!(!player.piece(0).is_home());
         assert_eq!(player.piece(0).position(), 0);
 
         player.make_move(0, 6);
@@ -85,7 +85,7 @@ mod move_piece_test {
         assert!(player.piece(0).is_dangerous());
 
         player.make_move(0, 6);
-        assert_eq!(player.piece(0).is_safe(), false);
+        assert!(!player.piece(0).is_safe());
 
         player.make_move(0, 2);
         assert!(player.piece(0).is_safe());
@@ -98,12 +98,12 @@ mod move_piece_test {
 
         player.make_move(0, 1);
         assert_eq!(player.piece(0).position(), 52);
-        assert_eq!(player.piece(0).is_safe(), true);
+        assert!(player.piece(0).is_safe());
 
         player.piece(0).set_position(45);
         player.make_move(0, 6);
         assert_eq!(player.piece(0).position(), 52);
-        assert_eq!(player.piece(0).is_safe(), true);
+        assert!(player.piece(0).is_safe());
 
         // assert!(player.piece(0).is_safe());
     }
@@ -122,7 +122,7 @@ mod move_piece_test {
                 player.update_piece_state(0);
                 player.make_move(0, i);
                 assert_eq!(player.piece(0).position(), 51 + i - j);
-                assert_eq!(player.piece(0).is_goal(), false)
+                assert!(!player.piece(0).is_goal())
             }
         }
     }
@@ -140,7 +140,7 @@ mod move_piece_test {
             player.update_piece_state(0);
             player.make_move(0, 7 - i);
             assert_eq!(player.piece(0).position(), 99);
-            assert_eq!(player.piece(0).is_goal(), true);
+            assert!(player.piece(0).is_goal());
         }
     }
 
@@ -158,7 +158,7 @@ mod move_piece_test {
                 assert_eq!(res, ans);
                 
                 let res = player.piece(0).is_goal();
-                assert_ne!(res, true);
+                assert!(!res);
             }
         }
     }
