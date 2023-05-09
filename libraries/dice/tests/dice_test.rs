@@ -16,6 +16,6 @@ mod dice_test {
         let mut dice = Dice::new();
         dice.roll();
         let value = dice.get_value();
-        assert!(value >= 1 && value <= 6);
+        assert!((1..=6).contains(&value));
     }
 }
