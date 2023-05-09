@@ -31,8 +31,8 @@ mod pieces_test {
         assert_eq!(piece.position(), 0);
         assert!(!piece.is_home());
         assert!(!piece.is_goal());
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
     }
 
     #[test]
@@ -40,10 +40,10 @@ mod pieces_test {
         let mut piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
         piece.dangerous();
-        assert_eq!(piece.is_home(), false);
-        assert_eq!(piece.is_goal(), false);
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), true);
+        assert!(!piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(piece.is_dangerous());
     }
 
     #[test]
@@ -51,10 +51,10 @@ mod pieces_test {
         let mut piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
         piece.not_safe();
-        assert_eq!(piece.is_home(), false);
-        assert_eq!(piece.is_goal(), false);
-        assert_eq!(piece.is_safe(), false);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(!piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(!piece.is_safe());
+        assert!(!piece.is_dangerous());
     }
 
     #[test]
@@ -62,10 +62,10 @@ mod pieces_test {
         let mut piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
         piece.safe();
-        assert_eq!(piece.is_home(), false);
-        assert_eq!(piece.is_goal(), false);
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(!piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
     }
 
     #[test]
@@ -74,10 +74,10 @@ mod pieces_test {
         assert_eq!(piece.id(), 1);
         piece.dead();
         assert_eq!(piece.position(), -1);
-        assert_eq!(piece.is_home(), true);
-        assert_eq!(piece.is_goal(), false);
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
     }
 
     #[test]
@@ -86,9 +86,9 @@ mod pieces_test {
         assert_eq!(piece.id(), 1);
         piece.goal();
         assert_eq!(piece.position(), 99);
-        assert_eq!(piece.is_home(), false);
-        assert_eq!(piece.is_goal(), true);
-        assert_eq!(piece.is_safe(), true);
-        assert_eq!(piece.is_dangerous(), false);
+        assert!(!piece.is_home());
+        assert!(piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
     }
 }
