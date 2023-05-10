@@ -108,8 +108,7 @@ mod move_piece_test {
     }
 
     #[test]
-    fn move_player_inside_globe_test()
-    {
+    fn move_player_inside_globe_test() {
         let mut player = Player::new(0);
         player.free_piece(0);
         player.piece(0).set_position(8);
@@ -133,6 +132,22 @@ mod move_piece_test {
                 player.make_move(0, i);
                 assert_eq!(player.piece(0).position(), 51 + i - j);
                 assert!(!player.piece(0).is_goal())
+            }
+        }
+    }
+
+    #[test]
+    fn navigate_inside_test()
+    {
+        let mut player = Player::new(0);
+
+        for i in 0..4 {
+            for j in 1..(5 - i)
+            {
+                player.piece(0).set_position(52 + i);
+                player.update_piece_state(0);
+                player.make_move(0, j);
+                assert_eq!(player.piece(0).position(), 52 + j + i);    
             }
         }
     }
@@ -181,15 +196,19 @@ mod move_piece_test {
         assert_eq!(player.piece(0).position(), 11);
 
         player.piece(0).set_position(17);
-        player.update_piece_state(0);
         player.make_move(0, 1);
         assert_eq!(player.piece(0).position(), 24);
 
+        player.piece(0).set_position(43);
+        player.make_move(0, 1);
+        assert_eq!(player.piece(0).position(), 50);
+        assert!(!player.piece(0).is_goal());
+
         player.piece(0).set_position(48);
-        player.update_piece_state(0);
         player.make_move(0, 2);
         assert_eq!(player.piece(0).position(), 99);
         assert!(player.piece(0).is_goal());
+
     }
 }
 
@@ -294,5 +313,152 @@ mod multipiece_test {
 
     }
 
+    #[test]
+    fn all_pieces_in_goal_test() {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        player.piece(0).set_position(99);
+        player.piece(1).set_position(99);
+        player.piece(2).set_position(99);
+        player.piece(3).set_position(99);
+
+        player.update_piece_state(0);
+        player.update_piece_state(1);
+        player.update_piece_state(2);
+        player.update_piece_state(3);
+
+        assert!(player.piece(0).is_goal());
+        assert!(player.piece(1).is_goal());
+        assert!(player.piece(2).is_goal());
+        assert!(player.piece(3).is_goal());
+
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    fn all_pieces_in_goal_test_part_2() 
+    {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        player.piece(0).set_position(52);
+        player.piece(1).set_position(52);
+        player.piece(2).set_position(52);
+        player.piece(3).set_position(52);
+
+        player.make_move(0, 5);
+        player.make_move(1, 5);
+        player.make_move(2, 5);
+        player.make_move(3, 5);
+
+        assert!(player.piece(0).is_goal());
+        assert!(player.piece(1).is_goal());
+        assert!(player.piece(2).is_goal());
+        assert!(player.piece(3).is_goal());
+
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    fn all_pieces_in_goal_test_part_3() {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        player.piece(0).set_position(49);
+        player.piece(1).set_position(49);
+        player.piece(2).set_position(49);
+        player.piece(3).set_position(49);
+
+        player.make_move(0, 1);
+        player.make_move(1, 1);
+        player.make_move(2, 1);
+        player.make_move(3, 1);
+
+        assert!(player.piece(0).is_goal());
+        assert!(player.piece(1).is_goal());
+        assert!(player.piece(2).is_goal());
+        assert!(player.piece(3).is_goal());
+
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    fn single_player_test() {
+        let mut player = Player::new(0);
+        while !player.is_finished() {
+            let dice = player.roll_dice();
+            println!("Dice hit : {}", dice);
+            let piece_id = player.choose_piece();
+            println!("Chosen piece: {}\n", piece_id);
+            player.make_move(piece_id, dice);
+            println!("Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n", 
+                player.piece(0).position(), 
+                player.piece(1).position(), 
+                player.piece(2).position(), 
+                player.piece(3).position()
+            );
+
+        }
+    }
 }
 
+mod multiplayer_test {
+    use super::*;
+    
+    #[test]
+    fn two_players_free_test() {
+        let mut player1 = Player::new(0);
+        let mut player2 = Player::new(1);
+
+        player1.free_piece(0);
+        player2.free_piece(0);
+
+        assert_eq!(player1.piece(0).position(), 0);
+        assert_eq!(player2.piece(0).position(), 13);
+    }
+
+    #[test]
+    fn all_players_free_test() {
+        let mut player1 = Player::new(0);
+        let mut player2 = Player::new(1);
+        let mut player3 = Player::new(2);
+        let mut player4 = Player::new(3);
+
+        player1.free_piece(0);
+        player2.free_piece(0);
+        player3.free_piece(0);
+        player4.free_piece(0);
+
+        assert_eq!(player1.piece(0).position(), 0);
+        assert_eq!(player2.piece(0).position(), 13);
+        assert_eq!(player3.piece(0).position(), 26);
+        assert_eq!(player4.piece(0).position(), 39);
+    }
+
+    #[test]
+    fn two_players_move_test() {
+        let mut player1 = Player::new(0);
+        let mut player2 = Player::new(1);
+
+        player1.free_piece(0);
+        player2.free_piece(0);
+
+        player1.make_move(0, 6);
+        player2.make_move(0, 6);
+
+        assert_eq!(player1.piece(0).position(), 6);
+        assert_eq!(player2.piece(0).position(), 19);
+    }
+
+
+}

@@ -62,21 +62,33 @@ mod players {
         fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
             let initial_position = self.pieces[piece_id as usize].position();
             let pos = initial_position + dice_number;
-            let pos = self.enter_inside(pos);
+            let pos = self.enter_inside(pos, initial_position);
             self.starjump(pos)
         }
 
-        fn enter_inside(&mut self, pos: i8) -> i8 {
-            let pos = match (pos, self.id) {
-                (51..=56, 0) => pos + 1,
-                _ => pos,
-            };
-            let pos = match (pos, self.id) {
-                (57, 0) => 99,
-                _ => pos,
-            };
+        fn enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
+            let pos = self.adjust_pos_when_enter_inside(pos, initial_position);
+            let pos = self.adjust_pos_when_entering_goal(pos);
+            self.go_back_when_overshoot(pos)
+        }
+
+        fn go_back_when_overshoot(&mut self, pos: i8) -> i8 {
             match (pos, self.id) {
                 (58..=62, 0) => 52 + (62 - pos),
+                _ => pos,
+            }
+        }
+
+        fn adjust_pos_when_entering_goal(&mut self, pos: i8) -> i8 {
+             match (pos, self.id) {
+                (57, 0) => 99,
+                _ => pos,
+            }
+        }
+
+        fn adjust_pos_when_enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
+             match (pos, initial_position, self.id) {
+                (51..=56, 0..=51 , 0) => pos + 1,
                 _ => pos,
             }
         }
@@ -97,7 +109,13 @@ mod players {
         }
 
         pub fn free_piece(&mut self, piece_id: i8) {
-            self.pieces[piece_id as usize].free();
+            match self.id() {
+                0 => self.piece(piece_id).free(),
+                1 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(13)},
+                2 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(26)},
+                3 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(39)},
+                _ => panic!("invalid move!"),
+            }
         }
 
         pub fn roll_dice(&mut self) -> i8 {
@@ -118,6 +136,9 @@ mod players {
         }
 
         pub fn valid_moves(&self, piece_id: i8, dice: i8) -> Act {
+            if piece_id == -1 {
+                return Act::Nothing;
+            }
             match (
                 self.pieces[piece_id as usize].is_goal(),
                 self.pieces[piece_id as usize].is_home(),
@@ -134,13 +155,17 @@ mod players {
             let mut available_pieces = vec![];
 
             for i in 0..4 {
-                if !self.pieces[i as usize].is_goal() {
+                let piece = self.piece(i);
+                let not_in_goal = !piece.is_goal();
+                let not_in_home_or_can_leave = !(piece.is_home() && self.dice.get_value() != 6);
+                if not_in_goal && not_in_home_or_can_leave
+                {
                     available_pieces.push(i);
                 }
             }
 
             if available_pieces.is_empty() {
-                return 0; // Return 0 as a default value if no piece is available
+                return -1; // Return 0 as a default value if no piece is available
             }
 
             let mut rng = rand::thread_rng();
@@ -174,7 +199,7 @@ mod players {
             }
         }
 
-        pub fn is_winner(&self) -> bool {
+        pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|p| p.is_goal())
         }
 
@@ -187,12 +212,18 @@ mod players {
             let mut position_map: HashMap<i8, i8> = HashMap::new();
             for i in 0..4 {
                 let pos = self.piece(i).position();
+                if pos == -1 || pos == 99 {
+                    continue;
+                }
                 let count = position_map.entry(pos).or_insert(0);
                 *count += 1;
             }
         
             for i in 0..4 {
                 let pos = self.piece(i).position();
+                if pos == -1 || pos == 99 {
+                    continue;
+                }
                 match position_map.get(&pos) {
                     Some(&count) if count > 1 => self.piece(i).dangerous(),
                     _ => self.piece(i).not_safe(),
