@@ -60,7 +60,7 @@ mod players {
         }
 
         fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
-            let initial_position = self.pieces[piece_id as usize].position();
+            let initial_position = self.piece(piece_id).position();
             let pos = initial_position + dice_number;
             let pos = self.enter_inside(pos, initial_position);
             self.starjump(pos)
@@ -69,7 +69,15 @@ mod players {
         fn enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
             let pos = self.adjust_pos_when_enter_inside(pos, initial_position);
             let pos = self.adjust_pos_when_entering_goal(pos);
+            let pos = self.adjust_pos_for_multiplayers(pos);
             self.go_back_when_overshoot(pos)
+        }
+
+        fn adjust_pos_for_multiplayers(&mut self, pos: i8) -> i8 {
+            match (pos, self.id) {
+                (52..=56, 1..=3) => pos - 52,
+                _ => pos,
+            }
         }
 
         fn go_back_when_overshoot(&mut self, pos: i8) -> i8 {

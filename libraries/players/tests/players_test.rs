@@ -460,5 +460,68 @@ mod multiplayer_test {
         assert_eq!(player2.piece(0).position(), 19);
     }
 
+    #[test]
+    fn all_players_move_test() {
+        let mut player1 = Player::new(0);
+        let mut player2 = Player::new(1);
+        let mut player3 = Player::new(2);
+        let mut player4 = Player::new(3);
 
+        player1.free_piece(0);
+        player2.free_piece(0);
+        player3.free_piece(0);
+        player4.free_piece(0);
+
+        player1.make_move(0, 6);
+        player2.make_move(0, 6);
+        player3.make_move(0, 6);
+        player4.make_move(0, 6);
+
+        assert_eq!(player1.piece(0).position(), 6);
+        assert_eq!(player2.piece(0).position(), 19);
+        assert_eq!(player3.piece(0).position(), 32);
+        assert_eq!(player4.piece(0).position(), 45);
+    }
+
+    #[test]
+    fn other_player_circumvent_player_1() {
+        let mut player2 = Player::new(1);
+
+        player2.free_piece(0);
+        player2.piece(0).set_position(50);
+        player2.make_move(0, 1);
+        assert_eq!(player2.piece(0).position(), 51);
+
+        player2.piece(0).set_position(50);
+        player2.make_move(0, 6);
+        assert_eq!(player2.piece(0).position(), 4);
+
+        
+        let mut player3 = Player::new(2);
+
+        player3.free_piece(0);
+        player3.piece(0).set_position(50);
+        player3.make_move(0, 1);
+        assert_eq!(player3.piece(0).position(), 51);
+        
+        player3.piece(0).set_position(50);
+        player3.make_move(0, 6);
+        assert_eq!(player3.piece(0).position(), 4);
+        
+
+        let mut player4 = Player::new(3);
+
+        player4.free_piece(0);
+        player4.piece(0).set_position(50);
+        player4.make_move(0, 1);
+        assert_eq!(player4.piece(0).position(), 51);
+        
+        player4.piece(0).set_position(50);
+        player4.make_move(0, 6);
+        assert_eq!(player4.piece(0).position(), 4);
+
+
+    }
+
+    
 }
