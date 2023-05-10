@@ -60,10 +60,11 @@ mod players {
         fn update_position(&mut self, id: i8, dice_number: i8) -> i8 {
             let initial_position = self.pieces[id as usize].position();
             let pos = initial_position + dice_number;
-            self.adjust_position(pos)
+            let pos = self.enter_inside(pos);
+            self.starjump(pos)
         }
 
-        fn adjust_position(&mut self, pos: i8) -> i8 {
+        fn enter_inside(&mut self, pos: i8) -> i8 {
             let pos = match (pos, self.id) {
                 (51..=56, 0) => pos + 1,
                 _ => pos,
@@ -74,6 +75,21 @@ mod players {
             };
             match (pos, self.id) {
                 (58..=62, 0) => 52 + (62 - pos),
+                _ => pos,
+            }
+        }
+
+        fn starjump(&mut self, pos: i8) -> i8 {
+            let goal_positions = [(50, 0), (11, 1), (24, 2), (37, 3)];
+            let star_positions = self.board.star();
+            let next_star = |pos| {
+                let pos_index = star_positions.iter().position(|&r| r == pos).unwrap();
+                star_positions[(pos_index + 1) % star_positions.len()]
+            };
+            
+            match pos {
+                pos if goal_positions.contains(&(pos, self.id)) => 99,
+                pos if star_positions.contains(&pos) => next_star(pos),
                 _ => pos,
             }
         }
@@ -136,9 +152,11 @@ mod players {
                 -1..=99 => {
                     if self.board.home().contains(&pos) {
                         self.piece(id).home();
-                    } else if self.board.invincible()[self.id() as usize] == pos {
+                    } else if self.board.invincible()[self.id() as usize] == pos
+                        || self.board.globe().contains(&pos)
+                    {
                         self.piece(id).dangerous();
-                    } else if self.board.globe().contains(&pos) || self.board.inside().contains(&pos) {
+                    } else if self.board.inside().contains(&pos) {
                         self.piece(id).safe();
                     } else if self.board.goal().contains(&pos) {
                         self.piece(id).goal();

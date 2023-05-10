@@ -156,10 +156,29 @@ mod move_piece_test {
                 let res = player.piece(0).position();
                 let ans = 56 - i + 2 + j;
                 assert_eq!(res, ans);
-                
+
                 let res = player.piece(0).is_goal();
                 assert!(!res);
             }
         }
+    }
+
+    #[test]
+    fn jump_to_star_test() {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.make_move(0, 5);
+        assert_eq!(player.piece(0).position(), 11);
+
+        player.piece(0).set_position(17);
+        player.update_piece_state(0);
+        player.make_move(0, 1);
+        assert_eq!(player.piece(0).position(), 24);
+
+        player.piece(0).set_position(48);
+        player.update_piece_state(0);
+        player.make_move(0, 2);
+        assert_eq!(player.piece(0).position(), 99);
+        assert!(player.piece(0).is_goal());
     }
 }

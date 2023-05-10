@@ -62,6 +62,6 @@ mod board_instantiation_test {
     #[test]
     fn board_star_spaces_test() {
         let board = Board::new();
-        assert_eq!(board.star(), [5, 11, 18, 25, 31, 38, 44, 51]);
+        assert_eq!(board.star(), [5, 11, 18, 24, 31, 37, 44, 50]);
     }
 }
