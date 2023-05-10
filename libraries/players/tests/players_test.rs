@@ -105,7 +105,17 @@ mod move_piece_test {
         assert_eq!(player.piece(0).position(), 52);
         assert!(player.piece(0).is_safe());
 
-        // assert!(player.piece(0).is_safe());
+    }
+
+    #[test]
+    fn move_player_inside_globe_test()
+    {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.piece(0).set_position(8);
+        player.update_piece_state(0);
+        assert!(player.piece(0).is_safe());
+        assert!(player.piece(0).is_dangerous());
     }
 
     #[test]
@@ -182,3 +192,107 @@ mod move_piece_test {
         assert!(player.piece(0).is_goal());
     }
 }
+
+mod multipiece_test {
+    use super::*;
+
+    #[test]
+    fn free_pieces_test() {
+        let mut player = Player::new(0);
+        for piece_id in 0..4 { // Assuming you have 4 pieces per player
+            let mut dice = player.roll_dice();
+            while dice != 6 {
+                dice = player.roll_dice();
+            }
+            player.free_piece(piece_id);
+            assert!(!player.piece(piece_id).is_home());
+            assert!(player.piece(piece_id).is_safe());
+        }
+    }
+
+    #[test]
+    fn two_piece_at_same_test() {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.free_piece(1);
+
+        player.make_move(0, 6);
+        player.make_move(1, 6);
+
+        assert_eq!(player.piece(0).position(), 6);
+        assert_eq!(player.piece(1).position(), 6);
+        assert!(player.piece(0).is_dangerous());
+        assert!(player.piece(1).is_dangerous());
+        assert!(player.piece(0).is_safe());
+        assert!(player.piece(1).is_safe());
+
+        player.make_move(0, 1);
+        assert_eq!(player.piece(0).position(), 7);
+        assert!(!player.piece(0).is_safe());
+        assert!(!player.piece(1).is_safe());
+        assert!(!player.piece(0).is_dangerous());
+        assert!(!player.piece(1).is_dangerous());
+
+    }
+
+    #[test]
+    fn all_pieces_at_same_place_test() {
+        let mut player = Player::new(0);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        player.make_move(0, 6);
+        player.make_move(1, 6);
+        player.make_move(2, 6);
+        player.make_move(3, 6);
+
+        assert_eq!(player.piece(0).position(), 6);
+        assert_eq!(player.piece(1).position(), 6);
+        assert_eq!(player.piece(2).position(), 6);
+        assert_eq!(player.piece(3).position(), 6);
+
+        assert!(player.piece(0).is_safe());
+        assert!(player.piece(1).is_safe());
+        assert!(player.piece(2).is_safe());
+        assert!(player.piece(3).is_safe());
+
+        assert!(player.piece(0).is_dangerous());
+        assert!(player.piece(1).is_dangerous());
+        assert!(player.piece(2).is_dangerous());
+        assert!(player.piece(3).is_dangerous());
+
+        player.make_move(0, 1);
+        assert_eq!(player.piece(0).position(), 7);
+        assert!(!player.piece(0).is_safe());
+        assert!(!player.piece(0).is_dangerous());
+
+        assert!(player.piece(1).is_safe());
+        assert!(player.piece(2).is_safe());
+        assert!(player.piece(3).is_safe());
+        assert!(player.piece(1).is_dangerous());
+        assert!(player.piece(2).is_dangerous());
+        assert!(player.piece(3).is_dangerous());
+
+        player.make_move(1, 3);
+        assert_eq!(player.piece(1).position(), 9);
+        assert!(!player.piece(1).is_safe());
+        assert!(!player.piece(1).is_dangerous());
+
+        assert!(player.piece(2).is_safe());
+        assert!(player.piece(3).is_safe());
+        assert!(player.piece(2).is_dangerous());
+        assert!(player.piece(3).is_dangerous());
+
+        player.make_move(2, 4);
+        assert_eq!(player.piece(2).position(), 10);
+        assert!(!player.piece(2).is_safe());
+        assert!(!player.piece(2).is_dangerous());
+        assert!(!player.piece(3).is_safe());
+        assert!(!player.piece(3).is_dangerous());
+
+    }
+
+}
+

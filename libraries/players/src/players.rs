@@ -1,4 +1,6 @@
 mod players {
+    use std::collections::HashMap;
+
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
@@ -40,25 +42,25 @@ mod players {
             &mut self.pieces
         }
 
-        pub fn make_move(&mut self, id: i8, dice_number: i8) {
-            match self.valid_moves(id, dice_number) {
+        pub fn make_move(&mut self, piece_id: i8, dice_number: i8) {
+            match self.valid_moves(piece_id, dice_number) {
                 Act::Move => {
-                    self.move_piece(id, dice_number);
+                    self.move_piece(piece_id, dice_number);
                 }
                 Act::Free => {
-                    self.free_piece(id);
+                    self.free_piece(piece_id);
                 }
                 Act::Nothing => (),
             }
         }
 
-        fn move_piece(&mut self, id: i8, dice_number: i8) {
-            let position = self.update_position(id, dice_number);
-            self.update_piece(id, position);
+        fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
+            let position = self.update_position(piece_id, dice_number);
+            self.update_piece(piece_id, position);
         }
 
-        fn update_position(&mut self, id: i8, dice_number: i8) -> i8 {
-            let initial_position = self.pieces[id as usize].position();
+        fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
+            let initial_position = self.pieces[piece_id as usize].position();
             let pos = initial_position + dice_number;
             let pos = self.enter_inside(pos);
             self.starjump(pos)
@@ -86,7 +88,7 @@ mod players {
                 let pos_index = star_positions.iter().position(|&r| r == pos).unwrap();
                 star_positions[(pos_index + 1) % star_positions.len()]
             };
-            
+
             match pos {
                 pos if goal_positions.contains(&(pos, self.id)) => 99,
                 pos if star_positions.contains(&pos) => next_star(pos),
@@ -94,8 +96,8 @@ mod players {
             }
         }
 
-        pub fn free_piece(&mut self, id: i8) {
-            self.pieces[id as usize].free();
+        pub fn free_piece(&mut self, piece_id: i8) {
+            self.pieces[piece_id as usize].free();
         }
 
         pub fn roll_dice(&mut self) -> i8 {
@@ -115,10 +117,10 @@ mod players {
             self.turn = self.dice.get_value() == 6;
         }
 
-        pub fn valid_moves(&self, id: i8, dice: i8) -> Act {
+        pub fn valid_moves(&self, piece_id: i8, dice: i8) -> Act {
             match (
-                self.pieces[id as usize].is_goal(),
-                self.pieces[id as usize].is_home(),
+                self.pieces[piece_id as usize].is_goal(),
+                self.pieces[piece_id as usize].is_home(),
                 dice,
             ) {
                 (true, _, _) | (_, true, 1..=5) => Act::Nothing,
@@ -146,33 +148,28 @@ mod players {
             available_pieces[index]
         }
 
-        pub fn update_piece_state(&mut self, id: i8) {
-            let pos = self.piece(id).position();
-            match pos {
-                -1..=99 => {
-                    if self.board.home().contains(&pos) {
-                        self.piece(id).home();
-                    } else if self.board.invincible()[self.id() as usize] == pos
-                        || self.board.globe().contains(&pos)
-                    {
-                        self.piece(id).dangerous();
-                    } else if self.board.inside().contains(&pos) {
-                        self.piece(id).safe();
-                    } else if self.board.goal().contains(&pos) {
-                        self.piece(id).goal();
-                    } else {
-                        self.piece(id).not_safe();
-                    }
-                }
-                _ => panic!("Invalid position"),
+        pub fn update_piece_state(&mut self, piece_id: i8) {
+            let pos = self.piece(piece_id).position();
+            if self.board.home().contains(&pos) {
+                self.piece(piece_id).home();
+            } else if self.board.invincible()[self.id() as usize] == pos
+            || self.board.globe().contains(&pos)
+            {
+                self.piece(piece_id).dangerous();
+            } else if self.board.inside().contains(&pos) {
+                self.piece(piece_id).safe();
+            } else if self.board.goal().contains(&pos) {
+                self.piece(piece_id).goal();
+            } else {
+                self.check_sharing_square();
             }
         }
 
         pub fn play_random(&mut self) {
             while self.is_player_turn() {
                 let dice = self.roll_dice();
-                let id = self.choose_piece();
-                self.make_move(id, dice);
+                let piece_id = self.choose_piece();
+                self.make_move(piece_id, dice);
                 self.can_continue();
             }
         }
@@ -181,10 +178,28 @@ mod players {
             self.pieces.iter().all(|p| p.is_goal())
         }
 
-        fn update_piece(&mut self, id: i8, pos: i8) {
-            self.piece(id).set_position(pos);
-            self.update_piece_state(id);
+        fn update_piece(&mut self, piece_id: i8, pos: i8) {
+            self.piece(piece_id).set_position(pos);
+            self.update_piece_state(piece_id);
         }
+
+        fn check_sharing_square(&mut self) {
+            let mut position_map: HashMap<i8, i8> = HashMap::new();
+            for i in 0..4 {
+                let pos = self.piece(i).position();
+                let count = position_map.entry(pos).or_insert(0);
+                *count += 1;
+            }
+        
+            for i in 0..4 {
+                let pos = self.piece(i).position();
+                match position_map.get(&pos) {
+                    Some(&count) if count > 1 => self.piece(i).dangerous(),
+                    _ => self.piece(i).not_safe(),
+                }
+            }
+        }        
+  
     }
 }
 
