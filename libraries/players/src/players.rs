@@ -12,10 +12,12 @@ mod players {
         turn: bool,
         dice: Dice,
         board: Board,
+        opponents: HashMap<i8, Player>,
     }
     pub enum Act {
         Move,
         Free,
+        Kill,
         Nothing,
     }
 
@@ -27,6 +29,7 @@ mod players {
                 turn: false,
                 dice: Dice::new(),
                 board: Board::new(),
+                opponents: HashMap::new(),
             }
         }
 
@@ -34,8 +37,8 @@ mod players {
             self.id
         }
 
-        pub fn piece(&mut self, id: i8) -> &mut Piece {
-            &mut self.pieces[id as usize]
+        pub fn piece(&mut self, piece_id: i8) -> &mut Piece {
+            &mut self.pieces[piece_id as usize]
         }
 
         pub fn pieces(&mut self) -> &mut Vec<Piece> {
@@ -50,8 +53,15 @@ mod players {
                 Act::Free => {
                     self.free_piece(piece_id);
                 }
+                Act::Kill => {
+                    self.kill_piece(self.opponents);
+                }
                 Act::Nothing => (),
             }
+        }
+
+        pub fn kill_piece(&mut self, piece_id: &i8) {
+            self.piece(piece_id).kill();
         }
 
         fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -143,13 +153,13 @@ mod players {
             self.turn = self.dice.get_value() == 6;
         }
 
-        pub fn valid_moves(&self, piece_id: i8, dice: i8) -> Act {
+        pub fn valid_moves(&mut self, piece_id: i8, dice: i8) -> Act {
             if piece_id == -1 {
                 return Act::Nothing;
             }
             match (
-                self.pieces[piece_id as usize].is_goal(),
-                self.pieces[piece_id as usize].is_home(),
+                self.piece(piece_id).is_goal(),
+                self.piece(piece_id).is_home(),
                 dice,
             ) {
                 (true, _, _) | (_, true, 1..=5) => Act::Nothing,

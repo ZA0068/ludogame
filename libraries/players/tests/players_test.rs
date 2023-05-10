@@ -523,5 +523,24 @@ mod multiplayer_test {
 
     }
 
-    
+    #[test]
+    fn two_player_kill_test() {
+        let mut player1 = Player::new(0);
+        let mut player2 = Player::new(1);
+
+        player1.free_piece(0);
+        player2.free_piece(0);
+
+        player1.piece(0).set_position(6);
+        player2.piece(0).set_position(5);
+
+        player1.make_move(0, 3);
+        player2.make_move(0, 4);
+
+        assert_eq!(player1.piece(0).position(), -1);
+        assert!(player1.piece(0).is_home());
+
+        assert_eq!(player2.piece(0).position(), 9);
+    }
+
 }
