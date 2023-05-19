@@ -50,6 +50,18 @@ mod board {
                 state,
             }
         }
+        pub fn set(
+            &mut self,
+            position: i8,
+            number_of_pieces: u8,
+            player_id: Option<PlayerID>,
+            state: State,
+        ) {
+            self.position = position;
+            self.number_of_pieces = number_of_pieces;
+            self.player_id = player_id;
+            self.state = state;
+        }
     }
 
     impl Default for BoardState {
@@ -58,24 +70,24 @@ mod board {
         }
     }
 
-    pub struct Board {
+    pub struct Board<'a> {
         pub home: [BoardState; 16],
         pub goal: [BoardState; 4],
         pub outside: [BoardState; 52],
         pub inside: [BoardState; 20],
-        pub globe: [BoardState; 4],
-        pub invincible: [BoardState; 4],
+        pub globe: Vec<&'a mut BoardState>,
+        pub invincible: Vec<&'a mut BoardState>,
         pub star: [BoardState; 8],
     }
 
-    impl Board {
+    impl Board<'a> {
         pub fn new() -> Self {
             let home = Self::initialize_home();
             let goal = Self::initialize_goal();
-            let outside = Self::initialize_outside();
+            let mut outside = Self::initialize_outside();
             let inside = Self::initialize_inside();
-            let globe = Self::initialize_globe();
-            let invincible = Self::initialize_invincible();
+            let globe = Self::initialize_globe(&mut outside);
+            let invincible = Self::initialize_invincible(&mut outside);
 
             Self {
                 home,
@@ -128,103 +140,106 @@ mod board {
         fn initialize_inside() -> [BoardState; 20] {
             let mut inside = [BoardState::new(); 20];
             (0..20).for_each(|position| {
-                inside[position] = BoardState::create((position + 52) as i8, 0, None, State::Inside);
+                inside[position] =
+                    BoardState::create((position + 52) as i8, 0, None, State::Inside);
             });
             inside
         }
 
-        fn initialize_globe() -> [BoardState; 4] {
-            let globes = [0, 13, 26, 39];
-            let mut globe = [BoardState::new(); 4];
+        fn initialize_globe(outside: &mut [BoardState; 52]) -> Vec<&mut BoardState> {
+            let globes = [8, 21, 34, 47];
+            let mut globe_states = Vec::new();
 
-            for (i, &position) in globes.iter().enumerate() {
-                globe[i] = BoardState::create(position as i8, 0, None, State::Invincible);
+            for &position in globes.iter() {
+                let board_state = &mut outside[position];
+                board_state.set(position as i8, 0, None, State::Globe);
+                globe_states.push(board_state);
             }
-            globe
+            globe_states
         }
 
-        fn initialize_invincible() -> [BoardState; 4] {
-            let invincible_positions = [0, 13, 26, 39];
-            let mut invincible = [BoardState::new(); 4];
+        fn initialize_invincible(outside: &mut [BoardState; 52]) -> Vec<&mut BoardState> {
+            let invincibles = [0, 13, 26, 39];
+            let mut invincible_states = Vec::new();
 
-            for (i, &position) in invincible_positions.iter().enumerate() {
-                invincible[i] = BoardState::create(position as i8, 0, None, State::Invincible);
+            for &position in invincibles.iter() {
+                let board_state = &mut outside[position];
+                board_state.set(position as i8, 0, None, State::Invincible);
+                invincible_states.push(board_state);
             }
-
-            invincible
+            invincible_states
         }
 
-    //     pub fn home(&self) -> &[BoardState; 16] {
-    //         &self.home
-    //     }
+        pub fn home(&self) -> &[BoardState; 16] {
+            &self.home
+        }
 
-    //     pub fn goal(&self) -> &[BoardState; 4] {
-    //         &self.goal
-    //     }
+        pub fn goal(&self) -> &[BoardState; 4] {
+            &self.goal
+        }
 
-    //     pub fn outside(&self) -> &[BoardState; 52] {
-    //         &self.outside
-    //     }
+        pub fn outside(&self) -> &[BoardState; 52] {
+            &self.outside
+        }
 
-    //     pub fn inside(&self) -> &[BoardState; 20] {
-    //         &self.inside
-    //     }
+        pub fn inside(&self) -> &[BoardState; 20] {
+            &self.inside
+        }
 
-    //     pub fn globe(&self) -> &[BoardState; 4] {
-    //         &self.globe
-    //     }
+        pub fn globe(&self) -> &Vec<&mut BoardState> {
+            &self.globe
+        }
 
-    //     pub fn invincible(&self) -> &[BoardState; 4] {
-    //         &self.invincible
-    //     }
+        pub fn invincible(&self) -> &Vec<&mut BoardState> {
+            &self.invincible
+        }
 
-    //     pub fn star(&self) -> &[BoardState; 8] {
-    //         &self.star
-    //     }
+        //     pub fn star(&self) -> &[BoardState; 8] {
+        //         &self.star
+        //     }
 
-    //     pub fn update(&mut self, old_position: i8, new_position: i8, player_id: Option<PlayerID>) {
-    //         let old_pos_num = old_position as usize;
-    //         let new_pos_num = new_position as usize;
-    //         let player_id = player_id.unwrap();
+        //     pub fn update(&mut self, old_position: i8, new_position: i8, player_id: Option<PlayerID>) {
+        //         let old_pos_num = old_position as usize;
+        //         let new_pos_num = new_position as usize;
+        //         let player_id = player_id.unwrap();
 
-    //         match (old_pos_num)
-    //         {
-    //              => {
-    //                 self.home[0].number_of_pieces -= 1;
-    //                 self.home[0].player_id = None;
-    //             },
-    //             0..=51 => {
-    //                 self.outside[old_pos_num].number_of_pieces -= 1;
-    //                 self.outside[old_pos_num].player_id = None;
-    //             },
-    //         }
-    //         if self.outside[old_pos_num].number_of_pieces > 1
-    //         {
-    //             self.outside[old_pos_num].number_of_pieces -= 1;
-    //         }
-    //         self.outside[old_pos_num].player_id = None;
+        //         match (old_pos_num)
+        //         {
+        //              => {
+        //                 self.home[0].number_of_pieces -= 1;
+        //                 self.home[0].player_id = None;
+        //             },
+        //             0..=51 => {
+        //                 self.outside[old_pos_num].number_of_pieces -= 1;
+        //                 self.outside[old_pos_num].player_id = None;
+        //             },
+        //         }
+        //         if self.outside[old_pos_num].number_of_pieces > 1
+        //         {
+        //             self.outside[old_pos_num].number_of_pieces -= 1;
+        //         }
+        //         self.outside[old_pos_num].player_id = None;
 
-    //         self.outside[new_pos_num].number_of_pieces += 1;
-    //         self.outside[new_pos_num].player_id = Some(player_id);
+        //         self.outside[new_pos_num].number_of_pieces += 1;
+        //         self.outside[new_pos_num].player_id = Some(player_id);
 
+        //     }
 
-    //     }
+        // }
 
-    // }
-
-    // impl Default for Board {
-    //     fn default() -> Self {
-    //         Self::new()
-    //     }
+        // impl Default for Board {
+        //     fn default() -> Self {
+        //         Self::new()
+        //     }
     }
 
-impl Default for Board {
-    fn default() -> Self {
-        Self::new()
+    impl Default for Board {
+        fn default() -> Self {
+            Self::new()
+        }
     }
 }
-}
-
 pub use board::Board;
 pub use board::BoardState;
 pub use board::PlayerID;
+pub use board::State;

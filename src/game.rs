@@ -8,17 +8,11 @@ mod game {
 
     impl Game {
         pub fn new_default() -> Game {
-            Game {
-                players: (0..4).map(Player::new).collect(),
-                board: Board::new(),
-            }
+            Game((0..4).map(Player::new).collect(), Board::new())
         }
 
         pub fn new_with_players(players: i8) -> Game {
-            Game {
-                players: (0..players).map(Player::new).collect(),
-                board: Board::new(),
-            }
+            Game((0..players).map(Player::new).collect(), Board::new())
         }
 
         pub fn new_with_flags(player1: bool, player2: bool, player3: bool, player4: bool) -> Game {
@@ -35,10 +29,7 @@ mod game {
             if player4 {
                 players.push(Player::new(3));
             }
-            Game {
-                players,
-                board: Board::new(),
-            }
+            Game(players, Board::new())
         }
 
         pub fn player(&mut self, id: u8) -> &mut Player {

@@ -22,13 +22,7 @@ mod players {
 
     impl Player {
         pub fn new(id: i8) -> Player {
-            Player {
-                id,
-                pieces: (0..4).map(Piece::new).collect(),
-                turn: false,
-                dice: Dice::new(),
-                board: Board::new(),
-            }
+            Player(id, (0..4).map(Piece::new).collect(), false, Dice::new(), Board::new())
         }
 
         pub fn id(&self) -> i8 {
