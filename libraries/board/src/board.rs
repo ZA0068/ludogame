@@ -1,5 +1,4 @@
 mod board {
-
     #[derive(Copy, Clone, Debug, PartialEq)]
     pub enum PlayerID {
         Player0,
@@ -70,17 +69,17 @@ mod board {
         }
     }
 
-    pub struct Board<'a> {
+    pub struct Board {
         pub home: [BoardState; 16],
         pub goal: [BoardState; 4],
         pub outside: [BoardState; 52],
         pub inside: [BoardState; 20],
-        pub globe: Vec<&'a mut BoardState>,
-        pub invincible: Vec<&'a mut BoardState>,
-        pub star: [BoardState; 8],
+        pub globe: [usize; 4],
+        pub invincible: [usize; 4],
+        pub star: [usize; 8],
     }
 
-    impl Board<'a> {
+    impl Board {
         pub fn new() -> Self {
             let home = Self::initialize_home();
             let goal = Self::initialize_goal();
@@ -88,6 +87,7 @@ mod board {
             let inside = Self::initialize_inside();
             let globe = Self::initialize_globe(&mut outside);
             let invincible = Self::initialize_invincible(&mut outside);
+            let star = Self::initialize_star(&mut outside);
 
             Self {
                 home,
@@ -96,7 +96,7 @@ mod board {
                 inside,
                 globe,
                 invincible,
-                star: [BoardState::new(); 8],
+                star,
             }
         }
 
@@ -146,28 +146,28 @@ mod board {
             inside
         }
 
-        fn initialize_globe(outside: &mut [BoardState; 52]) -> Vec<&mut BoardState> {
+        fn initialize_globe(outside: &mut [BoardState; 52]) -> [usize; 4] {
             let globes = [8, 21, 34, 47];
-            let mut globe_states = Vec::new();
-
             for &position in globes.iter() {
-                let board_state = &mut outside[position];
-                board_state.set(position as i8, 0, None, State::Globe);
-                globe_states.push(board_state);
+                outside[position].set(position as i8, 0, None, State::Globe);
             }
-            globe_states
+            globes
         }
 
-        fn initialize_invincible(outside: &mut [BoardState; 52]) -> Vec<&mut BoardState> {
+        fn initialize_invincible(outside: &mut [BoardState; 52]) -> [usize; 4] {
             let invincibles = [0, 13, 26, 39];
-            let mut invincible_states = Vec::new();
-
             for &position in invincibles.iter() {
-                let board_state = &mut outside[position];
-                board_state.set(position as i8, 0, None, State::Invincible);
-                invincible_states.push(board_state);
+                outside[position].set(position as i8, 0, None, State::Invincible);
             }
-            invincible_states
+            invincibles
+        }
+
+        fn initialize_star(outside: &mut [BoardState; 52]) -> [usize; 8] {
+            let stars = [5, 11, 18, 24, 31, 37, 44, 50];
+            for &position in stars.iter() {
+                outside[position].set(position as i8, 0, None, State::Star);
+            }
+            stars
         }
 
         pub fn home(&self) -> &[BoardState; 16] {
@@ -186,51 +186,17 @@ mod board {
             &self.inside
         }
 
-        pub fn globe(&self) -> &Vec<&mut BoardState> {
-            &self.globe
+        pub fn globe(&self) -> Vec<&BoardState> {
+            self.globe.iter().map(|&i| &self.outside[i]).collect()
         }
 
-        pub fn invincible(&self) -> &Vec<&mut BoardState> {
-            &self.invincible
+        pub fn invincible(&self) -> Vec<&BoardState> {
+            self.invincible.iter().map(|&i| &self.outside[i]).collect()
         }
 
-        //     pub fn star(&self) -> &[BoardState; 8] {
-        //         &self.star
-        //     }
-
-        //     pub fn update(&mut self, old_position: i8, new_position: i8, player_id: Option<PlayerID>) {
-        //         let old_pos_num = old_position as usize;
-        //         let new_pos_num = new_position as usize;
-        //         let player_id = player_id.unwrap();
-
-        //         match (old_pos_num)
-        //         {
-        //              => {
-        //                 self.home[0].number_of_pieces -= 1;
-        //                 self.home[0].player_id = None;
-        //             },
-        //             0..=51 => {
-        //                 self.outside[old_pos_num].number_of_pieces -= 1;
-        //                 self.outside[old_pos_num].player_id = None;
-        //             },
-        //         }
-        //         if self.outside[old_pos_num].number_of_pieces > 1
-        //         {
-        //             self.outside[old_pos_num].number_of_pieces -= 1;
-        //         }
-        //         self.outside[old_pos_num].player_id = None;
-
-        //         self.outside[new_pos_num].number_of_pieces += 1;
-        //         self.outside[new_pos_num].player_id = Some(player_id);
-
-        //     }
-
-        // }
-
-        // impl Default for Board {
-        //     fn default() -> Self {
-        //         Self::new()
-        //     }
+        pub fn star(&self) -> Vec<&BoardState> {
+            self.star.iter().map(|&i| &self.outside[i]).collect()
+        }
     }
 
     impl Default for Board {
@@ -239,6 +205,7 @@ mod board {
         }
     }
 }
+
 pub use board::Board;
 pub use board::BoardState;
 pub use board::PlayerID;

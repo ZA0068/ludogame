@@ -129,12 +129,12 @@ mod tests {
         }
     }
 
-    // #[test]
-    // fn board_star_spaces_test() {
-    //     let board = Board::new();
-    //     for state in board.star().iter() {
-    //         assert_eq!(state.player_id, None);
-    //         assert_eq!(state.number_of_pieces, 0);
-    //     }
-    // }
+    #[test]
+    fn board_star_spaces_test() {
+        let board = Board::new();
+        for state in board.star().iter() {
+            assert_eq!(state.player_id, None);
+            assert_eq!(state.number_of_pieces, 0);
+        }
+    } 
 }
