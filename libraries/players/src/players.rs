@@ -12,7 +12,6 @@ mod players {
         turn: bool,
         dice: Dice,
         board: Board,
-        opponents: HashMap<i8, Player>,
     }
     pub enum Act {
         Move,
@@ -29,7 +28,6 @@ mod players {
                 turn: false,
                 dice: Dice::new(),
                 board: Board::new(),
-                opponents: HashMap::new(),
             }
         }
 
@@ -54,14 +52,15 @@ mod players {
                     self.free_piece(piece_id);
                 }
                 Act::Kill => {
-                    self.kill_piece(self.opponents);
+                    // self.kill_piece();
                 }
                 Act::Nothing => (),
             }
         }
 
-        pub fn kill_piece(&mut self, piece_id: &i8) {
-            self.piece(piece_id).kill();
+        pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8, opponents: &mut Player) {
+            opponents.piece(0).dead();
+            self.move_piece(piece_id, dice_number);
         }
 
         fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -98,15 +97,15 @@ mod players {
         }
 
         fn adjust_pos_when_entering_goal(&mut self, pos: i8) -> i8 {
-             match (pos, self.id) {
+            match (pos, self.id) {
                 (57, 0) => 99,
                 _ => pos,
             }
         }
 
         fn adjust_pos_when_enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
-             match (pos, initial_position, self.id) {
-                (51..=56, 0..=51 , 0) => pos + 1,
+            match (pos, initial_position, self.id) {
+                (51..=56, 0..=51, 0) => pos + 1,
                 _ => pos,
             }
         }
@@ -129,9 +128,18 @@ mod players {
         pub fn free_piece(&mut self, piece_id: i8) {
             match self.id() {
                 0 => self.piece(piece_id).free(),
-                1 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(13)},
-                2 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(26)},
-                3 => {self.piece(piece_id).free(); self.piece(piece_id).set_position(39)},
+                1 => {
+                    self.piece(piece_id).free();
+                    self.piece(piece_id).set_position(13)
+                }
+                2 => {
+                    self.piece(piece_id).free();
+                    self.piece(piece_id).set_position(26)
+                }
+                3 => {
+                    self.piece(piece_id).free();
+                    self.piece(piece_id).set_position(39)
+                }
                 _ => panic!("invalid move!"),
             }
         }
@@ -176,8 +184,7 @@ mod players {
                 let piece = self.piece(i);
                 let not_in_goal = !piece.is_goal();
                 let not_in_home_or_can_leave = !(piece.is_home() && self.dice.get_value() != 6);
-                if not_in_goal && not_in_home_or_can_leave
-                {
+                if not_in_goal && not_in_home_or_can_leave {
                     available_pieces.push(i);
                 }
             }
@@ -196,7 +203,7 @@ mod players {
             if self.board.home().contains(&pos) {
                 self.piece(piece_id).home();
             } else if self.board.invincible()[self.id() as usize] == pos
-            || self.board.globe().contains(&pos)
+                || self.board.globe().contains(&pos)
             {
                 self.piece(piece_id).dangerous();
             } else if self.board.inside().contains(&pos) {
@@ -236,7 +243,7 @@ mod players {
                 let count = position_map.entry(pos).or_insert(0);
                 *count += 1;
             }
-        
+
             for i in 0..4 {
                 let pos = self.piece(i).position();
                 if pos == -1 || pos == 99 {
@@ -247,8 +254,7 @@ mod players {
                     _ => self.piece(i).not_safe(),
                 }
             }
-        }        
-  
+        }
     }
 }
 

@@ -23,11 +23,11 @@ mod dice {
         }
     }
 
-impl Default for Dice {
-    fn default() -> Self {
-        Self::new()
+    impl Default for Dice {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-}
 }
 
 pub use dice::Dice;
