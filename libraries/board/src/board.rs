@@ -5,6 +5,7 @@ mod board {
         Player1,
         Player2,
         Player3,
+        None,
     }
 
     #[derive(Copy, Clone, Debug, PartialEq)]
@@ -196,6 +197,32 @@ mod board {
 
         pub fn star(&self) -> Vec<&BoardState> {
             self.star.iter().map(|&i| &self.outside[i]).collect()
+        }
+
+        pub fn update(&mut self, board_state: &BoardState) {
+            match board_state.state {
+                State::Home => {
+                    self.home[board_state.position as usize] = *board_state;
+                }
+                State::Goal => {
+                    self.goal[board_state.position as usize] = *board_state;
+                }
+                State::Outside => {
+                    self.outside[board_state.position as usize] = *board_state;
+                }
+                State::Inside => {
+                    self.inside[board_state.position as usize] = *board_state;
+                }
+                State::Globe => {
+                    self.outside[board_state.position as usize] = *board_state;
+                }
+                State::Invincible => {
+                    self.outside[board_state.position as usize] = *board_state;
+                }
+                State::Star => {
+                    self.outside[board_state.position as usize] = *board_state;
+                }
+            }
         }
     }
 

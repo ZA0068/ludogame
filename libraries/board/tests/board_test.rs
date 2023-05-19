@@ -1,8 +1,8 @@
 use board::{Board, BoardState, PlayerID, State};
+use std::any::{Any, TypeId};
 
 #[cfg(test)]
-mod tests {
-    use std::any::{Any, TypeId};
+mod board_tests {
 
     use super::*;
 
@@ -137,4 +137,16 @@ mod tests {
             assert_eq!(state.number_of_pieces, 0);
         }
     } 
+}
+
+#[cfg(test)]
+mod board_tests_2 {
+    use super::*;
+
+    #[test]
+    fn update_test()
+    {
+        let mut board = Board::new();
+        board.update(board.star()[0]);
+    }
 }
