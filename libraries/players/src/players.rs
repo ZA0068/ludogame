@@ -20,8 +20,8 @@ mod players {
         Nothing,
     }
 
-    impl Player {
-        pub fn new<'a>(id: i8, board: &'a Board) -> Player<'a> {
+    impl<'a> Player<'a> {
+        pub fn new(id: i8, board: &'a Board) -> Player<'a> {
             let mut pieces = vec![];
             for i in 0..4 {
                 pieces.push(Piece::new(i));
@@ -45,6 +45,10 @@ mod players {
 
         pub fn pieces(&mut self) -> &mut Vec<Piece> {
             &mut self.pieces
+        }
+
+        pub fn board(&self) -> &Board {
+            self.board
         }
 
         pub fn make_move(&mut self, piece_id: i8, dice_number: i8) {

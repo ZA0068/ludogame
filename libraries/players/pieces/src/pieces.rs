@@ -1,5 +1,4 @@
 mod pieces {
-
     pub struct State {
         position: i8,
         home: bool,
@@ -7,6 +6,7 @@ mod pieces {
         dangerous: bool,
         goal: bool,
     }
+
     pub struct Piece {
         id: u8,
         state: State,

@@ -18,7 +18,8 @@ mod board {
         Star,
     }
 
-    #[derive(Copy, Clone)]
+    #[derive(Copy, Clone, Debug, PartialEq)]
+
     pub struct BoardState {
         pub position: i8,
         pub number_of_pieces: u8,
@@ -73,6 +74,7 @@ mod board {
         }
     }
 
+    #[derive(Copy, Clone, Debug, PartialEq)]
     pub struct Board {
         pub home: [BoardState; 4],
         pub goal: [BoardState; 4],

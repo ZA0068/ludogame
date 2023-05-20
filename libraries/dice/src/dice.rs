@@ -2,6 +2,7 @@ mod dice {
     use rand::distributions::Uniform;
     use rand::Rng;
 
+
     pub struct Dice {
         value: u8,
         dist: Uniform<u8>,
