@@ -6,12 +6,12 @@ mod players {
     use pieces::Piece;
     use rand::Rng;
 
-    pub struct Player {
+    pub struct Player<'a> {
         id: i8,
         pieces: Vec<Piece>,
         turn: bool,
         dice: Dice,
-        board: Board,
+        board: &'a Board,
     }
     pub enum Act {
         Move,
@@ -21,8 +21,18 @@ mod players {
     }
 
     impl Player {
-        pub fn new(id: i8) -> Player {
-            Player(id, (0..4).map(Piece::new).collect(), false, Dice::new(), Board::new())
+        pub fn new<'a>(id: i8, board: &'a Board) -> Player<'a> {
+            let mut pieces = vec![];
+            for i in 0..4 {
+                pieces.push(Piece::new(i));
+            }
+            Player {
+                id,
+                pieces,
+                turn: false,
+                dice: Dice::new(),
+                board,
+            }
         }
 
         pub fn id(&self) -> i8 {
@@ -58,16 +68,16 @@ mod players {
         }
 
         fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
-            let position = self.update_position(piece_id, dice_number);
-            self.update_piece(piece_id, position);
+            // let position = self.update_position(piece_id, dice_number);
+            // self.update_piece(piece_id, position);
         }
 
-        fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
-            let initial_position = self.piece(piece_id).position();
-            let pos = initial_position + dice_number;
-            let pos = self.enter_inside(pos, initial_position);
-            self.starjump(pos)
-        }
+        // fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
+        //     let initial_position = self.piece(piece_id).position();
+        //     let pos = initial_position + dice_number;
+        //     let pos = self.enter_inside(pos, initial_position);
+        //     self.starjump(pos)
+        // }
 
         fn enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
             let pos = self.adjust_pos_when_enter_inside(pos, initial_position);
@@ -104,20 +114,20 @@ mod players {
             }
         }
 
-        fn starjump(&mut self, pos: i8) -> i8 {
-            let goal_positions = [(50, 0), (11, 1), (24, 2), (37, 3)];
-            let star_positions = self.board.star();
-            let next_star = |pos| {
-                let pos_index = star_positions.iter().position(|&r| r == pos).unwrap();
-                star_positions[(pos_index + 1) % star_positions.len()]
-            };
+        // fn starjump(&mut self, pos: i8) -> i8 {
+        //     let goal_positions = [(50, 0), (11, 1), (24, 2), (37, 3)];
+        //     let star_positions = self.board.star();
+        //     let next_star = |pos| {
+        //         let pos_index = star_positions.iter().position(|&r| r == pos).unwrap();
+        //         star_positions[(pos_index + 1) % star_positions.len()]
+        //     };
 
-            match pos {
-                pos if goal_positions.contains(&(pos, self.id)) => 99,
-                pos if star_positions.contains(&pos) => next_star(pos),
-                _ => pos,
-            }
-        }
+        //     match pos {
+        //         pos if goal_positions.contains(&(pos, self.id)) => 99,
+        //         pos if star_positions.contains(&pos) => next_star(pos),
+        //         _ => pos,
+        //     }
+        // }
 
         pub fn free_piece(&mut self, piece_id: i8) {
             match self.id() {
@@ -192,22 +202,22 @@ mod players {
             available_pieces[index]
         }
 
-        pub fn update_piece_state(&mut self, piece_id: i8) {
-            let pos = self.piece(piece_id).position();
-            if self.board.home().contains(&pos) {
-                self.piece(piece_id).home();
-            } else if self.board.invincible()[self.id() as usize] == pos
-                || self.board.globe().contains(&pos)
-            {
-                self.piece(piece_id).dangerous();
-            } else if self.board.inside().contains(&pos) {
-                self.piece(piece_id).safe();
-            } else if self.board.goal().contains(&pos) {
-                self.piece(piece_id).goal();
-            } else {
-                self.check_sharing_square();
-            }
-        }
+        // pub fn update_piece_state(&mut self, piece_id: i8) {
+        //     let pos = self.piece(piece_id).position();
+        //     if self.board.home().contains(&pos) {
+        //         self.piece(piece_id).home();
+        //     } else if self.board.invincible()[self.id() as usize] == pos
+        //         || self.board.globe().contains(&pos)
+        //     {
+        //         self.piece(piece_id).dangerous();
+        //     } else if self.board.inside().contains(&pos) {
+        //         self.piece(piece_id).safe();
+        //     } else if self.board.goal().contains(&pos) {
+        //         self.piece(piece_id).goal();
+        //     } else {
+        //         self.check_sharing_square();
+        //     }
+        // }
 
         pub fn play_random(&mut self) {
             while self.is_player_turn() {
@@ -224,7 +234,7 @@ mod players {
 
         fn update_piece(&mut self, piece_id: i8, pos: i8) {
             self.piece(piece_id).set_position(pos);
-            self.update_piece_state(piece_id);
+            // self.update_piece_state(piece_id);
         }
 
         fn check_sharing_square(&mut self) {
