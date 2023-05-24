@@ -56,7 +56,7 @@ mod pieces {
 
         pub fn free(&mut self) {
             self.state.position = 0;
-            self.dangerous()
+            self.dangerous();
         }
 
         pub fn dangerous(&mut self) {

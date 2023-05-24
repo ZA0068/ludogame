@@ -8,16 +8,36 @@ mod player_tests {
 
     #[test]
     fn add_player_test() {
-        let board = Board::new();
-        let player = Player::new(0, &board);
+        let mut board = Board::new();
+        let player = Player::new(0, &mut board);
         assert_eq!(player.id(), 0);
-        assert_eq!(player.board(), &board);
+        assert_eq!(player.board(), &mut board);
     }
 
+    #[test]
+    fn add_all_player_test() {
+        let mut board = Board::new();
+        let player0= Player::new(0, &mut board);
+        let player1= Player::new(1, &mut board);
+        let player2= Player::new(2, &mut board);
+        let player3= Player::new(3, &mut board);
+
+        assert_eq!(player0.id(), 0);
+        assert_eq!(player1.id(), 1);
+        assert_eq!(player2.id(), 2);
+        assert_eq!(player3.id(), 3);
+
+        assert_eq!(player0.board(), &board);
+        assert_eq!(player1.board(), player0.board());
+        assert_eq!(player2.board(), player1.board());
+        assert_eq!(player3.board(), player2.board());
+        assert_eq!(&board, player3.board());
+    }
 
     // #[test]
     // fn get_pieces_test() {
-    //     let mut player = Player::new(0);
+    //     let board = Board::new();
+    //     let mut player = Player::new(0, &board);
 
     //     let piece = player.piece(0);
     //     assert_eq!(piece.id(), 0);
@@ -34,22 +54,26 @@ mod player_tests {
 
     // #[test]
     // fn get_piece_test() {
-    //     let mut player = Player::new(0);
-    //     let pieces = player.pieces();
-    //     assert!(pieces[0].is_home());
-    //     assert!(pieces[1].is_home());
-    //     assert!(pieces[2].is_home());
-    //     assert!(pieces[3].is_home());
-    //     assert!(player.piece(0).is_safe());
+    //     let board = Board::new();
+    //     let mut player = Player::new(0, &board);
+    //     (0..4).for_each(|i| {
+    //         let piece = player.piece(i);
+    //         assert_eq!(piece.id(), i as u8);
+    //         assert!(player.piece(i).is_home());
+    //         assert!(player.piece(i).is_safe());
+    //     });
     // }
 
-    // #[test]
-    // fn free_piece_test() {
-    //     let mut player = Player::new(0);
-    //     player.free_piece(0);
-    //     assert!(!player.piece(0).is_home());
-    //     assert!(player.piece(0).is_safe());
-    // }
+    #[test]
+    fn free_piece_test() {
+        let mut board = Board::new();
+        let mut player = Player::new(0, &mut board);
+        player.free_piece(0);
+        assert!(!player.piece(0).is_home());
+        assert!(player.piece(0).is_safe());
+        assert_eq!(player.piece(0).position(), 0);
+        assert_eq!(player.board().outside(0).unwrap().number_of_pieces, 1);
+    }
 
     // #[test]
     // fn play_random_piece() {

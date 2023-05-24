@@ -208,22 +208,7 @@ mod board {
                 .then(|| &self.outside[position])
         }
 
-        pub fn update(&mut self, id: u8, old_position: i8, new_position: i8) {
-            let old_pos = old_position as isize;
-            let new_pos = new_position as isize;
-            // let player_id = get_player_id(id);
-
-            // move from home
-            self.move_from_home(id, new_pos);
-            // move outside
-            if self.outside[old_pos as usize].number_of_pieces == 0 {
-                self.outside[new_pos as usize].player_id = None;
-            }
-            self.outside[old_pos as usize].number_of_pieces -= 1;
-            self.outside[new_pos as usize].number_of_pieces += 1;
-        }
-
-        pub fn move_from_home(&mut self, id: u8, new_pos: isize) {
+        pub fn move_from_home(&mut self, id: u8, new_pos: isize) -> Result<(), String> {
             self.home[id as usize].number_of_pieces -= 1;
             if self.home[id as usize].number_of_pieces == 0 {
                 self.home[id as usize].player_id = None;
@@ -231,6 +216,7 @@ mod board {
 
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
             self.outside[new_pos as usize].number_of_pieces += 1;
+            Ok(())
         }
 
         pub fn move_into_home(&mut self, id: u8, new_pos: isize) {
