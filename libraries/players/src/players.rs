@@ -4,7 +4,7 @@ mod players {
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
-    use rand::Rng;
+    
 
     pub struct Player {
         id: u8,
@@ -51,67 +51,79 @@ mod players {
             &self.board
         }
 
-        pub fn make_move(&mut self, piece_id: u8, dice_number: u8) {
-            match self.valid_moves(piece_id, dice_number) {
-                Act::Move => {
-                    self.move_piece(piece_id, dice_number);
-                }
-                Act::Free => {
-                    self.free_piece(piece_id);
-                }
-                Act::Kill => {
-                    // self.kill_piece();
-                }
-                Act::Nothing => (),
-            }
+        pub fn take_dice(&mut self, dice: Rc<RefCell<Dice>>) {
+            self.dice = Some(dice);
         }
 
-        pub fn kill_piece(&mut self, piece_id: u8, dice_number: u8, opponents: &mut Player) {
-            opponents.piece(0).dead();
-            self.move_piece(piece_id, dice_number);
+        pub fn give_dice(&mut self) {
+            self.dice = None;
         }
 
-        fn move_piece(&mut self, piece_id: u8, dice_number: u8) {
-            // let position = self.update_position(piece_id, dice_number);
-            // self.update_piece(piece_id, position);
-        }
-
-        // fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
-        //     let initial_position = self.piece(piece_id).position();
-        //     let pos = initial_position + dice_number;
-        //     let pos = self.enter_inside(pos, initial_position);
-        //     self.starjump(pos)
+        // pub fn make_move(&mut self, piece_id: u8, dice_number: u8) {
+        //     match self.valid_moves(piece_id, dice_number) {
+        //         Act::Move => {
+        //             self.move_piece(piece_id, dice_number);
+        //         }
+        //         Act::Free => {
+        //             self.free_piece(piece_id);
+        //         }
+        //         Act::Kill => {
+        //             // self.kill_piece();
+        //         }
+        //         Act::Nothing => (),
+        //     }
         // }
 
-        fn enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
-            let pos = self.adjust_pos_when_enter_inside(pos, initial_position);
-            let pos = self.adjust_pos_when_entering_goal(pos);
-            let pos = self.adjust_pos_for_multiplayers(pos);
-            self.go_back_when_overshoot(pos)
+        // pub fn kill_piece(&mut self, piece_id: u8, dice_number: u8, opponents: &mut Player) {
+        //     opponents.piece(0).dead();
+        //     self.move_piece(piece_id, dice_number);
+        // }
+
+        // fn move_piece(&mut self, piece_id: u8, dice_number: u8) {
+        //      let position = self.update_position(piece_id, dice_number);
+        //      self.update_piece(piece_id, position);
+        // }
+
+        // fn update_position(&mut self, piece_id: u8, dice_number: u8) -> u8 {
+        //     let initial_position = self.piece(piece_id).position() as u8;
+        //     initial_position + dice_number
+        // }
+
+        pub fn enter_inside(&mut self, piece_id: u8, old_position: i8, new_position: i8)  {
+            let position = match (new_position, old_position, self.id) {
+                (51..=56, 0..=51, 0) => new_position,
+                _ => new_position,
+            };
+            self.piece(piece_id).set_position(position);
+            self.board().borrow_mut().move_inside(self.id(), old_position as usize, new_position as usize);
+            
+            // let pos = self.adjust_pos_when_entering_goal(pos);
+            // let pos = self.adjust_pos_for_multiplayers(pos);
+            // self.go_back_when_overshoot(pos)
         }
 
-        fn adjust_pos_for_multiplayers(&mut self, pos: i8) -> i8 {
+        pub fn adjust_pos_for_multiplayers(&mut self, pos: i8) -> i8 {
             match (pos, self.id) {
                 (52..=56, 1..=3) => pos - 52,
                 _ => pos,
             }
         }
 
-        fn go_back_when_overshoot(&mut self, pos: i8) -> i8 {
+        pub fn go_back_when_overshoot(&mut self, piece_id: u8, pos: i8) -> i8 {
             match (pos, self.id) {
                 (58..=62, 0) => 52 + (62 - pos),
                 _ => pos,
             }
         }
 
-        fn adjust_pos_when_entering_goal(&mut self, pos: i8) -> i8 {
+        pub fn adjust_pos_when_entering_goal(&mut self, pos: i8) -> i8 {
             match (pos, self.id) {
                 (57, 0) => 99,
                 _ => pos,
             }
         }
 
-        fn adjust_pos_when_enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
+        pub fn adjust_pos_when_enter_inside(&mut self, pos: i8, initial_position: i8) -> i8 {
             match (pos, initial_position, self.id) {
                 (51..=56, 0..=51, 0) => pos + 1,
                 _ => pos,
@@ -141,24 +153,32 @@ mod players {
                 }
                 1 => {
                     self.piece(piece_id).free();
-                    self.piece(piece_id).set_position(13)
+                    self.piece(piece_id).set_position(13);
+                    self.board().borrow_mut().move_from_home(self.id(), 13).unwrap();
                 }
                 2 => {
                     self.piece(piece_id).free();
-                    self.piece(piece_id).set_position(26)
+                    self.piece(piece_id).set_position(26);
+                    self.board().borrow_mut().move_from_home(self.id(), 26).unwrap();
                 }
                 3 => {
                     self.piece(piece_id).free();
-                    self.piece(piece_id).set_position(39)
+                    self.piece(piece_id).set_position(39);
+                    self.board().borrow_mut().move_from_home(self.id(), 39).unwrap();
                 }
                 _ => panic!("invalid move!"),
             }
         }
 
-        // pub fn roll_dice(&mut self) -> u8 {
-        //     self.dice.roll();
-        //     self.dice.get_value()
-        // }
+        pub fn roll_dice(&mut self) -> i8 {
+            if let Some(dice) = &self.dice {
+                dice.borrow_mut().roll();
+                dice.borrow().get_value()
+            } else {
+                0
+            }
+        }
+        
 
         pub fn is_player_turn(&self) -> bool {
             self.turn
@@ -209,22 +229,9 @@ mod players {
         //     available_pieces[index]
         // }
 
-        // pub fn update_piece_state(&mut self, piece_id: i8) {
-        //     let pos = self.piece(piece_id).position();
-        //     if self.board.home().contains(&pos) {
-        //         self.piece(piece_id).home();
-        //     } else if self.board.invincible()[self.id() as usize] == pos
-        //         || self.board.globe().contains(&pos)
-        //     {
-        //         self.piece(piece_id).dangerous();
-        //     } else if self.board.inside().contains(&pos) {
-        //         self.piece(piece_id).safe();
-        //     } else if self.board.goal().contains(&pos) {
-        //         self.piece(piece_id).goal();
-        //     } else {
-        //         self.check_sharing_square();
-        //     }
-        // }
+        pub fn update_piece_state(&mut self, old_pos: i8, new_pos: i8) {
+            self.board().borrow_mut().update_outside(self.id(), old_pos.into(), new_pos.into());
+        }
 
         // pub fn play_random(&mut self) {
         //     while self.is_player_turn() {
@@ -236,12 +243,13 @@ mod players {
         // }
 
         pub fn is_finished(&self) -> bool {
-            self.pieces.iter().all(|p| p.is_goal())
+            self.pieces.iter().all(|p: &Piece| p.is_goal())
         }
 
-        fn update_piece(&mut self, piece_id: u8, pos: i8) {
-            self.piece(piece_id).set_position(pos);
-            // self.update_piece_state(piece_id);
+        pub fn update_piece(&mut self, piece_id: u8, new_pos: i8) {
+            let old_pos: i8 = self.piece(piece_id).position();
+            self.piece(piece_id).set_position(new_pos);
+            self.update_piece_state(old_pos, new_pos);
         }
 
         fn check_sharing_square(&mut self) {

@@ -4,8 +4,8 @@ mod dice {
 
 
     pub struct Dice {
-        value: u8,
-        dist: Uniform<u8>,
+        value: i8,
+        dist: Uniform<i8>,
     }
 
     impl Dice {
@@ -19,7 +19,7 @@ mod dice {
             self.value = rng.sample(self.dist);
         }
 
-        pub fn get_value(&self) -> u8 {
+        pub fn get_value(&self) -> i8 {
             self.value
         }
     }

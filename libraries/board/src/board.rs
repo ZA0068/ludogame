@@ -239,7 +239,7 @@ mod board {
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
         }
 
-        pub fn move_inside(&mut self, id: u8, old_pos: usize, new_pos: isize) {
+        pub fn move_inside(&mut self, id: u8, old_pos: usize, new_pos: usize) {
             if self.outside[old_pos].number_of_pieces > 0 {
                 self.outside[old_pos].number_of_pieces -= 1;
                 if self.outside[old_pos].number_of_pieces == 0 {
