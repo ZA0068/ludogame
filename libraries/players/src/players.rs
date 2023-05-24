@@ -10,7 +10,7 @@ mod players {
         id: u8,
         pieces: Vec<Piece>,
         turn: bool,
-        dice: Dice,
+        dice: Option<Rc<RefCell<Dice>>>,
         board: Rc<RefCell<Board>>,
     }
     pub enum Act {
@@ -21,7 +21,7 @@ mod players {
     }
 
     impl Player {
-        pub fn new(id: u8, board: Rc<RefCell<Board>>) -> Player {
+        pub fn new(id: u8, board: Rc<RefCell<Board>>, dice: Option<Rc<RefCell<Dice>>>) -> Player {
             let mut pieces = vec![];
             for i in 0..4 {
                 pieces.push(Piece::new(i));
@@ -30,8 +30,8 @@ mod players {
                 id,
                 pieces,
                 turn: false,
-                dice: Dice::new(),
                 board,
+                dice,
             }
         }
 
@@ -137,7 +137,7 @@ mod players {
             match self.id() {
                 0 => {
                     self.piece(piece_id).free();
-                    self.board.move_from_home(self.id(), 0)?;
+                    self.board().borrow_mut().move_from_home(self.id(), 0).unwrap();
                 }
                 1 => {
                     self.piece(piece_id).free();
@@ -155,10 +155,10 @@ mod players {
             }
         }
 
-        pub fn roll_dice(&mut self) -> u8 {
-            self.dice.roll();
-            self.dice.get_value() as u8
-        }
+        // pub fn roll_dice(&mut self) -> u8 {
+        //     self.dice.roll();
+        //     self.dice.get_value()
+        // }
 
         pub fn is_player_turn(&self) -> bool {
             self.turn
@@ -168,9 +168,9 @@ mod players {
             self.turn = true;
         }
 
-        pub fn can_continue(&mut self) {
-            self.turn = self.dice.get_value() == 6;
-        }
+        // pub fn can_continue(&mut self) {
+        //     self.turn = self.dice.get_value() == 6;
+        // }
 
         pub fn valid_moves(&mut self, piece_id: u8, dice: u8) -> Act {
             if piece_id > 3 {
@@ -188,26 +188,26 @@ mod players {
             }
         }
 
-        pub fn choose_piece(&mut self) -> u8 {
-            let mut available_pieces = vec![];
+        // pub fn choose_piece(&mut self) -> u8 {
+        //     let mut available_pieces = vec![];
 
-            for i in 0..4 {
-                let piece = self.piece(i);
-                let not_in_goal = !piece.is_goal();
-                let not_in_home_or_can_leave = !(piece.is_home() && self.dice.get_value() != 6);
-                if not_in_goal && not_in_home_or_can_leave {
-                    available_pieces.push(i);
-                }
-            }
+        //     for i in 0..4 {
+        //         let piece = self.piece(i);
+        //         let not_in_goal = !piece.is_goal();
+        //         let not_in_home_or_can_leave = !(piece.is_home() && self.dice.get_value() != 6);
+        //         if not_in_goal && not_in_home_or_can_leave {
+        //             available_pieces.push(i);
+        //         }
+        //     }
 
-            if available_pieces.is_empty() {
-                return 5; // Return 0 as a default value if no piece is available
-            }
+        //     if available_pieces.is_empty() {
+        //         return 5; // Return 0 as a default value if no piece is available
+        //     }
 
-            let mut rng = rand::thread_rng();
-            let index = rng.gen_range(0..available_pieces.len());
-            available_pieces[index]
-        }
+        //     let mut rng = rand::thread_rng();
+        //     let index = rng.gen_range(0..available_pieces.len());
+        //     available_pieces[index]
+        // }
 
         // pub fn update_piece_state(&mut self, piece_id: i8) {
         //     let pos = self.piece(piece_id).position();
@@ -226,14 +226,14 @@ mod players {
         //     }
         // }
 
-        pub fn play_random(&mut self) {
-            while self.is_player_turn() {
-                let dice = self.roll_dice();
-                let piece_id = self.choose_piece();
-                self.make_move(piece_id, dice);
-                self.can_continue();
-            }
-        }
+        // pub fn play_random(&mut self) {
+        //     while self.is_player_turn() {
+        //         let dice = self.roll_dice();
+        //         let piece_id = self.choose_piece();
+        //         self.make_move(piece_id, dice);
+        //         self.can_continue();
+        //     }
+        // }
 
         pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|p| p.is_goal())

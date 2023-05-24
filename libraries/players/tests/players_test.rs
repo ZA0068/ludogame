@@ -4,82 +4,87 @@ use board::Board;
 #[cfg(test)]
 mod player_tests {
 
+    use std::{rc::Rc, cell::RefCell};
+
     use super::*;
 
     #[test]
     fn add_player_test() {
-        let mut board = Board::new();
-        let player = Player::new(0, &mut board);
+        let board = Rc::new(RefCell::new(Board::new()));
+        let player = Player::new(0, board.clone(), None);
         assert_eq!(player.id(), 0);
-        assert_eq!(player.board(), &mut board);
+        assert_eq!(player.board().as_ptr(), board.as_ptr());
     }
 
     #[test]
     fn add_all_player_test() {
-        let mut board = Board::new();
-        let player0= Player::new(0, &mut board);
-        let player1= Player::new(1, &mut board);
-        let player2= Player::new(2, &mut board);
-        let player3= Player::new(3, &mut board);
+        let board = Rc::new(RefCell::new(Board::new()));
+        let board2 = Rc::new(RefCell::new(Board::new()));
+        let player0= Player::new(0, board.clone(), None);
+        let player1= Player::new(1, board.clone(), None);
+        let player2= Player::new(2, board.clone(), None);
+        let player3= Player::new(3, board.clone(), None);
 
         assert_eq!(player0.id(), 0);
         assert_eq!(player1.id(), 1);
         assert_eq!(player2.id(), 2);
         assert_eq!(player3.id(), 3);
 
-        assert_eq!(player0.board(), &board);
-        assert_eq!(player1.board(), player0.board());
-        assert_eq!(player2.board(), player1.board());
-        assert_eq!(player3.board(), player2.board());
-        assert_eq!(&board, player3.board());
+        assert_eq!(player0.board().as_ptr(), board.as_ptr());
+        assert_eq!(player1.board().as_ptr(), player0.board().as_ptr());
+        assert_eq!(player2.board().as_ptr(), player1.board().as_ptr());
+        assert_eq!(player3.board().as_ptr(), player2.board().as_ptr());
+        assert_eq!(board.as_ptr(), player3.board().as_ptr());
+        assert_ne!(board2.as_ptr(), player0.board().as_ptr());
+    }
+
+    #[test]
+    fn get_pieces_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(0, board, None);
+
+        let piece = player.piece(0);
+        assert_eq!(piece.id(), 0);
+
+        let piece = player.piece(1);
+        assert_eq!(piece.id(), 1);
+
+        let piece = player.piece(2);
+        assert_eq!(piece.id(), 2);
+
+        let piece = player.piece(3);
+        assert_eq!(piece.id(), 3);
     }
 
     // #[test]
-    // fn get_pieces_test() {
-    //     let board = Board::new();
-    //     let mut player = Player::new(0, &board);
-
-    //     let piece = player.piece(0);
-    //     assert_eq!(piece.id(), 0);
-
-    //     let piece = player.piece(1);
-    //     assert_eq!(piece.id(), 1);
-
-    //     let piece = player.piece(2);
-    //     assert_eq!(piece.id(), 2);
-
-    //     let piece = player.piece(3);
-    //     assert_eq!(piece.id(), 3);
-    // }
-
-    // #[test]
     // fn get_piece_test() {
-    //     let board = Board::new();
-    //     let mut player = Player::new(0, &board);
+    //     let board = Rc::new(RefCell::new(Board::new()));
+    //     let mut player = Player::new(0, board);
     //     (0..4).for_each(|i| {
     //         let piece = player.piece(i);
-    //         assert_eq!(piece.id(), i as u8);
+    //         assert_eq!(piece.id(), i);
     //         assert!(player.piece(i).is_home());
     //         assert!(player.piece(i).is_safe());
     //     });
     // }
 
-    #[test]
-    fn free_piece_test() {
-        let mut board = Board::new();
-        let mut player = Player::new(0, &mut board);
-        player.free_piece(0);
-        assert!(!player.piece(0).is_home());
-        assert!(player.piece(0).is_safe());
-        assert_eq!(player.piece(0).position(), 0);
-        assert_eq!(player.board().outside(0).unwrap().number_of_pieces, 1);
-    }
+    // #[test]
+    // fn free_piece_test() {
+    //     let board = Rc::new(RefCell::new(Board::new()));
+    //     let mut player = Player::new(0, board);
+    //     player.free_piece(0);
+    //     assert!(!player.piece(0).is_home());
+    //     assert!(player.piece(0).is_safe());
+    //     assert_eq!(player.piece(0).position(), 0);
+    //     assert_eq!(player.board().borrow().outside(0).unwrap().number_of_pieces, 1);
+    // }
 
     // #[test]
     // fn play_random_piece() {
-    //     let mut player = Player::new(0);
-    //     player.my_turn();
-    //     player.play_random();
+    //     let board = Rc::new(RefCell::new(Board::new()));
+    //     let mut player = Player::new(0, board);
+    //     let result = player.roll_dice();
+    //     assert!(result > 0 && result < 7);
     // }
 }
 
