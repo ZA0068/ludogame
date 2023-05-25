@@ -22,7 +22,7 @@ mod board {
 
     pub struct BoardState {
         pub position: i8,
-        pub number_of_pieces: u8,
+        pub number_of_pieces: i8,
         pub player_id: Option<PlayerID>,
         pub state: State,
     }
@@ -39,7 +39,7 @@ mod board {
 
         pub fn create(
             position: i8,
-            number_of_pieces: u8,
+            number_of_pieces: i8,
             player_id: Option<PlayerID>,
             state: State,
         ) -> BoardState {
@@ -53,7 +53,7 @@ mod board {
         pub fn set(
             &mut self,
             position: i8,
-            number_of_pieces: u8,
+            number_of_pieces: i8,
             player_id: Option<PlayerID>,
             state: State,
         ) {
@@ -170,11 +170,11 @@ mod board {
             stars
         }
 
-        pub fn home(&self, id: u8) -> Option<&BoardState> {
+        pub fn home(&self, id: i8) -> Option<&BoardState> {
             self.home.get(id as usize)
         }
 
-        pub fn goal(&self, id: u8) -> Option<&BoardState> {
+        pub fn goal(&self, id: i8) -> Option<&BoardState> {
             self.goal.get(id as usize)
         }
 
@@ -208,7 +208,7 @@ mod board {
                 .then(|| &self.outside[position])
         }
 
-        pub fn move_from_home(&mut self, id: u8, new_pos: isize) -> Result<(), String> {
+        pub fn move_from_home(&mut self, id: i8, new_pos: isize) {
             self.home[id as usize].number_of_pieces -= 1;
             if self.home[id as usize].number_of_pieces == 0 {
                 self.home[id as usize].player_id = None;
@@ -216,10 +216,9 @@ mod board {
 
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
             self.outside[new_pos as usize].number_of_pieces += 1;
-            Ok(())
         }
 
-        pub fn move_into_home(&mut self, id: u8, new_pos: isize) {
+        pub fn move_into_home(&mut self, id: i8, new_pos: isize) {
             self.home[id as usize].number_of_pieces += 1;
             self.home[id as usize].player_id = Some(get_player_id(id).unwrap());
             self.outside[new_pos as usize].number_of_pieces -= 1;
@@ -228,7 +227,7 @@ mod board {
             }
         }
 
-        pub fn update_outside(&mut self, id: u8, old_pos: isize, new_pos: isize) {
+        pub fn update_outside(&mut self, id: i8, old_pos: isize, new_pos: isize) {
             if self.outside[old_pos as usize].number_of_pieces > 0 {
                 self.outside[old_pos as usize].number_of_pieces -= 1;
                 if self.outside[old_pos as usize].number_of_pieces == 0 {
@@ -239,7 +238,7 @@ mod board {
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
         }
 
-        pub fn move_inside(&mut self, id: u8, old_pos: usize, new_pos: usize) {
+        pub fn move_inside(&mut self, id: i8, old_pos: usize, new_pos: usize) {
             if self.outside[old_pos].number_of_pieces > 0 {
                 self.outside[old_pos].number_of_pieces -= 1;
                 if self.outside[old_pos].number_of_pieces == 0 {
@@ -257,7 +256,7 @@ mod board {
             self.inside[index].player_id = Some(get_player_id(id).unwrap());
         }
 
-        pub fn update_inside(&mut self, id: u8, old_pos: isize, new_pos: isize) {
+        pub fn update_inside(&mut self, id: i8, old_pos: isize, new_pos: isize) {
             let old_index_option = self
                 .inside
                 .iter()
@@ -285,7 +284,7 @@ mod board {
             self.inside[new_index].player_id = Some(get_player_id(id).unwrap());
         }
 
-        pub fn enter_goal(&mut self, idx: u8, old_pos: isize) {
+        pub fn enter_goal(&mut self, idx: i8, old_pos: isize) {
             let old_pos_usize = old_pos as usize;
             let id = get_player_id(idx).unwrap();
             if old_pos >= 52 {
@@ -324,7 +323,7 @@ mod board {
             self.goal[id as usize].player_id = Some(id);
         }
 
-        pub fn get_state(&self, id: u8, pos: isize) -> &BoardState {
+        pub fn get_state(&self, id: i8, pos: isize) -> &BoardState {
             if pos < 0 {
                 self.home[id as usize].get()
             } else if pos >= 52 {
@@ -336,7 +335,7 @@ mod board {
         }
     }
 
-    fn get_player_id(id: u8) -> Option<PlayerID> {
+    fn get_player_id(id: i8) -> Option<PlayerID> {
         match id {
             0 => Some(PlayerID::Player0),
             1 => Some(PlayerID::Player1),

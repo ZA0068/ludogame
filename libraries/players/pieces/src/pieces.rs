@@ -8,12 +8,12 @@ mod pieces {
     }
 
     pub struct Piece {
-        id: u8,
+        id: i8,
         state: State,
     }
 
     impl Piece {
-        pub fn new(id: u8) -> Piece {
+        pub fn new(id: i8) -> Piece {
             Piece {
                 id,
                 state: State {
@@ -26,7 +26,7 @@ mod pieces {
             }
         }
 
-        pub fn id(&self) -> u8 {
+        pub fn id(&self) -> i8 {
             self.id
         }
 
@@ -47,11 +47,11 @@ mod pieces {
         }
 
         pub fn position(&self) -> i8 {
-            self.state.position
+            self.state.position as i8
         }
 
         pub fn set_position(&mut self, position: i8) {
-            self.state.position = position;
+            self.state.position = position as i8;
         }
 
         pub fn free(&mut self) {

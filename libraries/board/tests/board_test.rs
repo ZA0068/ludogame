@@ -142,7 +142,7 @@ mod board_update_test {
     #[test]
     fn move_from_home_test() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         assert_eq!(board.home(0).unwrap().number_of_pieces, 3);
         assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
         assert_eq!(board.outside(0).unwrap().player_id, Some(PlayerID::Player0));
@@ -152,7 +152,7 @@ mod board_update_test {
     fn move_all_from_home_test() {
         let mut board = Board::new();
         for _ in 0..4 {
-            board.move_from_home(0, 0).unwrap();
+            board.move_from_home(0, 0);
         }
         assert_eq!(board.home(0).unwrap().number_of_pieces, 0);
         assert_eq!(board.home(0).unwrap().player_id, None);
@@ -163,7 +163,7 @@ mod board_update_test {
     #[test]
     fn move_into_home_test() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         assert_eq!(board.home(0).unwrap().number_of_pieces, 3);
         assert_eq!(board.home(0).unwrap().player_id, Some(PlayerID::Player0));
         assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
@@ -179,7 +179,7 @@ mod board_update_test {
     #[test]
     fn move_pieces_test() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
         assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
 
@@ -198,7 +198,7 @@ mod board_update_test {
     #[test]
     fn move_pieces_test_2() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
         assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
 
@@ -217,7 +217,7 @@ mod board_update_test {
     #[test]
     fn move_pieces_test_3() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         board.update_outside(0, 0, 51);
         board.move_inside(0, 51, 52);
         if let Some(inside_piece) = board.inside(0) {
@@ -232,7 +232,7 @@ mod board_update_test {
     #[test]
     fn move_pieces_test_4() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         board.update_outside(0, 0, 51);
         board.move_inside(0, 51, 52);
         if let Some(inside_piece) = board.inside(0) {
@@ -246,13 +246,13 @@ mod board_update_test {
     #[test]
     fn move_piece_test_enter_goal() {
         let mut board = Board::new();
-        board.move_from_home(0, 0).unwrap();
+        board.move_from_home(0, 0);
         board.update_outside(0, 0, 50);
         board.enter_goal(0, 50);
 
         assert_eq!(board.goal(0).unwrap().number_of_pieces, 1);
 
-        board.move_from_home(0, 50).unwrap();
+        board.move_from_home(0, 50);
         board.move_inside(0, 50, 56);
         if let Some(board) = board.inside(4)    {
             assert_eq!(board.number_of_pieces, 1);
@@ -266,7 +266,7 @@ mod board_update_test {
         let mut board = Board::new();
         for i in 0..4 {
             for _ in 0..4 {
-                board.move_from_home(i, 0).unwrap();
+                board.move_from_home(i, 0);
                 board.update_outside(i, 0, 50);
                 board.enter_goal(i, 50);
             }

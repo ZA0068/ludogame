@@ -7,12 +7,14 @@ mod players {
     
 
     pub struct Player {
-        id: u8,
+        id: i8,
         pieces: Vec<Piece>,
         turn: bool,
         dice: Option<Rc<RefCell<Dice>>>,
         board: Rc<RefCell<Board>>,
     }
+
+    #[derive(PartialEq, Debug)]
     pub enum Act {
         Move,
         Free,
@@ -21,7 +23,7 @@ mod players {
     }
 
     impl Player {
-        pub fn new(id: u8, board: Rc<RefCell<Board>>, dice: Option<Rc<RefCell<Dice>>>) -> Player {
+        pub fn new(id: i8, board: Rc<RefCell<Board>>, dice: Option<Rc<RefCell<Dice>>>) -> Player {
             let mut pieces = vec![];
             for i in 0..4 {
                 pieces.push(Piece::new(i));
@@ -35,11 +37,11 @@ mod players {
             }
         }
 
-        pub fn id(&self) -> u8 {
+        pub fn id(&self) -> i8 {
             self.id
         }
 
-        pub fn piece(&mut self, piece_id: u8) -> &mut Piece {
+        pub fn piece(&mut self, piece_id: i8) -> &mut Piece {
             &mut self.pieces[piece_id as usize]
         }
 
@@ -59,37 +61,37 @@ mod players {
             self.dice = None;
         }
 
-        // pub fn make_move(&mut self, piece_id: u8, dice_number: u8) {
-        //     match self.valid_moves(piece_id, dice_number) {
-        //         Act::Move => {
-        //             self.move_piece(piece_id, dice_number);
-        //         }
-        //         Act::Free => {
-        //             self.free_piece(piece_id);
-        //         }
-        //         Act::Kill => {
-        //             // self.kill_piece();
-        //         }
-        //         Act::Nothing => (),
-        //     }
-        // }
+        pub fn make_choice(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
+            match choice {
+                Act::Move => {
+                    self.move_piece(piece_id, dice_number);
+                }
+                Act::Free => {
+                    self.free_piece(piece_id);
+                }
+                Act::Kill => {
+                    // self.kill_piece();
+                }
+                Act::Nothing => (),
+            }
+        }
 
-        // pub fn kill_piece(&mut self, piece_id: u8, dice_number: u8, opponents: &mut Player) {
+        // pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8, opponents: &mut Player) {
         //     opponents.piece(0).dead();
         //     self.move_piece(piece_id, dice_number);
         // }
 
-        // fn move_piece(&mut self, piece_id: u8, dice_number: u8) {
-        //      let position = self.update_position(piece_id, dice_number);
-        //      self.update_piece(piece_id, position);
-        // }
+        fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
+             let position = self.update_position(piece_id, dice_number);
+             self.update_piece(piece_id, position);
+        }
 
-        // fn update_position(&mut self, piece_id: u8, dice_number: u8) -> u8 {
-        //     let initial_position = self.piece(piece_id).position() as u8;
-        //     initial_position + dice_number
-        // }
+        fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
+            let initial_position = self.piece(piece_id).position() as i8;
+            initial_position + dice_number
+        }
 
-        pub fn enter_inside(&mut self, piece_id: u8, old_position: i8, new_position: i8)  {
+        pub fn enter_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8)  {
             let position = match (new_position, old_position, self.id) {
                 (51..=56, 0..=51, 0) => new_position,
                 _ => new_position,
@@ -109,7 +111,7 @@ mod players {
             }
         }
 
-        pub fn go_back_when_overshoot(&mut self, piece_id: u8, pos: i8) -> i8 {
+        pub fn go_back_when_overshoot(&mut self, piece_id: i8, pos: i8) -> i8 {
             match (pos, self.id) {
                 (58..=62, 0) => 52 + (62 - pos),
                 _ => pos,
@@ -145,26 +147,26 @@ mod players {
         //     }
         // }
 
-        pub fn free_piece(&mut self, piece_id: u8) {
+        pub fn free_piece(&mut self, piece_id: i8) {
             match self.id() {
                 0 => {
                     self.piece(piece_id).free();
-                    self.board().borrow_mut().move_from_home(self.id(), 0).unwrap();
+                    self.board().borrow_mut().move_from_home(self.id(), 0);
                 }
                 1 => {
                     self.piece(piece_id).free();
                     self.piece(piece_id).set_position(13);
-                    self.board().borrow_mut().move_from_home(self.id(), 13).unwrap();
+                    self.board().borrow_mut().move_from_home(self.id(), 13);
                 }
                 2 => {
                     self.piece(piece_id).free();
                     self.piece(piece_id).set_position(26);
-                    self.board().borrow_mut().move_from_home(self.id(), 26).unwrap();
+                    self.board().borrow_mut().move_from_home(self.id(), 26);
                 }
                 3 => {
                     self.piece(piece_id).free();
                     self.piece(piece_id).set_position(39);
-                    self.board().borrow_mut().move_from_home(self.id(), 39).unwrap();
+                    self.board().borrow_mut().move_from_home(self.id(), 39);
                 }
                 _ => panic!("invalid move!"),
             }
@@ -192,7 +194,7 @@ mod players {
         //     self.turn = self.dice.get_value() == 6;
         // }
 
-        pub fn valid_moves(&mut self, piece_id: u8, dice: u8) -> Act {
+        pub fn valid_moves(&mut self, piece_id: i8, dice: i8) -> Act {
             if piece_id > 3 {
                 return Act::Nothing;
             }
@@ -208,7 +210,7 @@ mod players {
             }
         }
 
-        // pub fn choose_piece(&mut self) -> u8 {
+        // pub fn choose_piece(&mut self) -> i8 {
         //     let mut available_pieces = vec![];
 
         //     for i in 0..4 {
@@ -246,8 +248,8 @@ mod players {
             self.pieces.iter().all(|p: &Piece| p.is_goal())
         }
 
-        pub fn update_piece(&mut self, piece_id: u8, new_pos: i8) {
-            let old_pos: i8 = self.piece(piece_id).position();
+        pub fn update_piece(&mut self, piece_id: i8, new_pos: i8) {
+            let old_pos = self.piece(piece_id).position();
             self.piece(piece_id).set_position(new_pos);
             self.update_piece_state(old_pos, new_pos);
         }
@@ -277,4 +279,4 @@ mod players {
     }
 }
 
-pub use players::Player;
+pub use players::{Player, Act};
