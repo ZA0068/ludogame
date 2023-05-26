@@ -121,7 +121,7 @@ mod players {
             }
 
         fn starjump(&mut self, piece_id: i8, new_position: i8, old_position: i8) {
-            let adjusted_position = match new_position {
+            let new_position = match new_position {
                 5 => 11,
                 11 => 18,
                 18 => 24,
@@ -133,6 +133,7 @@ mod players {
                 _ => new_position,
             };
             self.piece(piece_id).set_position(new_position);
+            self.piece(piece_id).not_safe();
             self.board().borrow_mut().update_outside(
                 self.id(),
                 old_position.into(),
@@ -288,21 +289,6 @@ mod players {
                 .enter_goal(self.id(), old_position.into());
         }
 
-        // fn starjump(&mut self, pos: i8) -> i8 {
-        //     let goal_positions = [(50, 0), (11, 1), (24, 2), (37, 3)];
-        //     let star_positions = self.board.star();
-        //     let next_star = |pos| {
-        //         let pos_index = star_positions.iter().position(|&r| r == pos).unwrap();
-        //         star_positions[(pos_index + 1) % star_positions.len()]
-        //     };
-
-        //     match pos {
-        //         pos if goal_positions.contains(&(pos, self.id)) => 99,
-        //         pos if star_positions.contains(&pos) => next_star(pos),
-        //         _ => pos,
-        //     }
-        // }
-
         pub fn free_piece(&mut self, piece_id: i8) {
             let position = match self.id() {
                 0 => 0,
@@ -362,36 +348,6 @@ mod players {
                 _ => Act::Nothing,
             }
         }
-
-        // pub fn choose_piece(&mut self) -> i8 {
-        //     let mut available_pieces = vec![];
-
-        //     for i in 0..4 {
-        //         let piece = self.piece(i);
-        //         let not_in_goal = !piece.is_goal();
-        //         let not_in_home_or_can_leave = !(piece.is_home() && self.dice.get_value() != 6);
-        //         if not_in_goal && not_in_home_or_can_leave {
-        //             available_pieces.push(i);
-        //         }
-        //     }
-
-        //     if available_pieces.is_empty() {
-        //         return 5; // Return 0 as a default value if no piece is available
-        //     }
-
-        //     let mut rng = rand::thread_rng();
-        //     let index = rng.gen_range(0..available_pieces.len());
-        //     available_pieces[index]
-        // }
-
-        // pub fn play_random(&mut self) {
-        //     while self.is_player_turn() {
-        //         let dice = self.roll_dice();
-        //         let piece_id = self.choose_piece();
-        //         self.make_move(piece_id, dice);
-        //         self.can_continue();
-        //     }
-        // }
 
         pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|p: &Piece| p.is_goal())

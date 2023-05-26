@@ -202,9 +202,11 @@ mod move_single_piece_test {
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(0, board, Some(dice));
 
-        while player.roll_dice() != 6 {}
         player.free_piece(0);
-        let result = player.roll_dice();
+        let mut result = player.roll_dice();
+        if result == 5 {
+            result = 1;
+        }
         player.move_piece(0, result);
         assert_eq!(player.piece(0).position(), result);
         assert_eq!(
@@ -273,7 +275,7 @@ mod move_single_piece_test {
 
         dice_roll = 5;
 
-        player.move_piece(piece_id, 50);
+        player.move_piece(piece_id, 44);
         valid_choice = player.valid_moves(piece_id, dice_roll);
         player.make_choice(piece_id, dice_roll, valid_choice);
         assert_eq!(player.piece(piece_id).position(), 51 + dice_roll);
@@ -300,7 +302,7 @@ mod move_single_piece_test {
 
         let piece_id = 0;
         player.free_piece(piece_id);
-        player.move_piece(piece_id, 50);
+        player.move_piece(piece_id, 44);
         player.move_piece(piece_id, 6);
 
         assert_eq!(player.piece(piece_id).position(), 99);
@@ -320,8 +322,8 @@ mod move_single_piece_test {
 
         let piece_id = 0;
         player.free_piece(piece_id);
-        player.move_piece(piece_id, 50);
-        player.move_piece(piece_id, 3);
+        player.move_piece(piece_id, 49);
+        player.move_piece(piece_id, 4);
 
         assert_eq!(player.piece(piece_id).position(), 54);
         assert!(!player.piece(piece_id).is_goal());
@@ -353,7 +355,7 @@ mod move_single_piece_test {
 
         let piece_id = 0;
         player.free_piece(piece_id);
-        player.move_piece(piece_id, 50);
+        player.move_piece(piece_id, 44);
         player.move_piece(piece_id, 4);
 
         assert_eq!(player.piece(piece_id).position(), 55);
@@ -413,10 +415,29 @@ mod move_single_piece_test {
         assert!(!player.piece(piece_id).is_safe());
         assert!(!player.piece(piece_id).is_dangerous());
 
-        player.make_choice(piece_id, 5, Act::Move);
-        assert_eq!(player.piece(piece_id).position(), 7);
-        assert!(player.piece(piece_id).is_safe());
-        assert!(player.piece(piece_id).is_dangerous());
+        player.move_piece(piece_id, 7);
+        assert_eq!(player.piece(piece_id).position(), 24);
+        assert!(!player.piece(piece_id).is_safe());
+        assert!(!player.piece(piece_id).is_dangerous());
+    }
+
+    #[test]
+    fn starjump_to_goal_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 37);
+        player.move_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).position(), 99);
+        assert!(player.piece(piece_id).is_goal());
+        assert_eq!(player.board().borrow().goal[0].number_of_pieces, 1);
+        assert_eq!(
+            player.board().borrow().goal[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
     }
 }
 
@@ -441,7 +462,6 @@ mod multipiece_test {
     }
 
     #[test]
-    #[ignore]
     fn two_piece_at_same_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
