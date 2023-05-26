@@ -187,25 +187,19 @@ mod board {
             self.inside.get(position.checked_sub(52)?)
         }
 
-        pub fn globe(&self, position: usize) -> Option<&BoardState> {
-            // Return None if position is not in globe
-            self.globe
-                .contains(&position)
-                .then(|| &self.outside[position])
+        pub fn is_globe(&self, position: usize) -> bool {
+            self.globe.contains(&position)
         }
 
-        pub fn invincible(&self, position: usize) -> Option<&BoardState> {
+        pub fn is_invincible(&self, position: usize) -> bool {
             // Return None if position is not in invincible
             self.invincible
                 .contains(&position)
-                .then(|| &self.outside[position])
         }
 
-        pub fn star(&self, position: usize) -> Option<&BoardState> {
+        pub fn is_star(&self, position: usize) -> bool {
             // Return None if position is not in star
-            self.star
-                .contains(&position)
-                .then(|| &self.outside[position])
+            self.star.contains(&position)
         }
 
         pub fn move_from_home(&mut self, id: i8, new_pos: isize) {

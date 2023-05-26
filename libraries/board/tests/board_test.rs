@@ -13,6 +13,13 @@ mod board_tests {
     }
 
     #[test]
+    fn create_default_board_test()
+    {
+        let board = Board::default();
+        assert_eq!(TypeId::of::<Board>(), board.type_id());
+    }
+
+    #[test]
     fn create_a_board_state_test() {
         let board_state = BoardState::new();
         assert_eq!(board_state.position, -1);
@@ -34,10 +41,10 @@ mod board_tests {
     fn board_home_spaces_test() {
         let board = Board::new();
 
-        let player0 = board.home(0).unwrap();
-        let player1 = board.home(1).unwrap();
-        let player2 = board.home(2).unwrap();
-        let player3 = board.home(3).unwrap();
+        let player0 = board.home[0];
+        let player1 = board.home[1];
+        let player2 = board.home[2];
+        let player3 = board.home[3];
 
         assert_eq!(player0.player_id, Some(PlayerID::Player0));
         assert_eq!(player0.position, -1);
@@ -64,7 +71,7 @@ mod board_tests {
     fn board_goal_spaces_test() {
         let board = Board::new();
         for i in 0..4 {
-            let state = board.goal(i).unwrap();
+            let state = board.goal[i];
             assert_eq!(state.player_id, None);
             assert_eq!(state.number_of_pieces, 0);
             assert_eq!(state.position, 99);
@@ -76,7 +83,7 @@ mod board_tests {
     fn board_outside_spaces_test() {
         let board = Board::new();
         for cnt in 0..52 {
-            let state = board.outside(cnt).unwrap();
+            let state = board.outside[cnt];
             if state.state != State::Outside {
                 continue;
             }
@@ -91,10 +98,8 @@ mod board_tests {
     fn board_inside_spaces_test() {
         let board = Board::new();
         for cnt in 0..20 {
-            if let Some(state) = board.inside(cnt) {
-                assert_eq!(state.player_id, None);
-                assert_eq!(state.number_of_pieces, 0);
-            }
+            let pos = board.inside[cnt].position;
+            assert!(board.is_inside(pos));
         }
     }
 
@@ -103,36 +108,26 @@ mod board_tests {
         let board = Board::new();
         let vec = [8, 21, 34, 47];
         (0..4).for_each(|cnt| {
-            if let Some(state) = board.globe(cnt) {
-                assert_eq!(state.player_id, None);
-                assert_eq!(state.number_of_pieces, 0);
-                assert_eq!(state.position, vec[cnt]);
-            }
+        assert!(board.is_globe(vec[cnt]));
         });
     }
 
     #[test]
     fn invincible_test() {
         let board = Board::new();
-        let vec = [0, 13, 26, 39];
         (0..4).for_each(|cnt| {
-            if let Some(state) = board.invincible(cnt) {
-                assert_eq!(state.player_id, None);
-                assert_eq!(state.number_of_pieces, 0);
-                assert_eq!(state.position, vec[cnt]);
-            }
+            let pos = board.invincible[cnt];
+            assert!(board.is_invincible(pos));
         });
     }
 
     #[test]
     fn board_star_spaces_test() {
         let board = Board::new();
-        for cnt in 0..8 {
-            if let Some(state) = board.star(cnt) {
-                assert_eq!(state.player_id, None);
-                assert_eq!(state.number_of_pieces, 0);
-            }
-        }
+        let stars = [5, 11, 18, 24, 31, 37, 44, 50];
+        (0..8).for_each(|cnt| {
+            assert!(board.is_star(stars[cnt]));
+        });
     }
 }
 #[cfg(test)]
@@ -143,9 +138,9 @@ mod board_update_test {
     fn move_from_home_test() {
         let mut board = Board::new();
         board.move_from_home(0, 0);
-        assert_eq!(board.home(0).unwrap().number_of_pieces, 3);
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
-        assert_eq!(board.outside(0).unwrap().player_id, Some(PlayerID::Player0));
+        assert_eq!(board.home[0].number_of_pieces, 3);
+        assert_eq!(board.outside[0].number_of_pieces, 1);
+        assert_eq!(board.outside[0].player_id, Some(PlayerID::Player0));
     }
 
     #[test]
@@ -154,64 +149,64 @@ mod board_update_test {
         for _ in 0..4 {
             board.move_from_home(0, 0);
         }
-        assert_eq!(board.home(0).unwrap().number_of_pieces, 0);
-        assert_eq!(board.home(0).unwrap().player_id, None);
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 4);
-        assert_eq!(board.outside(0).unwrap().player_id, Some(PlayerID::Player0));
+        assert_eq!(board.home[0].number_of_pieces, 0);
+        assert_eq!(board.home[0].player_id, None);
+        assert_eq!(board.outside[0].number_of_pieces, 4);
+        assert_eq!(board.outside[0].player_id, Some(PlayerID::Player0));
     }
 
     #[test]
     fn move_into_home_test() {
         let mut board = Board::new();
         board.move_from_home(0, 0);
-        assert_eq!(board.home(0).unwrap().number_of_pieces, 3);
-        assert_eq!(board.home(0).unwrap().player_id, Some(PlayerID::Player0));
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
-        assert_eq!(board.outside(0).unwrap().player_id, Some(PlayerID::Player0));
+        assert_eq!(board.home[0].number_of_pieces, 3);
+        assert_eq!(board.home[0].player_id, Some(PlayerID::Player0));
+        assert_eq!(board.outside[0].number_of_pieces, 1);
+        assert_eq!(board.outside[0].player_id, Some(PlayerID::Player0));
 
         board.move_into_home(0, 0);
-        assert_eq!(board.home(0).unwrap().number_of_pieces, 4);
-        assert_eq!(board.home(0).unwrap().player_id, Some(PlayerID::Player0));
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 0);
-        assert_eq!(board.outside(0).unwrap().player_id, None);
+        assert_eq!(board.home[0].number_of_pieces, 4);
+        assert_eq!(board.home[0].player_id, Some(PlayerID::Player0));
+        assert_eq!(board.outside[0].number_of_pieces, 0);
+        assert_eq!(board.outside[0].player_id, None);
     }
 
     #[test]
     fn move_pieces_test() {
         let mut board = Board::new();
         board.move_from_home(0, 0);
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[0].number_of_pieces, 1);
+        assert_ne!(board.outside[1].number_of_pieces, 1);
 
         board.update_outside(0, 0, 1);
-        assert_eq!(board.outside(1).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(0).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[1].number_of_pieces, 1);
+        assert_ne!(board.outside[0].number_of_pieces, 1);
 
         board.update_outside(0, 1, 9);
-        assert_eq!(board.outside(9).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[9].number_of_pieces, 1);
+        assert_ne!(board.outside[1].number_of_pieces, 1);
 
         board.update_outside(0, 9, 10);
-        assert_eq!(board.outside(10).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[10].number_of_pieces, 1);
     }
 
     #[test]
     fn move_pieces_test_2() {
         let mut board = Board::new();
         board.move_from_home(0, 0);
-        assert_eq!(board.outside(0).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[0].number_of_pieces, 1);
+        assert_ne!(board.outside[1].number_of_pieces, 1);
 
         board.update_outside(0, 0, 1);
-        assert_eq!(board.outside(1).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(0).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[1].number_of_pieces, 1);
+        assert_ne!(board.outside[0].number_of_pieces, 1);
 
         board.update_outside(0, 1, 9);
-        assert_eq!(board.outside(9).unwrap().number_of_pieces, 1);
-        assert_ne!(board.outside(1).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[9].number_of_pieces, 1);
+        assert_ne!(board.outside[1].number_of_pieces, 1);
 
         board.update_outside(0, 9, 10);
-        assert_eq!(board.outside(10).unwrap().number_of_pieces, 1);
+        assert_eq!(board.outside[10].number_of_pieces, 1);
     }
 
     #[test]
@@ -220,13 +215,10 @@ mod board_update_test {
         board.move_from_home(0, 0);
         board.update_outside(0, 0, 51);
         board.move_inside(0, 51, 52);
-        if let Some(inside_piece) = board.inside(0) {
-            assert_eq!(inside_piece.number_of_pieces, 1);
-            assert_eq!(inside_piece.position, 52);
-            assert_eq!(inside_piece.state, State::Inside);
-        }
-
-        assert_eq!(board.outside(51).unwrap().number_of_pieces, 0);
+            assert_eq!(board.inside[0].number_of_pieces, 1);
+            assert_eq!(board.inside[0].position, 52);
+            assert_eq!(board.inside[0].state, State::Inside);
+        assert_eq!(board.outside[51].number_of_pieces, 0);
     }
 
     #[test]
@@ -235,12 +227,10 @@ mod board_update_test {
         board.move_from_home(0, 0);
         board.update_outside(0, 0, 51);
         board.move_inside(0, 51, 52);
-        if let Some(inside_piece) = board.inside(0) {
-            assert_eq!(inside_piece.number_of_pieces, 1);
-            assert_eq!(inside_piece.player_id, Some(PlayerID::Player0));
-        }
-        assert_eq!(board.outside(51).unwrap().number_of_pieces, 0);
-        assert_eq!(board.outside(51).unwrap().player_id, None);
+            assert_eq!(board.inside[0].number_of_pieces, 1);
+            assert_eq!(board.inside[0].player_id, Some(PlayerID::Player0));
+        assert_eq!(board.outside[51].number_of_pieces, 0);
+        assert_eq!(board.outside[51].player_id, None);
     }
 
     #[test]
@@ -250,15 +240,13 @@ mod board_update_test {
         board.update_outside(0, 0, 50);
         board.enter_goal(0, 50);
 
-        assert_eq!(board.goal(0).unwrap().number_of_pieces, 1);
+        assert_eq!(board.goal[0].number_of_pieces, 1);
 
         board.move_from_home(0, 50);
         board.move_inside(0, 50, 56);
-        if let Some(board) = board.inside(4) {
-            assert_eq!(board.number_of_pieces, 1);
-        }
+            assert_eq!(board.inside[4].number_of_pieces, 1);
         board.enter_goal(0, 56);
-        assert_eq!(board.goal(0).unwrap().number_of_pieces, 2);
+        assert_eq!(board.goal[0].number_of_pieces, 2);
     }
 
     #[test]
@@ -270,7 +258,7 @@ mod board_update_test {
                 board.update_outside(i, 0, 50);
                 board.enter_goal(i, 50);
             }
-            assert_eq!(board.goal(i).unwrap().number_of_pieces, 4);
+            assert_eq!(board.goal[i as usize].number_of_pieces, 4);
         }
     }
 }
