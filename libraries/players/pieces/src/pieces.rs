@@ -1,4 +1,6 @@
 mod pieces {
+
+    #[derive(PartialEq, Debug)]
     pub struct State {
         position: i8,
         home: bool,
@@ -7,6 +9,7 @@ mod pieces {
         goal: bool,
     }
 
+    #[derive(PartialEq, Debug)]
     pub struct Piece {
         id: i8,
         state: State,
@@ -47,11 +50,11 @@ mod pieces {
         }
 
         pub fn position(&self) -> i8 {
-            self.state.position as i8
+            self.state.position
         }
 
         pub fn set_position(&mut self, position: i8) {
-            self.state.position = position as i8;
+            self.state.position = position;
         }
 
         pub fn free(&mut self) {

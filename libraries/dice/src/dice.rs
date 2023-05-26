@@ -2,7 +2,7 @@ mod dice {
     use rand::distributions::Uniform;
     use rand::Rng;
 
-
+    #[derive(PartialEq, Debug)]
     pub struct Dice {
         value: i8,
         dist: Uniform<i8>,

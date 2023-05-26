@@ -1,11 +1,11 @@
 mod players {
-    use std::{collections::HashMap, cell::RefCell, rc::Rc};
+    use std::{cell::RefCell, rc::Rc};
 
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
-    
 
+    #[derive(PartialEq, Debug)]
     pub struct Player {
         id: i8,
         pieces: Vec<Piece>,
@@ -81,46 +81,162 @@ mod players {
         //     self.move_piece(piece_id, dice_number);
         // }
 
-        fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
-             let position = self.update_position(piece_id, dice_number);
-             self.update_piece(piece_id, position);
+        pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
+            let old_position = self.piece(piece_id).position();
+            let new_position = old_position + dice_number;
+            self.update_piece_state(piece_id, old_position, new_position);
         }
 
-        fn update_position(&mut self, piece_id: i8, dice_number: i8) -> i8 {
-            let initial_position = self.piece(piece_id).position() as i8;
-            initial_position + dice_number
+        fn update_piece_state(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            let res = self.try_enter_inside(piece_id, old_position, new_position);
+            if res == Ok(()) {
+                return;
+            }
+            let res = self.try_enter_goal(piece_id, old_position, res.unwrap_err());
+            if res == Ok(()) {
+                return;
+            }
+            let res = self.try_move_back(piece_id, old_position, res.unwrap_err());
+            if res == Ok(()) {
+                return;
+            }
+            let res = self.try_update_outside(piece_id, old_position, res.unwrap_err());
+            if res == Ok(()) {
+                return;
+            }
         }
 
-        pub fn enter_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8)  {
-            let position = match (new_position, old_position, self.id) {
-                (51..=56, 0..=51, 0) => new_position,
-                _ => new_position,
+        fn try_update_outside(
+            &mut self,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) -> Result<(), i8> {
+            self.piece(piece_id).set_position(new_position);
+            self.piece(piece_id).not_safe();
+            self.board().borrow_mut().update_outside(
+                self.id(),
+                old_position.into(),
+                new_position.into(),
+            );
+            Ok(())
+        }
+
+        fn check_sharing_square(&mut self) {
+            for i in 0..4 {
+                for j in 0..4 {
+                    if i != j
+                        && self.piece(i).position() == self.piece(j).position()
+                        && !self.piece(i).is_home()
+                        && !self.piece(j).is_home()
+                    {
+                        self.piece(i).dangerous();
+                        self.piece(j).dangerous();
+                        break;
+                    }
+                }
+            }
+        }
+
+        fn try_move_back(
+            &mut self,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) -> Result<(), i8> {
+            let adjusted_position = match (self.id, old_position, new_position) {
+                (0, 52..=56, 58..=62)
+                | (1, 57..=61, 63..=67)
+                | (2, 62..=66, 68..=72)
+                | (3, 67..=71, 73..=77) => new_position - 6,
+                _ => return Err(new_position),
             };
-            self.piece(piece_id).set_position(position);
-            self.board().borrow_mut().move_inside(self.id(), old_position as usize, new_position as usize);
-            
-            // let pos = self.adjust_pos_when_entering_goal(pos);
-            // let pos = self.adjust_pos_for_multiplayers(pos);
-            // self.go_back_when_overshoot(pos)
+            self.piece(piece_id).set_position(adjusted_position);
+            self.board().borrow_mut().update_inside(
+                self.id(),
+                old_position as isize,
+                adjusted_position as isize,
+            );
+            Ok(())
+        }
+
+        fn try_enter_goal(
+            &mut self,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) -> Result<(), i8> {
+            match (self.id, old_position, new_position) {
+                (0, 50, 56) | (0, 52..=56, 57) | (0, 44..=49, 50) => {
+                    self.enter_goal(piece_id, old_position);
+                    Ok(())
+                }
+                (1, 11, 17) | (1, 57..=61, 62) | (1, 5..=10, 11) => {
+                    self.enter_goal(piece_id, old_position);
+                    Ok(())
+                }
+                (2, 24, 30) | (2, 62..=66, 67) | (2, 18..=23, 24) => {
+                    self.enter_goal(piece_id, old_position);
+                    Ok(())
+                }
+                (3, 37, 43) | (3, 67..=71, 72) | (3, 31..=36, 37) => {
+                    self.enter_goal(piece_id, old_position);
+                    Ok(())
+                }
+                _ => Err(new_position),
+            }
+        }
+
+        fn try_enter_inside(
+            &mut self,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) -> Result<(), i8> {
+            match (self.id, old_position, new_position) {
+                (0, 45..=50, 51..=55) => {
+                    let new_position: i8 = new_position + 1;
+                    self.enter_inside(piece_id, old_position, new_position);
+                    Ok(())
+                }
+                (1, 6..=11, 12..=16) => {
+                    let new_position: i8 = new_position + 45;
+                    self.enter_inside(piece_id, old_position, new_position);
+                    Ok(())
+                }
+                (2, 19..=24, 25..=29) => {
+                    let new_position: i8 = new_position + 37;
+                    self.enter_inside(piece_id, old_position, new_position);
+                    Ok(())
+                }
+                (3, 32..=37, 38..=42) => {
+                    let new_position: i8 = new_position + 29;
+                    self.enter_inside(piece_id, old_position, new_position);
+                    Ok(())
+                }
+                _ => Err(new_position),
+            }
+        }
+
+        fn enter_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            self.piece(piece_id).set_position(new_position);
+            self.board().borrow_mut().move_inside(
+                self.id(),
+                old_position as usize,
+                new_position as usize,
+            );
+        }
+
+        fn enter_goal(&mut self, piece_id: i8, old_position: i8) {
+            self.piece(piece_id).goal();
+            self.board()
+                .borrow_mut()
+                .enter_goal(self.id(), old_position.into());
         }
 
         pub fn adjust_pos_for_multiplayers(&mut self, pos: i8) -> i8 {
             match (pos, self.id) {
                 (52..=56, 1..=3) => pos - 52,
-                _ => pos,
-            }
-        }
-
-        pub fn go_back_when_overshoot(&mut self, piece_id: i8, pos: i8) -> i8 {
-            match (pos, self.id) {
-                (58..=62, 0) => 52 + (62 - pos),
-                _ => pos,
-            }
-        }
-
-        pub fn adjust_pos_when_entering_goal(&mut self, pos: i8) -> i8 {
-            match (pos, self.id) {
-                (57, 0) => 99,
                 _ => pos,
             }
         }
@@ -180,7 +296,14 @@ mod players {
                 0
             }
         }
-        
+
+        pub fn die(&mut self, piece_id: i8) {
+            let new_pos = self.piece(piece_id).position();
+            self.piece(piece_id).dead();
+            self.board()
+                .borrow_mut()
+                .move_into_home(self.id(), new_pos.into());
+        }
 
         pub fn is_player_turn(&self) -> bool {
             self.turn
@@ -204,8 +327,8 @@ mod players {
                 dice,
             ) {
                 (true, _, _) | (_, true, 1..=5) => Act::Nothing,
-                (false, true, 6) => Act::Free,
-                (false, _, 1..=6) => Act::Move,
+                (_, true, 6) => Act::Free,
+                (false, false, 1..=6) => Act::Move,
                 _ => Act::Nothing,
             }
         }
@@ -231,10 +354,6 @@ mod players {
         //     available_pieces[index]
         // }
 
-        pub fn update_piece_state(&mut self, old_pos: i8, new_pos: i8) {
-            self.board().borrow_mut().update_outside(self.id(), old_pos.into(), new_pos.into());
-        }
-
         // pub fn play_random(&mut self) {
         //     while self.is_player_turn() {
         //         let dice = self.roll_dice();
@@ -247,36 +366,7 @@ mod players {
         pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|p: &Piece| p.is_goal())
         }
-
-        pub fn update_piece(&mut self, piece_id: i8, new_pos: i8) {
-            let old_pos = self.piece(piece_id).position();
-            self.piece(piece_id).set_position(new_pos);
-            self.update_piece_state(old_pos, new_pos);
-        }
-
-        fn check_sharing_square(&mut self) {
-            let mut position_map: HashMap<i8, i8> = HashMap::new();
-            for i in 0..4 {
-                let pos = self.piece(i).position();
-                if pos == -1 || pos == 99 {
-                    continue;
-                }
-                let count = position_map.entry(pos).or_insert(0);
-                *count += 1;
-            }
-
-            for i in 0..4 {
-                let pos = self.piece(i).position();
-                if pos == -1 || pos == 99 {
-                    continue;
-                }
-                match position_map.get(&pos) {
-                    Some(&count) if count > 1 => self.piece(i).dangerous(),
-                    _ => self.piece(i).not_safe(),
-                }
-            }
-        }
     }
 }
 
-pub use players::{Player, Act};
+pub use players::{Act, Player};

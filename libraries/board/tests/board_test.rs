@@ -128,9 +128,9 @@ mod board_tests {
     fn board_star_spaces_test() {
         let board = Board::new();
         for cnt in 0..8 {
-            if let Some(state) = board.star(cnt){ 
-            assert_eq!(state.player_id, None);
-            assert_eq!(state.number_of_pieces, 0);
+            if let Some(state) = board.star(cnt) {
+                assert_eq!(state.player_id, None);
+                assert_eq!(state.number_of_pieces, 0);
             }
         }
     }
@@ -254,7 +254,7 @@ mod board_update_test {
 
         board.move_from_home(0, 50);
         board.move_inside(0, 50, 56);
-        if let Some(board) = board.inside(4)    {
+        if let Some(board) = board.inside(4) {
             assert_eq!(board.number_of_pieces, 1);
         }
         board.enter_goal(0, 56);
