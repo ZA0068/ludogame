@@ -99,7 +99,7 @@ mod board_tests {
         let board = Board::new();
         for cnt in 0..20 {
             let pos = board.inside[cnt].position;
-            assert!(board.is_inside(pos));
+            assert!(board.inside(pos as usize).unwrap().position == pos);
         }
     }
 
@@ -260,5 +260,18 @@ mod board_update_test {
             }
             assert_eq!(board.goal[i as usize].number_of_pieces, 4);
         }
+    }
+
+    #[test]
+    fn is_occupied_test() {
+        let mut board = Board::new();
+        board.move_from_home(0, 0);
+        board.update_outside(0, 0, 4);
+        assert!(board.is_occupied(4));
+        assert!(!board.is_occupied(0));
+
+        board.update_outside(0, 4, 10);
+        assert!(board.is_occupied(10));
+        assert!(!board.is_occupied(4));
     }
 }

@@ -327,6 +327,10 @@ mod board {
                 return self.outside[pos as usize].get();
             }
         }
+
+        pub fn is_occupied(&self, pos: isize) -> bool {
+            self.outside[pos as usize].number_of_pieces > 0
+        }
     }
 
     fn get_player_id(id: i8) -> Option<PlayerID> {

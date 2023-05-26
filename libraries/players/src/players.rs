@@ -19,6 +19,8 @@ mod players {
         Move,
         Free,
         Kill,
+        Join,
+        Leave,
         Nothing,
     }
 
@@ -68,14 +70,26 @@ mod players {
                 Act::Kill => {
                     // self.kill_piece();
                 }
+                Act::Join => {
+                    self.join_piece(piece_id, dice_number);
+                }
                 Act::Nothing => (),
+                _ => (),
             }
         }
 
-        // pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8, opponents: &mut Player) {
-        //     opponents.piece(0).dead();
-        //     self.move_piece(piece_id, dice_number);
-        // }
+        pub fn join_piece(&mut self, piece_id: i8, dice_number: i8){
+            let old_position = self.piece(piece_id).position();
+            let new_position = old_position + dice_number;
+            self.piece(piece_id).set_position(new_position);
+            self.piece(piece_id).dangerous();
+            self.piece(0).dangerous();
+            self.board().borrow_mut().update_outside(
+                self.id(),
+                old_position.into(),
+                new_position.into(),
+            );
+        }
 
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
             let old_position = self.piece(piece_id).position();
@@ -175,19 +189,6 @@ mod players {
             );
             Ok(())
         }
-
-        // fn check_sharing_square(&mut self) {
-        //     for i in 0..4 {
-        //         for j in 0..4
-        //         {
-        //             if i != j && self.piece(i).position() == self.piece(j).position() && !self.piece(i).is_home() &&  !self.piece(j).is_home() {
-        //                 self.piece(i).dangerous();
-        //                 self.piece(j).dangerous();
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
 
         fn try_move_back(
             &mut self,

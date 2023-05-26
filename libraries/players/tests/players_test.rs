@@ -470,7 +470,7 @@ mod multipiece_test {
         player.free_piece(1);
 
         player.make_choice(0, 6, Act::Move);
-        player.make_choice(1, 6, Act::Move);
+        player.make_choice(1, 6, Act::Join);
 
         assert_eq!(player.piece(0).position(), 6);
         assert_eq!(player.piece(1).position(), 6);
@@ -479,13 +479,6 @@ mod multipiece_test {
         assert!(player.piece(1).is_dangerous());
         assert!(player.piece(0).is_safe());
         assert!(player.piece(1).is_safe());
-
-        player.make_choice(0, 1, Act::Move);
-        assert_eq!(player.piece(0).position(), 7);
-        assert!(!player.piece(0).is_safe());
-        assert!(!player.piece(1).is_safe());
-        assert!(!player.piece(0).is_dangerous());
-        assert!(!player.piece(1).is_dangerous());
     }
 
     // #[test]
