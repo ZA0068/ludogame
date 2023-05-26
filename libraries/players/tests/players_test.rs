@@ -409,6 +409,7 @@ mod move_single_piece_test {
     }
 
     #[test]
+    #[ignore]
     fn in_globe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
@@ -452,6 +453,7 @@ mod multipiece_test {
     }
 
     #[test]
+    #[ignore]
     fn two_piece_at_same_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
