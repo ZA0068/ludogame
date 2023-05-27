@@ -1,4 +1,7 @@
 mod board {
+
+    use pieces::Piece;
+
     #[derive(Copy, Clone, Debug, PartialEq)]
     pub enum PlayerID {
         Player0,
@@ -28,11 +31,11 @@ mod board {
         Star,
     }
 
-    #[derive(Copy, Clone, Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq)]
 
     pub struct BoardState {
         pub position: i8,
-        pub number_of_pieces: i8,
+        pub pieces: Vec<Piece>,
         pub player_id: Option<PlayerID>,
         pub state: State,
     }
@@ -41,7 +44,7 @@ mod board {
         pub fn new() -> BoardState {
             BoardState {
                 position: -1,
-                number_of_pieces: 0,
+                pieces: Vec::new(),
                 player_id: None,
                 state: State::Home,
             }
@@ -49,13 +52,13 @@ mod board {
 
         pub fn create(
             position: i8,
-            number_of_pieces: i8,
+            pieces: Vec<Piece>,
             player_id: Option<PlayerID>,
             state: State,
         ) -> BoardState {
             BoardState {
                 position,
-                number_of_pieces,
+                pieces,
                 player_id,
                 state,
             }
@@ -63,12 +66,12 @@ mod board {
         pub fn set(
             &mut self,
             position: i8,
-            number_of_pieces: i8,
+            pieces: Vec<Piece>,
             player_id: Option<PlayerID>,
             state: State,
         ) {
             self.position = position;
-            self.number_of_pieces = number_of_pieces;
+            self.pieces = pieces;
             self.player_id = player_id;
             self.state = state;
         }
@@ -84,7 +87,7 @@ mod board {
         }
     }
 
-    #[derive(Copy, Clone, Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq)]
     pub struct Board {
         pub home: [BoardState; 4],
         pub goal: [BoardState; 4],
@@ -96,14 +99,14 @@ mod board {
     }
 
     impl Board {
-        pub fn new() -> Self {
-            let home = Self::initialize_home();
-            let goal = Self::initialize_goal();
-            let mut outside = Self::initialize_outside();
-            let inside = Self::initialize_inside();
-            let globe = Self::initialize_globe(&mut outside);
-            let invincible = Self::initialize_invincible(&mut outside);
-            let star = Self::initialize_star(&mut outside);
+        pub fn new(&mut self) -> Self {
+            let home = self.initialize_home();
+            let goal = self.initialize_goal();
+            let mut outside = self.initialize_outside();
+            let inside = self.initialize_inside();
+            let globe = self.initialize_globe(&mut outside);
+            let invincible = self.initialize_invincible(&mut outside);
+            let star = self.initialize_star(&mut outside);
 
             Self {
                 home,
@@ -116,24 +119,31 @@ mod board {
             }
         }
 
-        fn initialize_home() -> [BoardState; 4] {
-            let mut home = [BoardState::new(); 4];
+        fn initialize_home(&mut self) -> [BoardState; 4] {
+            let mut home = self.home.clone();
             let player_ids = [
                 PlayerID::Player0,
                 PlayerID::Player1,
                 PlayerID::Player2,
                 PlayerID::Player3,
             ];
-            for (position, player_id) in home.iter_mut().zip(player_ids.iter()) {
-                position.set(-1, 4, Some(*player_id), State::Home);
+            let pieces = vec![
+                Piece::new(0),
+                Piece::new(1),
+                Piece::new(2),
+                Piece::new(3),
+            ];
+
+            for (position, player_id) in self.home.iter_mut().zip(player_ids.iter()) {
+                position.set(-1, pieces, Some(*player_id), State::Home);
             }
             home
         }
 
-        fn initialize_goal() -> [BoardState; 4] {
-            let mut goal = [BoardState::new(); 4];
+        fn initialize_goal(&mut self) -> [BoardState; 4] {
+            let mut goal = self.goal.clone();
             (0..4).for_each(|position| {
-                goal[position] = BoardState::create(99, 0, None, State::Goal);
+                goal[position] = BoardState::create(99, vec![], None, State::Goal);
             });
 
             goal
@@ -213,39 +223,39 @@ mod board {
         }
 
         pub fn move_from_home(&mut self, id: i8, new_pos: isize) {
-            self.home[id as usize].number_of_pieces -= 1;
-            if self.home[id as usize].number_of_pieces == 0 {
+            self.home[id as usize].pieces -= 1;
+            if self.home[id as usize].pieces == 0 {
                 self.home[id as usize].player_id = None;
             }
 
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
-            self.outside[new_pos as usize].number_of_pieces += 1;
+            self.outside[new_pos as usize].pieces += 1;
         }
 
         pub fn move_into_home(&mut self, id: i8, old_pos: isize) {
-            self.home[id as usize].number_of_pieces += 1;
+            self.home[id as usize].pieces += 1;
             self.home[id as usize].player_id = Some(get_player_id(id).unwrap());
-            self.outside[old_pos as usize].number_of_pieces -= 1;
-            if self.outside[old_pos as usize].number_of_pieces == 0 {
+            self.outside[old_pos as usize].pieces -= 1;
+            if self.outside[old_pos as usize].pieces == 0 {
                 self.outside[old_pos as usize].player_id = None;
             }
         }
 
         pub fn update_outside(&mut self, id: i8, old_pos: isize, new_pos: isize) {
-            if self.outside[old_pos as usize].number_of_pieces > 0 {
-                self.outside[old_pos as usize].number_of_pieces -= 1;
-                if self.outside[old_pos as usize].number_of_pieces == 0 {
+            if self.outside[old_pos as usize].pieces > 0 {
+                self.outside[old_pos as usize].pieces -= 1;
+                if self.outside[old_pos as usize].pieces == 0 {
                     self.outside[old_pos as usize].player_id = None;
                 }
             }
-            self.outside[new_pos as usize].number_of_pieces += 1;
+            self.outside[new_pos as usize].pieces += 1;
             self.outside[new_pos as usize].player_id = Some(get_player_id(id).unwrap());
         }
 
         pub fn move_inside(&mut self, id: i8, old_pos: usize, new_pos: usize) {
-            if self.outside[old_pos].number_of_pieces > 0 {
-                self.outside[old_pos].number_of_pieces -= 1;
-                if self.outside[old_pos].number_of_pieces == 0 {
+            if self.outside[old_pos].pieces > 0 {
+                self.outside[old_pos].pieces -= 1;
+                if self.outside[old_pos].pieces == 0 {
                     self.outside[old_pos].player_id = None;
                 }
             }
@@ -256,7 +266,7 @@ mod board {
                 .position(|&x| x.position == new_pos as i8)
                 .unwrap();
 
-            self.inside[index].number_of_pieces += 1;
+            self.inside[index].pieces += 1;
             self.inside[index].player_id = Some(get_player_id(id).unwrap());
         }
 
@@ -277,14 +287,14 @@ mod board {
             let old_index = old_index_option.unwrap();
             let new_index = new_index_option.unwrap();
 
-            if self.inside[old_index].number_of_pieces > 0 {
-                self.inside[old_index].number_of_pieces -= 1;
-                if self.inside[old_index].number_of_pieces == 0 {
+            if self.inside[old_index].pieces > 0 {
+                self.inside[old_index].pieces -= 1;
+                if self.inside[old_index].pieces == 0 {
                     self.inside[old_index].player_id = None;
                 }
             }
 
-            self.inside[new_index].number_of_pieces += 1;
+            self.inside[new_index].pieces += 1;
             self.inside[new_index].player_id = Some(get_player_id(id).unwrap());
         }
 
@@ -301,8 +311,8 @@ mod board {
                             old_pos, idx
                         );
                     }
-                    old_position.number_of_pieces -= 1;
-                    if old_position.number_of_pieces == 0 {
+                    old_position.pieces -= 1;
+                    if old_position.pieces == 0 {
                         old_position.player_id = None;
                     }
                 } else {
@@ -315,15 +325,15 @@ mod board {
                         old_pos, idx
                     );
                 }
-                old_position.number_of_pieces -= 1;
-                if old_position.number_of_pieces == 0 {
+                old_position.pieces -= 1;
+                if old_position.pieces == 0 {
                     old_position.player_id = None;
                 }
             } else {
                 panic!("Invalid outside position: {}", old_pos);
             }
 
-            self.goal[id as usize].number_of_pieces += 1;
+            self.goal[id as usize].pieces += 1;
             self.goal[id as usize].player_id = Some(id);
         }
 
@@ -339,11 +349,11 @@ mod board {
         }
 
         pub fn is_occupied_more(&self, new_pos: i8) -> bool {
-            self.outside[new_pos as usize].number_of_pieces > 1
+            self.outside[new_pos as usize].pieces > 1
         }
 
         pub fn is_occupied(&self, pos: i8) -> bool {
-            self.outside[pos as usize].number_of_pieces > 0
+            self.outside[pos as usize].pieces > 0
         }
 
         pub fn is_occupied_by_other(&self, id: i8, pos: i8) -> bool {

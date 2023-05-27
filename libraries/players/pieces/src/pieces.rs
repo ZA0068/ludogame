@@ -1,6 +1,6 @@
 mod pieces {
 
-    #[derive(PartialEq, Debug)]
+    #[derive(PartialEq, Debug, Clone)]
     pub struct State {
         position: i8,
         home: bool,
@@ -9,7 +9,7 @@ mod pieces {
         goal: bool,
     }
 
-    #[derive(PartialEq, Debug)]
+    #[derive(PartialEq, Debug, Clone)]
     pub struct Piece {
         id: i8,
         state: State,

@@ -26,6 +26,9 @@ dependencies = [
 [[package]]
 name = "board"
 version = "0.1.1"
+dependencies = [
+ "pieces",
+]
 
 [[package]]
 name = "boolinator"
