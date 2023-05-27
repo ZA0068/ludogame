@@ -8,7 +8,7 @@ name = "players"
 path = "src/players.rs"
 
 [dependencies]
-pieces = { path = "pieces" }
+pieces = { path = "../pieces" }
 dice = { path = "../dice" }
 board = { path = "../board" }
 rand = "0.8.4"

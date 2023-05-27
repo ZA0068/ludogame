@@ -3,12 +3,10 @@ mod players {
 
     use board::Board;
     use dice::Dice;
-    use pieces::Piece;
 
     #[derive(PartialEq, Debug)]
     pub struct Player {
         id: i8,
-        pieces: Vec<Piece>,
         turn: bool,
         dice: Option<Rc<RefCell<Dice>>>,
         board: Rc<RefCell<Board>>,
@@ -34,13 +32,8 @@ mod players {
 
     impl Player {
         pub fn new(id: i8, board: Rc<RefCell<Board>>, dice: Option<Rc<RefCell<Dice>>>) -> Player {
-            let mut pieces = vec![];
-            for i in 0..4 {
-                pieces.push(Piece::new(i));
-            }
             Player {
                 id,
-                pieces,
                 turn: false,
                 board,
                 dice,
@@ -52,7 +45,7 @@ mod players {
         }
 
         pub fn piece(&mut self, piece_id: i8) -> &mut Piece {
-            &mut self.pieces[piece_id as usize]
+            &mut self.board().borrow_mut().pieces[piece_id as usize]
         }
 
         pub fn board(&self) -> &Rc<RefCell<Board>> {
