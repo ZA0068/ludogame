@@ -24,6 +24,14 @@ mod players {
         Nothing,
     }
 
+    // pub trait Playstyle {
+        // fn aggro_play(&mut self) -> Vec<Act>;
+        // fn fast_aggro_play(&mut self) -> Vec<Act>;
+        // fn random_play(&mut self, piece_id: i8, dice_number: i8) -> Vec<Act>;
+        // fn safe_play(&mut self) -> Vec<Act>;
+        // fn fast_play(&mut self) -> Vec<Act>;
+    // }
+
     impl Player {
         pub fn new(id: i8, board: Rc<RefCell<Board>>, dice: Option<Rc<RefCell<Dice>>>) -> Player {
             let mut pieces = vec![];
@@ -59,7 +67,7 @@ mod players {
             self.dice = None;
         }
 
-        pub fn make_choice(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
+        pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
             match choice {
                 Act::Move => {
                     self.move_piece(piece_id, dice_number);
@@ -68,41 +76,81 @@ mod players {
                     self.free_piece(piece_id);
                 }
                 Act::Kill => {
-                    // self.kill_piece();
+                    self.kill_piece(piece_id, dice_number);
                 }
                 Act::Join => {
                     self.join_piece(piece_id, dice_number);
                 }
+                Act::Leave => {
+                    self.leave_piece(piece_id, dice_number);
+                }
                 Act::Nothing => (),
-                _ => (),
             }
         }
 
-        pub fn join_piece(&mut self, piece_id: i8, dice_number: i8){
-            let old_position = self.piece(piece_id).position();
-            let new_position = old_position + dice_number;
-            self.piece(piece_id).set_position(new_position);
-            self.piece(piece_id).dangerous();
-            self.piece(0).dangerous();
-            self.board().borrow_mut().update_outside(
-                self.id(),
-                old_position.into(),
-                new_position.into(),
-            );
+        pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
+            let pos = self.piece(piece_id).position() + dice_number;
+            let other_player_id = self.board.borrow_mut().outside(pos as usize).unwrap().player_id.unwrap() as i8;
+            
+            self.board.borrow_mut().move_into_home(other_player_id, pos as isize);
+
         }
 
+        pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.move_piece(piece_id, dice_number);
+        
+            let board = *self.board().borrow();
+        
+            for i in 0..4 {
+                let piece = self.piece(i);
+        
+                if piece.is_home() {
+                    continue;
+                }
+        
+                let pos = piece.position();
+        
+                if board.is_globe(pos) || board.is_occupied_more(pos) {
+                    piece.dangerous();
+                } else {
+                    piece.not_safe();
+                }
+            }
+        }
+        
+
+        pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.move_piece(piece_id, dice_number);
+            let piece_position = self.piece(piece_id).position();
+        
+            for i in 0..4 {
+                let piece = self.piece(i);
+                let pos = piece.position();
+        
+                if pos == piece_position {
+                    piece.dangerous();
+                }
+            }
+        }
+        
+
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
-            let old_position = self.piece(piece_id).position();
-            let new_position = old_position + dice_number;
+            let (old_position, new_position) = self.update_position(piece_id, dice_number);
             self.update_piece_state(piece_id, old_position, new_position);
         }
 
+        fn update_position(&mut self, piece_id: i8, dice_number: i8) -> (i8, i8) {
+            let old_position = self.piece(piece_id).position();
+            let new_position = old_position + dice_number;
+            (old_position, new_position)
+        }
+
         fn update_piece_state(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            let res = self.try_enter_inside(piece_id, old_position, new_position);
+            let res = self.try_enter_goal(piece_id, old_position, new_position);
             if res == Ok(()) {
                 return;
             }
-            let res = self.try_enter_goal(piece_id, old_position, res.unwrap_err());
+            let res = self.try_enter_inside(piece_id, old_position, res.unwrap_err());
             if res == Ok(()) {
                 return;
             }
@@ -127,25 +175,22 @@ mod players {
             old_position: i8,
             new_position: i8,
         ) -> Result<(), i8> {
-            if self.board().borrow().is_star(new_position as usize) {
-                self.starjump(piece_id, new_position, old_position);
-                return Ok(());
-                }
-                Err(new_position)
-            }
+            let star_position = match (old_position, new_position) {
+                (51, 5) | (0..=4, 5) => 11,
+                (5..=10, 11)  if self.id() != 1 => 18,
+                (12..=17, 18) => 24,
+                (18..=23, 24) if self.id() != 2 => 31,
+                (25..=30, 31) => 37,
+                (31..=36, 37) if self.id() != 3 => 44,
+                (38..=43, 44) => 50,
+                (44..=49, 50) if self.id() != 0 => 5,
+                _ => return Err(new_position),
+            };
+            self.starjump(piece_id, star_position, old_position);
+            Ok(())
+        }
 
         fn starjump(&mut self, piece_id: i8, new_position: i8, old_position: i8) {
-            let new_position = match new_position {
-                5 => 11,
-                11 => 18,
-                18 => 24,
-                24 => 31,
-                31 => 37,
-                37 => 44,
-                44 => 50,
-                50 => 5,
-                _ => new_position,
-            };
             self.piece(piece_id).set_position(new_position);
             self.piece(piece_id).not_safe();
             self.board().borrow_mut().update_outside(
@@ -161,7 +206,7 @@ mod players {
             old_position: i8,
             new_position: i8,
         ) -> Result<(), i8> {
-            if self.board().borrow().is_globe(new_position as usize) {
+            if self.board().borrow().is_globe(new_position) {
                 self.piece(piece_id).set_position(new_position);
                 self.piece(piece_id).dangerous();
                 self.board().borrow_mut().update_outside(
@@ -180,6 +225,16 @@ mod players {
             old_position: i8,
             new_position: i8,
         ) -> Result<(), i8> {
+            let new_position = match (self.id(), new_position) {
+                (1, 52..=58) | (2, 52..=58) | (3, 52..=58) => new_position - 52,
+                _ => new_position,
+            };
+            self.update_outside(piece_id, new_position, old_position);
+            Ok(())
+        }
+        
+
+        fn update_outside(&mut self, piece_id: i8, new_position: i8, old_position: i8) {
             self.piece(piece_id).set_position(new_position);
             self.piece(piece_id).not_safe();
             self.board().borrow_mut().update_outside(
@@ -187,7 +242,6 @@ mod players {
                 old_position.into(),
                 new_position.into(),
             );
-            Ok(())
         }
 
         fn try_move_back(
@@ -223,8 +277,9 @@ mod players {
             old_position: i8,
             new_position: i8,
         ) -> Result<(), i8> {
-            match (piece_id, old_position, new_position) {
-                (0, 50, 56)
+            match (self.id(), old_position, new_position) {
+                (_, _, 99)
+                | (0, 50, 56)
                 | (0, 52..=56, 57)
                 | (0, 44..=49, 50)
                 | (1, 11, 17)
@@ -334,23 +389,67 @@ mod players {
             self.turn = self.dice.clone().unwrap().borrow().get_value() == 6;
         }
 
-        pub fn valid_moves(&mut self, piece_id: i8, dice: i8) -> Act {
+        pub fn valid_moves(&mut self, piece_id: i8, dice: i8) -> bool {
             if piece_id > 3 {
-                return Act::Nothing;
+                return false;
             }
             match (
                 self.piece(piece_id).is_goal(),
                 self.piece(piece_id).is_home(),
                 dice,
             ) {
-                (true, _, _) | (_, true, 1..=5) => Act::Nothing,
-                (_, true, 6) => Act::Free,
-                (false, false, 1..=6) => Act::Move,
-                _ => Act::Nothing,
+                (true, _, _) | (_, true, 1..=5) => false,
+                (_, true, 6) => true,
+                (false, false, 1..=6) => true,
+                _ => false,
             }
         }
 
-        pub fn is_finished(&self) -> bool {
+        pub fn select_choice(&mut self, piece_id: i8, dice_number: i8, action : Act) -> Act {
+        let valid_moves = self.valid_moves(piece_id, dice_number);
+        match (action, valid_moves) {
+            (Act::Free, true) => {
+                Act::Free
+            }
+            (Act::Move, true) => {
+                Act::Move
+            }
+            (Act::Join, true) => {
+                let pos = self.piece(piece_id).position();
+                let new_pos = pos + dice_number;
+                let is_occupied = self.board().borrow().is_occupied(new_pos);
+                if is_occupied {
+                    Act::Join
+                } else {
+                    Act::Nothing
+                }
+            }
+            (Act::Kill, true) => {
+                let pos = self.piece(piece_id).position();
+                let new_pos = pos + dice_number;
+                let occupied_by_other = self.board().borrow().is_occupied_by_other(new_pos, self.id());
+                if occupied_by_other {
+                    Act::Kill
+                } else {
+                    Act::Nothing
+                }
+            }
+            _ => Act::Nothing,
+        }
+    }
+
+    pub fn random_play(&mut self) {
+        while self.is_player_turn() {
+            let dice_number = self.roll_dice();
+            {
+                // self.make_choice(dice_number, Act::Free);
+                // self.make_choice(dice_number, Act::Free);
+            }
+            self.can_continue();
+        }
+    }
+
+    pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|p: &Piece| p.is_goal())
         }
     }

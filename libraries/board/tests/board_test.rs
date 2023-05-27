@@ -116,7 +116,7 @@ mod board_tests {
     fn invincible_test() {
         let board = Board::new();
         (0..4).for_each(|cnt| {
-            let pos = board.invincible[cnt];
+            let pos = board.invincible[cnt] as i8;
             assert!(board.is_invincible(pos));
         });
     }

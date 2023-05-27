@@ -7,6 +7,16 @@ mod board {
         Player3,
     }
 
+    fn get_player_id(id: i8) -> Option<PlayerID> {
+        match id {
+            0 => Some(PlayerID::Player0),
+            1 => Some(PlayerID::Player1),
+            2 => Some(PlayerID::Player2),
+            3 => Some(PlayerID::Player3),
+            _ => None,
+        }
+    }
+
     #[derive(Copy, Clone, Debug, PartialEq)]
     pub enum State {
         Home,
@@ -187,19 +197,19 @@ mod board {
             self.inside.get(position.checked_sub(52)?)
         }
 
-        pub fn is_globe(&self, position: usize) -> bool {
-            self.globe.contains(&position)
+        pub fn is_globe(&self, position: i8) -> bool {
+            self.globe.contains(&(position as usize))
         }
 
-        pub fn is_invincible(&self, position: usize) -> bool {
+        pub fn is_invincible(&self, position: i8) -> bool {
             // Return None if position is not in invincible
             self.invincible
-                .contains(&position)
+                .contains(&(position as usize))
         }
 
-        pub fn is_star(&self, position: usize) -> bool {
+        pub fn is_star(&self, position: i8) -> bool {
             // Return None if position is not in star
-            self.star.contains(&position)
+            self.star.contains(&(position as usize))
         }
 
         pub fn move_from_home(&mut self, id: i8, new_pos: isize) {
@@ -212,12 +222,12 @@ mod board {
             self.outside[new_pos as usize].number_of_pieces += 1;
         }
 
-        pub fn move_into_home(&mut self, id: i8, new_pos: isize) {
+        pub fn move_into_home(&mut self, id: i8, old_pos: isize) {
             self.home[id as usize].number_of_pieces += 1;
             self.home[id as usize].player_id = Some(get_player_id(id).unwrap());
-            self.outside[new_pos as usize].number_of_pieces -= 1;
-            if self.outside[new_pos as usize].number_of_pieces == 0 {
-                self.outside[new_pos as usize].player_id = None;
+            self.outside[old_pos as usize].number_of_pieces -= 1;
+            if self.outside[old_pos as usize].number_of_pieces == 0 {
+                self.outside[old_pos as usize].player_id = None;
             }
         }
 
@@ -328,20 +338,24 @@ mod board {
             }
         }
 
-        pub fn is_occupied(&self, pos: isize) -> bool {
+        pub fn is_occupied_more(&self, new_pos: i8) -> bool {
+            self.outside[new_pos as usize].number_of_pieces > 1
+        }
+
+        pub fn is_occupied(&self, pos: i8) -> bool {
             self.outside[pos as usize].number_of_pieces > 0
         }
+
+        pub fn is_occupied_by_other(&self, id: i8, pos: i8) -> bool {
+            if !self.is_occupied(pos) {
+                return false;
+            }
+            self.outside[pos as usize].player_id != get_player_id(id)
+        }
+
     }
 
-    fn get_player_id(id: i8) -> Option<PlayerID> {
-        match id {
-            0 => Some(PlayerID::Player0),
-            1 => Some(PlayerID::Player1),
-            2 => Some(PlayerID::Player2),
-            3 => Some(PlayerID::Player3),
-            _ => None,
-        }
-    }
+
 
     impl Default for Board {
         fn default() -> Self {
