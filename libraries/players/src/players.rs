@@ -70,72 +70,72 @@ mod players {
             self.dice = None;
         }
 
-    //     pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
-    //         match choice {
-    //             Act::Move => {
-    //                 self.move_piece(piece_id, dice_number);
-    //             }
-    //             Act::Free => {
-    //                 self.free_piece(piece_id).borrow_mut();
-    //             }
-    //             Act::Kill => {
+        pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
+            match choice {
+                Act::Move => {
+                    self.move_piece(piece_id, dice_number);
+                }
+                Act::Free => {
+                    self.free_piece(piece_id);
+                }
+                Act::Kill => {
                     // self.kill_piece(piece_id, dice_number);
-    //             }
-    //             Act::Join => {
-    //                 self.join_piece(piece_id, dice_number);
-    //             }
-    //             Act::Leave => {
-    //                 self.leave_piece(piece_id, dice_number);
-    //             }
-    //             Act::Nothing => (),
-    //         }
-    //     }
+                }
+                Act::Join => {
+                    self.join_piece(piece_id, dice_number);
+                }
+                Act::Leave => {
+                    // self.leave_piece(piece_id, dice_number);
+                }
+                Act::Nothing => (),
+            }
+        }
 
 
-    //     pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
-    //         let pos = self.piece(piece_id).borrow_mut().position() + dice_number;
-    //         let other_player_id = self.board.borrow_mut().outside(pos as usize).unwrap().player_id.unwrap() as i8;
+        // pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
+        //     let pos = self.piece(piece_id).borrow_mut().position() + dice_number;
+        //     let other_player_id = self.board.borrow_mut().outside(pos as usize).unwrap().player_id.unwrap() as i8;
             
-    //         self.board.borrow_mut().move_into_home(other_player_id, pos as isize);
+        //     self.board.borrow_mut().move_into_home(other_player_id, pos as isize);
 
-    //     }
+        // }
 
-    //     pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
-    //         self.move_piece(piece_id, dice_number);
+        // pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
+        //     self.move_piece(piece_id, dice_number);
         
-    //         let board = *self.board().borrow();
+        //     let board = self.board().borrow_mut();
         
-    //         for i in 0..4 {
-    //             let piece = self.piece(i);
+        //     for i in 0..4 {
+        //         let mut piece = self.piece(i).borrow_mut();
         
-    //             if piece.is_home() {
-    //                 continue;
-    //             }
+        //         if piece.is_home() {
+        //             continue;
+        //         }
         
-    //             let pos = piece.position();
+        //         let pos = piece.position();
         
-    //             if board.is_globe(pos) || board.is_occupied_more(pos) {
-    //                 piece.dangerous();
-    //             } else {
-    //                 piece.not_safe();
-    //             }
-    //         }
-    //     }
+        //         if board.is_globe(pos) || board.is_occupied_more(pos) {
+        //             piece.dangerous();
+        //         } else {
+        //             piece.not_safe();
+        //         }
+        //     }
+        // }
         
 
-    //     pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
-    //         self.move_piece(piece_id, dice_number);
-    //         let piece_position = self.piece(piece_id).borrow_mut().position();
+        pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.move_piece(piece_id, dice_number);
+            let piece_position = self.piece(piece_id).borrow_mut().position();
         
-    //         for i in 0..4 {
-    //             let piece = self.piece(i);
-    //             let pos = piece.position();
+            for i in 0..4 {
+                let piece = self.piece(i);
+                let pos = piece.borrow_mut().position();
         
-    //             if pos == piece_position {
-    //                 piece.dangerous();
-    //             }
-    //         }
-    //     }
+                if pos == piece_position {
+                    piece.borrow_mut().dangerous();
+                }
+            }
+        }
         
 
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -369,13 +369,15 @@ mod players {
             }
         }
 
-    //     pub fn die(&mut self, piece_id: i8) {
-    //         let new_pos = self.piece(piece_id).borrow_mut().position();
-    //         self.piece(piece_id).borrow_mut().dead();
-    //         self.board()
-    //             .borrow_mut()
-    //             .move_into_home(self.id(), new_pos.into());
-    //     }
+        pub fn die(&mut self, piece_id: i8) {
+            let old_position = self.piece(piece_id).borrow_mut().position();
+            self.piece(piece_id).borrow_mut().dead();
+            self.board()
+                .borrow_mut()
+                .move_into_home(self.id(), 
+                piece_id,
+                old_position);
+        }
 
         pub fn is_player_turn(&self) -> bool {
             self.turn
@@ -393,9 +395,13 @@ mod players {
             if piece_id > 3 {
                 return false;
             }
+            let binding = self.piece(piece_id);
+            let binding = binding.borrow_mut();
+            let is_home = binding.is_home();
+            let is_goal = binding.is_goal();
             match (
-                self.piece(piece_id).borrow_mut().is_goal(),
-                self.piece(piece_id).borrow_mut().is_home(),
+                is_goal,
+                is_home,
                 dice,
             ) {
                 (true, _, _) | (_, true, 1..=5) => false,
@@ -405,38 +411,38 @@ mod players {
             }
         }
 
-    //     pub fn select_choice(&mut self, piece_id: i8, dice_number: i8, action : Act) -> Act {
-    //     let valid_moves = self.valid_moves(piece_id, dice_number);
-    //     match (action, valid_moves) {
-    //         (Act::Free, true) => {
-    //             Act::Free
-    //         }
-    //         (Act::Move, true) => {
-    //             Act::Move
-    //         }
-    //         (Act::Join, true) => {
-    //             let pos = self.piece(piece_id).borrow_mut().position();
-    //             let new_pos = pos + dice_number;
-    //             let is_occupied = self.board().borrow().is_occupied(new_pos);
-    //             if is_occupied {
-    //                 Act::Join
-    //             } else {
-    //                 Act::Nothing
-    //             }
-    //         }
-    //         (Act::Kill, true) => {
-    //             let pos = self.piece(piece_id).borrow_mut().position();
-    //             let new_pos = pos + dice_number;
-    //             let occupied_by_other = self.board().borrow().is_occupied_by_other(new_pos, self.id());
-    //             if occupied_by_other {
-    //                 Act::Kill
-    //             } else {
-    //                 Act::Nothing
-    //             }
-    //         }
-    //         _ => Act::Nothing,
-    //     }
-    // }
+        pub fn select_choice(&mut self, piece_id: i8, dice_number: i8, action : Act) -> Act {
+        let valid_moves = self.valid_moves(piece_id, dice_number);
+        match (action, valid_moves) {
+            (Act::Free, true) => {
+                Act::Free
+            }
+            (Act::Move, true) => {
+                Act::Move
+            }
+            (Act::Join, true) => {
+                let pos = self.piece(piece_id).borrow_mut().position();
+                let new_pos = pos + dice_number;
+                let is_occupied = self.board().borrow_mut().is_occupied(new_pos);
+                if is_occupied {
+                    Act::Join
+                } else {
+                    Act::Nothing
+                }
+            }
+            (Act::Kill, true) => {
+                let pos = self.piece(piece_id).borrow_mut().position();
+                let new_pos = pos + dice_number;
+                let occupied_by_other = self.board().borrow_mut().is_occupied_by_other(new_pos, self.id());
+                if occupied_by_other {
+                    Act::Kill
+                } else {
+                    Act::Nothing
+                }
+            }
+            _ => Act::Nothing,
+        }
+    }
 
     // pub fn random_play(&mut self) {
     //     while self.is_player_turn() {
