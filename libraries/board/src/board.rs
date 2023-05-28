@@ -79,6 +79,11 @@ mod board {
         pub fn get(&self) -> &BoardState {
             self
         }
+        pub fn piece(&mut self, piece_id: i8) -> &mut Piece {
+            let piece_idx = self.pieces.iter().position(|piece| piece.id() == piece_id).unwrap();
+            &mut self.pieces[piece_idx]
+        }
+
     }
 
     impl Default for BoardState {
@@ -199,21 +204,27 @@ mod board {
             &mut self.home[id as usize]
         }
 
-        pub fn goal(&self, id: i8) -> Option<&BoardState> {
-            self.goal.get(id as usize)
+        pub fn goal(&mut self, id: i8) -> &mut BoardState {
+            &mut self.goal[id as usize]
         }
 
-        pub fn outside(&self, position: usize) -> Option<&BoardState> {
-            self.outside.get(position)
+        pub fn outside(&mut self, position: i8) -> &mut BoardState {
+            &mut self.outside[position as usize]
         }
 
-        pub fn inside(&self, position: usize) -> Option<&BoardState> {
-            // Subtract 52 from position to account for position starting at 52
-            self.inside.get(position.checked_sub(52)?)
+        pub fn inside(&mut self, position: i8) -> &mut BoardState {
+            &mut self.inside[(position - 52) as usize]
+        }
+        pub fn invincible(&mut self, position: i8) -> &mut BoardState {
+            &mut self.outside[self.invincible[position as usize]]
         }
 
-        pub fn pieces(&mut self, player_id: i8) -> &Vec<Piece> {
-            &mut self.home[player_id as usize].pieces
+        pub fn star(&mut self, position: i8) -> &mut BoardState {
+            &mut self.outside[self.star[position as usize]]
+        }
+
+        pub fn globe(&mut self, position: i8) -> &mut BoardState {
+            &mut self.outside[self.globe[position as usize]]
         }
 
         pub fn is_globe(&self, position: i8) -> bool {
@@ -231,148 +242,192 @@ mod board {
             self.star.contains(&(position as usize))
         }
 
-        pub fn move_from_home(&mut self, player_id: i8, new_pos: isize) {
-            let piece_id = self.home[player_id as usize].pieces.iter().position(|piece| piece.position() == -1).unwrap();
-            let piece = self.home[player_id as usize].pieces[piece_id].clone();
-            self.home[player_id as usize].pieces.remove(piece_id);
-            if self.home[player_id as usize].pieces.is_empty() {
-                self.home[player_id as usize].player_id = None;
-            }
-            self.outside[new_pos as usize].player_id = Some(get_player_id(player_id).unwrap());
-            self.outside[new_pos as usize].pieces.push(piece);
+        pub fn move_from_home(&mut self, player_id: i8, piece_id: i8,new_position: i8) {
+            let (piece, piece_idx) = self.get_home_piece_and_index(player_id, piece_id);
+            self.remove_piece_from_home_position(player_id, piece_idx);
+            self.add_piece_to_outside_position(new_position, player_id, piece);
         }
 
-        // pub fn move_into_home(&mut self, id: i8, old_pos: isize) {
-        //     self.home[id as usize].pieces += 1;
-        //     self.home[id as usize].player_ID = Some(get_player_id(id).unwrap());
-        //     self.outside[old_pos as usize].pieces -= 1;
-        //     if self.outside[old_pos as usize].pieces == 0 {
-        //         self.outside[old_pos as usize].player_ID = None;
-        //     }
-        // }
+        fn add_piece_to_outside_position(&mut self, new_position: i8, player_id: i8, piece: Piece) {
+            self.outside(new_position).player_id = Some(get_player_id(player_id).unwrap());
+            self.outside(new_position).pieces.push(piece);
+        }
 
-        // pub fn update_outside(&mut self, id: i8, old_pos: isize, new_pos: isize) {
-        //     if self.outside[old_pos as usize].pieces > 0 {
-        //         self.outside[old_pos as usize].pieces -= 1;
-        //         if self.outside[old_pos as usize].pieces == 0 {
-        //             self.outside[old_pos as usize].player_ID = None;
-        //         }
-        //     }
-        //     self.outside[new_pos as usize].pieces += 1;
-        //     self.outside[new_pos as usize].player_ID = Some(get_player_id(id).unwrap());
-        // }
+        fn get_home_piece_and_index(&mut self, player_id: i8, piece_id: i8) -> (Piece, usize) {
+            let piece_idx = self.get_home_piece_index(player_id, piece_id);
+            let piece = self.get_home_piece(player_id, piece_idx);
+            (piece, piece_idx)
+        }
 
-        // pub fn move_inside(&mut self, id: i8, old_pos: usize, new_pos: usize) {
-        //     if self.outside[old_pos].pieces > 0 {
-        //         self.outside[old_pos].pieces -= 1;
-        //         if self.outside[old_pos].pieces == 0 {
-        //             self.outside[old_pos].player_ID = None;
-        //         }
-        //     }
+        fn get_home_piece(&mut self, player_id: i8, piece_idx: usize) -> Piece {
+            self.home(player_id).pieces[piece_idx].clone()
+        }
 
-        //     let index = self
-        //         .inside
-        //         .iter()
-        //         .position(|&x| x.position == new_pos as i8)
-        //         .unwrap();
+        fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
+            self.home(player_id).pieces.iter().position(|piece| piece.id() == piece_id).unwrap()
+        }
 
-        //     self.inside[index].pieces += 1;
-        //     self.inside[index].player_ID = Some(get_player_id(id).unwrap());
-        // }
+        fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
+            self.remove_home_piece_if_not_empty(player_id, piece_idx);
+            self.set_home_player_id_to_none_if_empty(player_id);
+        }
 
-        // pub fn update_inside(&mut self, id: i8, old_pos: isize, new_pos: isize) {
-        //     let old_index_option = self
-        //         .inside
-        //         .iter()
-        //         .position(|&x| x.position == old_pos as i8);
-        //     let new_index_option = self
-        //         .inside
-        //         .iter()
-        //         .position(|&x| x.position == new_pos as i8);
+        fn set_home_player_id_to_none_if_empty(&mut self, player_id: i8) {
+            if self.home(player_id).pieces.is_empty() {
+                self.home(player_id).player_id = None;
+            }
+        }
 
-        //     if old_index_option.is_none() || new_index_option.is_none() {
-        //         panic!("Invalid position: old: {}, new: {}", old_pos, new_pos);
-        //     }
+        fn remove_home_piece_if_not_empty(&mut self, player_id: i8, piece_idx: usize) {
+            if !self.home(player_id).pieces.is_empty() {
+                self.home(player_id).pieces.remove(piece_idx);
+            }
+        }
 
-        //     let old_index = old_index_option.unwrap();
-        //     let new_index = new_index_option.unwrap();
+        pub fn move_into_home(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
+            let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+            self.remove_piece_from_outside_position(old_position, piece_idx);
+            self.add_piece_to_home_position(player_id, piece);
+        }
 
-        //     if self.inside[old_index].pieces > 0 {
-        //         self.inside[old_index].pieces -= 1;
-        //         if self.inside[old_index].pieces == 0 {
-        //             self.inside[old_index].player_ID = None;
-        //         }
-        //     }
+        fn add_piece_to_home_position(&mut self, player_id: i8, piece: Piece) {
+            self.home[player_id as usize].pieces.push(piece) ;
+            self.home[player_id as usize].player_id = Some(get_player_id(player_id).unwrap());
+        }
 
-        //     self.inside[new_index].pieces += 1;
-        //     self.inside[new_index].player_ID = Some(get_player_id(id).unwrap());
-        // }
+        fn get_outside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Piece, usize) {
+            let piece_idx = self.get_outside_piece_index(old_position, piece_id);
+            let piece = self.get_outside_piece(old_position, piece_idx);
+            (piece, piece_idx)
+        }
 
-        // pub fn enter_goal(&mut self, idx: i8, old_pos: isize) {
-        //     let old_pos_usize = old_pos as usize;
-        //     let id = get_player_id(idx).unwrap();
-        //     if old_pos >= 52 {
-        //         let old_inside_index = old_pos_usize - 52;
+        fn get_outside_piece(&mut self, old_position: i8, piece_idx: usize) -> Piece {
+            self.outside(old_position).pieces[piece_idx].clone()
+        }
 
-        //         if let Some(old_position) = self.inside.get_mut(old_inside_index) {
-        //             if old_position.player_ID.as_ref() != Some(&id) {
-        //                 panic!(
-        //                     "Invalid move: Inside position {} is not owned by player {}",
-        //                     old_pos, idx
-        //                 );
-        //             }
-        //             old_position.pieces -= 1;
-        //             if old_position.pieces == 0 {
-        //                 old_position.player_ID = None;
-        //             }
-        //         } else {
-        //             panic!("Invalid inside position: {}", old_pos);
-        //         }
-        //     } else if let Some(old_position) = self.outside.get_mut(old_pos_usize) {
-        //         if old_position.player_ID.as_ref() != Some(&id) {
-        //             panic!(
-        //                 "Invalid move: Outside position {} is not owned by player {}",
-        //                 old_pos, idx
-        //             );
-        //         }
-        //         old_position.pieces -= 1;
-        //         if old_position.pieces == 0 {
-        //             old_position.player_ID = None;
-        //         }
-        //     } else {
-        //         panic!("Invalid outside position: {}", old_pos);
-        //     }
+        fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+            let piece_idx = self.outside(old_position).pieces.iter().position(|piece| piece.id() == piece_id).unwrap();
+            piece_idx
+        }
 
-        //     self.goal[id as usize].pieces += 1;
-        //     self.goal[id as usize].player_ID = Some(id);
-        // }
+        pub fn update_outside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
+            let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+            self.remove_piece_from_outside_position(old_position, piece_idx);
+            self.add_piece_to_outside_position(new_position, player_id, piece);
+        }
 
-        // pub fn get_state(&self, id: i8, pos: isize) -> &BoardState {
-        //     if pos < 0 {
-        //         self.home[id as usize].get()
-        //     } else if pos >= 52 {
-        //         let inside_index = pos as usize - 52;
-        //         return self.inside[inside_index].get();
-        //     } else {
-        //         return self.outside[pos as usize].get();
-        //     }
-        // }
+        fn remove_piece_from_outside_position(&mut self, old_position: i8, piece_idx: usize) {
+            self.remove_outside_piece_if_not_empty(old_position, piece_idx);
+            self.set_outside_player_id_to_none_if_empty(old_position);
+        }
 
-        // pub fn is_occupied_more(&self, new_pos: i8) -> bool {
-        //     self.outside[new_pos as usize].pieces > 1
-        // }
+        fn set_outside_player_id_to_none_if_empty(&mut self, old_position: i8) {
+            if  self.outside(old_position).pieces.is_empty() {
+                self.outside(old_position).player_id = None;
+            }
+        }
 
-        // pub fn is_occupied(&self, pos: i8) -> bool {
-        //     self.outside[pos as usize].pieces > 0
-        // }
+        fn remove_outside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
+            if !self.outside(old_position).pieces.is_empty() {
+                self.outside(old_position).pieces.remove(piece_idx);
+            }
+        }
 
-        // pub fn is_occupied_by_other(&self, id: i8, pos: i8) -> bool {
-        //     if !self.is_occupied(pos) {
-        //         return false;
-        //     }
-        //     self.outside[pos as usize].player_ID != get_player_id(id)
-        // }
+        pub fn move_inside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
+            let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+            self.remove_piece_from_outside_position(old_position, piece_idx);
 
+            self.add_piece_to_inside_position(new_position, piece, player_id);
+        }
+
+        fn add_piece_to_inside_position(&mut self, new_position: i8, piece: Piece, player_id: i8) {
+            self.inside(new_position).pieces.push(piece);
+            self.inside(new_position).player_id = Some(get_player_id(player_id).unwrap());
+        }
+
+        pub fn update_inside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
+
+            let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
+            self.remove_piece_from_inside_position(old_position, piece_idx);
+            self.add_piece_to_inside_position(new_position, piece, player_id);
+        }
+
+        fn get_inside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Piece, usize) {
+            let piece_idx = self.get_inside_piece_index(old_position, piece_id);
+            let piece = self.get_inside_piece(old_position, piece_idx);
+            (piece, piece_idx)
+        }
+
+        
+
+        fn remove_piece_from_inside_position(&mut self, old_position: i8, piece_idx: usize) {
+            self.remove_inside_piece_if_not_empty(old_position, piece_idx);
+            self.set_inside_player_id_to_none_if_empty(old_position);
+        }
+
+        fn set_inside_player_id_to_none_if_empty(&mut self, old_position: i8) {
+            if self.inside(old_position).pieces.is_empty() {
+               self.inside(old_position).player_id = None;
+                        }
+        }
+
+        fn remove_inside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
+            if !self.inside(old_position).pieces.is_empty() {
+               self.inside(old_position).pieces.remove(piece_idx);
+            }
+        }
+
+        fn get_inside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+            self.inside(old_position).pieces.iter().position(|piece| piece.id() == piece_id).unwrap()
+        }
+
+        fn get_inside_piece(&mut self, old_position: i8, piece_idx: usize) -> Piece {
+            self.inside(old_position).pieces[piece_idx].clone()
+        }
+
+        pub fn enter_goal(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
+            let piece = match old_position  {
+                (0..=51) => {
+                    let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+                    self.remove_piece_from_outside_position(old_position, piece_idx);
+                    piece
+                }
+                (52..=71) => {
+                    let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
+                    self.remove_piece_from_inside_position(old_position, piece_idx);
+                    piece
+                }
+                _ => panic!("Invalid position")
+            };
+            self.add_piece_to_goal_position(player_id, piece);
+        }
+
+        fn add_piece_to_goal_position(&mut self, player_id: i8, piece: Piece) {
+            self.goal(player_id).pieces.push(piece);
+            self.goal(player_id).player_id = Some(get_player_id(player_id).unwrap());
+        }
+        
+        pub fn is_occupied_more(&mut self, position: i8) -> bool {
+            self.outside(position).pieces.len() > 1
+        }
+
+        pub fn is_occupied(&mut self, position: i8) -> bool {
+            !self.outside(position).pieces.is_empty()
+        }
+
+        pub fn is_occupied_by_other(&mut self, player_id: i8, position: i8) -> bool {
+            if !self.is_occupied(position) {
+                return false;
+            }
+            self.outside(position).player_id != get_player_id(player_id)
+        }
+
+        pub fn is_occupied_by_other_more(&mut self, player_id: i8, position: i8) -> bool {
+            if !self.is_occupied_more(position) {
+                return false;
+            }
+            self.outside(position).player_id != get_player_id(player_id)
+        }
     }
 
 

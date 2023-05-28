@@ -32,7 +32,7 @@ mod pieces_test {
         assert!(!piece.is_home());
         assert!(!piece.is_goal());
         assert!(piece.is_safe());
-        assert!(!piece.is_dangerous());
+        assert!(piece.is_dangerous());
     }
 
     #[test]
@@ -73,6 +73,15 @@ mod pieces_test {
         let mut piece = Piece::new(1);
         assert_eq!(piece.id(), 1);
         piece.dead();
+        assert_eq!(piece.position(), -1);
+        assert!(piece.is_home());
+        assert!(!piece.is_goal());
+        assert!(piece.is_safe());
+        assert!(!piece.is_dangerous());
+        
+        let mut piece = Piece::new(2);
+        assert_eq!(piece.id(), 2);
+        piece.home();
         assert_eq!(piece.position(), -1);
         assert!(piece.is_home());
         assert!(!piece.is_goal());
