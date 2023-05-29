@@ -78,7 +78,7 @@ mod pieces_test {
         assert!(!piece.is_goal());
         assert!(piece.is_safe());
         assert!(!piece.is_dangerous());
-        
+
         let mut piece = Piece::new(2);
         assert_eq!(piece.id(), 2);
         piece.home();

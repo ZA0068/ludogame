@@ -899,7 +899,62 @@ mod multipiece_test {
     }
 
     #[test]
-    #[ignore = "This is a long test"]
+    fn try_to_move_test()
+    {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
+        for i in 0..4 {
+            player.free_piece(i);
+            let action = player.try_to_move(i, 50);
+            if i > 0 {
+                assert_eq!(action, Act::Nothing);
+            } else {
+                assert_eq!(action, Act::Move);
+            }
+        }
+    }
+
+    #[test]
+    fn try_to_join_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
+
+        for i in 0..4 {
+            player.free_piece(i);
+            let action = player.try_to_join(i, 50);
+            if i > 0 {
+                assert_eq!(action, Act::Join);
+            } else {
+                assert_eq!(action, Act::Nothing);
+            }
+            player.move_piece(i, 50);
+        }
+    }
+
+    #[test]
+    fn try_to_kill_test()
+    {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut opponent = Player::new(1, board, Some(dice));
+        
+        opponent.free_piece(0);
+
+        for i in 0..4 {
+            player.free_piece(i);
+            let action = player.try_to_kill(i, 13);
+            assert_eq!(action, Act::Nothing);
+        }
+    }
+
+
+    #[test]
+    #[ignore]
     fn single_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
@@ -1162,11 +1217,8 @@ mod multiplayer_test {
 
         player1.free_piece(0);
         player1.free_piece(1);
-        let diceroll1 = 3;
-        let choice1 = player1.valid_choices(0, diceroll1, Act::Move);
-        player1.make_move(0, 17, choice1);
-        let choice1 = player1.valid_choices(1, diceroll1, Act::Move);
-        player1.make_move(1, 17, choice1);
+        player1.move_piece(0, 17);
+        player1.move_piece(1, 17);
 
         player2.free_piece(0);
         assert_eq!(player2.piece(0).borrow().position(), 13);

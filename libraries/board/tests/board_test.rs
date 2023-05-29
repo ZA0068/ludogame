@@ -5,7 +5,6 @@ use std::{cell::RefCell, rc::Rc};
 #[cfg(test)]
 mod board_tests {
 
-
     use super::*;
     use pieces::Piece;
     #[test]
@@ -15,8 +14,7 @@ mod board_tests {
     }
 
     #[test]
-    fn create_default_board_test()
-    {
+    fn create_default_board_test() {
         let board = Board::default();
         assert_eq!(TypeId::of::<Board>(), board.type_id());
     }
@@ -37,8 +35,9 @@ mod board_tests {
             Rc::new(RefCell::new(Piece::new(1))),
             Rc::new(RefCell::new(Piece::new(2))),
             Rc::new(RefCell::new(Piece::new(3))),
-            ];
-        let board_state = BoardState::create(-1, pieces.clone(), Some(PlayerID::Player1), State::Home);
+        ];
+        let board_state =
+            BoardState::create(-1, pieces.clone(), Some(PlayerID::Player1), State::Home);
         assert_eq!(TypeId::of::<BoardState>(), board_state.type_id());
         assert_eq!(board_state.position, -1);
         assert_eq!(board_state.pieces, pieces);
@@ -54,7 +53,7 @@ mod board_tests {
             Rc::new(RefCell::new(Piece::new(1))),
             Rc::new(RefCell::new(Piece::new(2))),
             Rc::new(RefCell::new(Piece::new(3))),
-            ];
+        ];
         let player0 = board.home(0).clone();
         let player1 = board.home(1).clone();
         let player2 = board.home(2).clone();
@@ -122,7 +121,7 @@ mod board_tests {
         let mut board = Board::new();
         (0..4).for_each(|cnt| {
             let globe = board.globe(cnt).clone();
-        assert!(board.is_globe(globe.position));
+            assert!(board.is_globe(globe.position));
         });
     }
 
@@ -156,11 +155,14 @@ mod board_update_test {
         let piece_id = 0;
         let player_id = 0;
         let new_position = 0;
-        
+
         board.move_from_home(player_id, piece_id, new_position);
         assert_eq!(board.home(player_id).pieces.len(), 3);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
-        assert_eq!(board.outside(new_position).player_id, Some(PlayerID::Player0));
+        assert_eq!(
+            board.outside(new_position).player_id,
+            Some(PlayerID::Player0)
+        );
     }
 
     #[test]
@@ -190,7 +192,10 @@ mod board_update_test {
         assert_eq!(board.home(player_id).pieces.len(), 3);
         assert_eq!(board.home(player_id).player_id, Some(PlayerID::Player0));
         assert_eq!(board.outside(new_position).pieces.len(), 1);
-        assert_eq!(board.outside(new_position).player_id, Some(PlayerID::Player0));
+        assert_eq!(
+            board.outside(new_position).player_id,
+            Some(PlayerID::Player0)
+        );
 
         let old_position = 0;
         board.move_into_home(piece_id, old_position, old_position);
@@ -249,7 +254,10 @@ mod board_update_test {
         board.move_inside(player_id, piece_id, old_position, new_position);
 
         assert_eq!(board.inside(new_position).pieces.len(), 1);
-        assert_eq!(board.inside(new_position).piece(piece_id).borrow_mut().id(), 0);
+        assert_eq!(
+            board.inside(new_position).piece(piece_id).borrow_mut().id(),
+            0
+        );
         assert_eq!(board.inside(new_position).position, 52);
         assert_eq!(board.inside(new_position).state, State::Inside);
         assert_eq!(board.outside(old_position).pieces.len(), 0);
@@ -274,8 +282,14 @@ mod board_update_test {
         board.move_inside(player_id, piece_id, old_position, new_position);
 
         assert_eq!(board.inside(new_position).pieces.len(), 1);
-        assert_eq!(board.inside(new_position).piece(piece_id).borrow_mut().id(), 3);
-        assert_eq!(board.inside(new_position).player_id, Some(PlayerID::Player3));
+        assert_eq!(
+            board.inside(new_position).piece(piece_id).borrow_mut().id(),
+            3
+        );
+        assert_eq!(
+            board.inside(new_position).player_id,
+            Some(PlayerID::Player3)
+        );
         assert_eq!(board.inside(new_position).position, 67);
         assert_eq!(board.inside(new_position).state, State::Inside);
         assert_eq!(board.outside(old_position).pieces.len(), 0);
@@ -304,8 +318,14 @@ mod board_update_test {
 
         assert_eq!(board.inside(new_position).pieces.len(), 1);
         assert_eq!(board.inside(new_position).position, 56);
-        assert_eq!(board.inside(new_position).piece(piece_id).borrow_mut().id(), 2);
-        assert_eq!(board.inside(new_position).player_id, Some(PlayerID::Player1));
+        assert_eq!(
+            board.inside(new_position).piece(piece_id).borrow_mut().id(),
+            2
+        );
+        assert_eq!(
+            board.inside(new_position).player_id,
+            Some(PlayerID::Player1)
+        );
         assert_eq!(board.inside(old_position).pieces.len(), 0);
         assert_eq!(board.inside(old_position).player_id, None);
     }
@@ -331,7 +351,7 @@ mod board_update_test {
         let piece_id = 1;
         new_position = 0;
         board.move_from_home(player_id, piece_id, new_position);
-        
+
         old_position = new_position;
         new_position = 50;
         board.update_outside(player_id, piece_id, old_position, new_position);
@@ -339,13 +359,12 @@ mod board_update_test {
         old_position = new_position;
         new_position = 56;
         board.move_inside(player_id, piece_id, old_position, new_position);
-        
+
         assert_eq!(board.inside(new_position).pieces.len(), 1);
 
         old_position = new_position;
         board.enter_goal(player_id, piece_id, old_position);
         assert_eq!(board.goal(player_id).pieces.len(), 2);
-
     }
 
     #[test]
@@ -398,9 +417,9 @@ mod board_update_test {
     #[test]
     fn is_occupied_test() {
         let mut board = Board::new();
-        let piece_id :i8 = 0;
-        let player_id :i8 = 0;
-        let new_position :i8 = 0;
+        let piece_id: i8 = 0;
+        let player_id: i8 = 0;
+        let new_position: i8 = 0;
         board.move_from_home(player_id, piece_id, new_position);
         assert!(board.is_occupied(new_position));
 
@@ -413,10 +432,10 @@ mod board_update_test {
 
     #[test]
     fn is_occupied_by_more_test() {
-        let piece_1 :i8 = 0;
-        let piece_2 :i8 = 1;
-        let player_id :i8 = 0;
-        let new_position :i8 = 0;
+        let piece_1: i8 = 0;
+        let piece_2: i8 = 1;
+        let player_id: i8 = 0;
+        let new_position: i8 = 0;
         let mut board = Board::new();
 
         board.move_from_home(player_id, piece_1, new_position);
@@ -436,15 +455,15 @@ mod board_update_test {
     #[test]
     fn is_occupied_by_other_test() {
         let mut board = Board::new();
-        let piece_id :i8 = 0;
-        let player_0 :i8 = 0;
-        let player_1 :i8 = 1;
-        let new_position :i8 = 0;
+        let piece_id: i8 = 0;
+        let player_0: i8 = 0;
+        let player_1: i8 = 1;
+        let new_position: i8 = 0;
 
         board.move_from_home(player_0, piece_id, new_position);
         assert!(board.is_occupied_by_other(player_1, new_position));
 
-        let new_position :i8 = 4;
+        let new_position: i8 = 4;
         board.move_from_home(player_1, piece_id, new_position);
         assert!(board.is_occupied_by_other(player_0, new_position));
     }
@@ -452,17 +471,17 @@ mod board_update_test {
     #[test]
     fn is_occupied_by_other_more_test() {
         let mut board = Board::new();
-        let piece_0 :i8 = 0;
-        let piece_1 :i8 = 1;
-        let player_0 :i8 = 0;
-        let player_1 :i8 = 1;
-        let new_position :i8 = 0;
+        let piece_0: i8 = 0;
+        let piece_1: i8 = 1;
+        let player_0: i8 = 0;
+        let player_1: i8 = 1;
+        let new_position: i8 = 0;
 
         board.move_from_home(player_0, piece_0, new_position);
         board.move_from_home(player_0, piece_1, new_position);
         assert!(board.is_occupied_by_other_more(player_1, new_position));
-    
-        let new_position :i8 = 4;
+
+        let new_position: i8 = 4;
         board.move_from_home(player_1, piece_0, new_position);
         board.move_from_home(player_1, piece_1, new_position);
         assert!(board.is_occupied_by_other_more(player_0, new_position));
@@ -471,28 +490,67 @@ mod board_update_test {
     #[test]
     fn internal_update_test() {
         let mut board = Board::new();
-        let piece_id :i8 = 0;
-        let player_id :i8 = 0;
-        let new_position :i8 = 0;
+        let piece_id: i8 = 0;
+        let player_id: i8 = 0;
+        let new_position: i8 = 0;
 
         board.home(player_id).piece(piece_id).borrow_mut().free();
         board.move_from_home(player_id, piece_id, new_position);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
-        assert_eq!(board.outside(new_position).piece(piece_id).borrow_mut().id(), piece_id);
-        assert!(!board.outside(new_position).piece(piece_id).borrow_mut().is_home());
-        assert!(board.outside(new_position).piece(piece_id).borrow_mut().is_dangerous());
-        assert_eq!(board.outside(new_position).piece(piece_id).borrow_mut().position(), 0);
+        assert_eq!(
+            board
+                .outside(new_position)
+                .piece(piece_id)
+                .borrow_mut()
+                .id(),
+            piece_id
+        );
+        assert!(!board
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_home());
+        assert!(board
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_dangerous());
+        assert_eq!(
+            board
+                .outside(new_position)
+                .piece(piece_id)
+                .borrow_mut()
+                .position(),
+            0
+        );
 
         let old_position = new_position;
         let new_position = 4;
-        board.outside(player_id).piece(piece_id).borrow_mut().not_safe();
+        board
+            .outside(player_id)
+            .piece(piece_id)
+            .borrow_mut()
+            .not_safe();
         board.update_outside(player_id, piece_id, old_position, new_position);
         assert_eq!(board.outside(old_position).pieces.len(), 0);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
-        assert_eq!(board.outside(new_position).piece(piece_id).borrow_mut().id(), piece_id);
-        assert!(!board.outside(new_position).piece(piece_id).borrow().is_dangerous());
-        assert!(!board.outside(new_position).piece(piece_id).borrow().is_safe());
-
+        assert_eq!(
+            board
+                .outside(new_position)
+                .piece(piece_id)
+                .borrow_mut()
+                .id(),
+            piece_id
+        );
+        assert!(!board
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow()
+            .is_dangerous());
+        assert!(!board
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow()
+            .is_safe());
     }
-
 }

@@ -83,10 +83,13 @@ mod board {
         }
 
         pub fn piece(&mut self, piece_id: i8) -> Rc<RefCell<Piece>> {
-            let piece_idx = self.pieces.iter().position(|piece| piece.borrow_mut().id() == piece_id).unwrap();
+            let piece_idx = self
+                .pieces
+                .iter()
+                .position(|piece| piece.borrow_mut().id() == piece_id)
+                .unwrap();
             self.pieces[piece_idx].clone()
-            }
-
+        }
     }
 
     impl Default for BoardState {
@@ -129,10 +132,11 @@ mod board {
 
         fn initialize_home() -> [BoardState; 4] {
             let mut home: [BoardState; 4] = [
-                BoardState::new(), 
                 BoardState::new(),
-                BoardState::new(), 
-                BoardState::new()];
+                BoardState::new(),
+                BoardState::new(),
+                BoardState::new(),
+            ];
             let player_ids = [
                 PlayerID::Player0,
                 PlayerID::Player1,
@@ -141,18 +145,23 @@ mod board {
             ];
 
             for (position, player_id) in home.iter_mut().zip(player_ids.iter()) {
-                position.set(-1, create_vector_of_pieces().clone(), Some(*player_id), State::Home);
+                position.set(
+                    -1,
+                    create_vector_of_pieces().clone(),
+                    Some(*player_id),
+                    State::Home,
+                );
             }
             home
         }
 
-
         fn initialize_goal() -> [BoardState; 4] {
             let mut goal = [
-                BoardState::new(), 
                 BoardState::new(),
-                BoardState::new(), 
-                BoardState::new()];
+                BoardState::new(),
+                BoardState::new(),
+                BoardState::new(),
+            ];
             (0..4).for_each(|position| {
                 goal[position] = BoardState::create(99, Vec::default(), None, State::Goal);
             });
@@ -162,7 +171,12 @@ mod board {
         fn initialize_outside() -> [BoardState; 52] {
             let mut outside: Vec<BoardState> = vec![];
             (0..52).for_each(|position| {
-                outside.push(BoardState::create(position as i8, Vec::default(), None, State::Outside));
+                outside.push(BoardState::create(
+                    position as i8,
+                    Vec::default(),
+                    None,
+                    State::Outside,
+                ));
             });
             outside.try_into().unwrap()
         }
@@ -170,7 +184,12 @@ mod board {
         fn initialize_inside() -> [BoardState; 20] {
             let mut inside: Vec<BoardState> = vec![];
             (0..20).for_each(|position| {
-                inside.push(BoardState::create((position + 52) as i8, Vec::default(), None, State::Inside));
+                inside.push(BoardState::create(
+                    (position + 52) as i8,
+                    Vec::default(),
+                    None,
+                    State::Inside,
+                ));
             });
             inside.try_into().unwrap()
         }
@@ -232,8 +251,7 @@ mod board {
 
         pub fn is_invincible(&self, position: i8) -> bool {
             // Return None if position is not in invincible
-            self.invincible
-                .contains(&(position as usize))
+            self.invincible.contains(&(position as usize))
         }
 
         pub fn is_star(&self, position: i8) -> bool {
@@ -241,18 +259,27 @@ mod board {
             self.star.contains(&(position as usize))
         }
 
-        pub fn move_from_home(&mut self, player_id: i8, piece_id: i8,new_position: i8) {
+        pub fn move_from_home(&mut self, player_id: i8, piece_id: i8, new_position: i8) {
             let (piece, piece_idx) = self.get_home_piece_and_index(player_id, piece_id);
-            self.add_piece_to_outside_position(new_position, player_id, piece);  
+            self.add_piece_to_outside_position(new_position, player_id, piece);
             self.remove_piece_from_home_position(player_id, piece_idx);
         }
 
-        fn add_piece_to_outside_position(&mut self, new_position: i8, player_id: i8, piece: Rc<RefCell<Piece>>) {
+        fn add_piece_to_outside_position(
+            &mut self,
+            new_position: i8,
+            player_id: i8,
+            piece: Rc<RefCell<Piece>>,
+        ) {
             self.outside(new_position).player_id = Some(get_player_id(player_id).unwrap());
             self.outside(new_position).pieces.push(piece);
         }
 
-        fn get_home_piece_and_index(&mut self, player_id: i8, piece_id: i8) -> (Rc<RefCell<Piece>>, usize) {
+        fn get_home_piece_and_index(
+            &mut self,
+            player_id: i8,
+            piece_id: i8,
+        ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_home_piece_index(player_id, piece_id);
             let piece = self.get_home_piece(player_id, piece_idx);
             (piece, piece_idx)
@@ -263,7 +290,11 @@ mod board {
         }
 
         fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
-            self.home(player_id).pieces.iter().position(|piece| piece.borrow().id() == piece_id).unwrap()
+            self.home(player_id)
+                .pieces
+                .iter()
+                .position(|piece| piece.borrow().id() == piece_id)
+                .unwrap()
         }
 
         fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
@@ -290,26 +321,45 @@ mod board {
         }
 
         fn add_piece_to_home_position(&mut self, player_id: i8, piece: Rc<RefCell<Piece>>) {
-            self.home[player_id as usize].pieces.push(piece) ;
+            self.home[player_id as usize].pieces.push(piece);
             self.home[player_id as usize].player_id = Some(get_player_id(player_id).unwrap());
         }
 
-        pub fn get_outside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Rc<RefCell<Piece>>, usize) {
+        pub fn get_outside_piece_and_index(
+            &mut self,
+            old_position: i8,
+            piece_id: i8,
+        ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_outside_piece_index(old_position, piece_id);
             let piece = self.get_outside_piece(old_position, piece_idx);
             (piece, piece_idx)
         }
 
-        pub fn get_outside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
+        pub fn get_outside_piece(
+            &mut self,
+            old_position: i8,
+            piece_idx: usize,
+        ) -> Rc<RefCell<Piece>> {
             self.outside(old_position).pieces[piece_idx].clone()
         }
 
         fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
-            let piece_idx = self.outside(old_position).pieces.iter().position(|piece| piece.borrow().id() == piece_id).unwrap();
+            let piece_idx = self
+                .outside(old_position)
+                .pieces
+                .iter()
+                .position(|piece| piece.borrow().id() == piece_id)
+                .unwrap();
             piece_idx
         }
 
-        pub fn update_outside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
+        pub fn update_outside(
+            &mut self,
+            player_id: i8,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) {
             let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
             self.remove_piece_from_outside_position(old_position, piece_idx);
             self.add_piece_to_outside_position(new_position, player_id, piece);
@@ -321,7 +371,7 @@ mod board {
         }
 
         fn set_outside_player_id_to_none_if_empty(&mut self, old_position: i8) {
-            if  self.outside(old_position).pieces.is_empty() {
+            if self.outside(old_position).pieces.is_empty() {
                 self.outside(old_position).player_id = None;
             }
         }
@@ -332,31 +382,49 @@ mod board {
             }
         }
 
-        pub fn move_inside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
+        pub fn move_inside(
+            &mut self,
+            player_id: i8,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) {
             let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
             self.add_piece_to_inside_position(new_position, piece, player_id);
             self.remove_piece_from_outside_position(old_position, piece_idx);
         }
 
-        fn add_piece_to_inside_position(&mut self, new_position: i8, piece: Rc<RefCell<Piece>>, player_id: i8) {
+        fn add_piece_to_inside_position(
+            &mut self,
+            new_position: i8,
+            piece: Rc<RefCell<Piece>>,
+            player_id: i8,
+        ) {
             self.inside(new_position).pieces.push(piece);
             self.inside(new_position).player_id = Some(get_player_id(player_id).unwrap());
         }
 
-        pub fn update_inside(&mut self, player_id: i8, piece_id: i8, old_position: i8, new_position: i8) {
-
+        pub fn update_inside(
+            &mut self,
+            player_id: i8,
+            piece_id: i8,
+            old_position: i8,
+            new_position: i8,
+        ) {
             let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
             self.remove_piece_from_inside_position(old_position, piece_idx);
             self.add_piece_to_inside_position(new_position, piece, player_id);
         }
 
-        fn get_inside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Rc<RefCell<Piece>>, usize) {
+        fn get_inside_piece_and_index(
+            &mut self,
+            old_position: i8,
+            piece_id: i8,
+        ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_inside_piece_index(old_position, piece_id);
             let piece = self.get_inside_piece(old_position, piece_idx);
             (piece, piece_idx)
         }
-
-        
 
         fn remove_piece_from_inside_position(&mut self, old_position: i8, piece_idx: usize) {
             self.remove_inside_piece_if_not_empty(old_position, piece_idx);
@@ -365,8 +433,8 @@ mod board {
 
         fn set_inside_player_id_to_none_if_empty(&mut self, old_position: i8) {
             if self.inside(old_position).pieces.is_empty() {
-               self.inside(old_position).player_id = None;
-                        }
+                self.inside(old_position).player_id = None;
+            }
         }
 
         fn remove_inside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
@@ -376,7 +444,11 @@ mod board {
         }
 
         fn get_inside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
-            self.inside(old_position).pieces.iter().position(|piece| piece.borrow().id() == piece_id).unwrap()
+            self.inside(old_position)
+                .pieces
+                .iter()
+                .position(|piece| piece.borrow().id() == piece_id)
+                .unwrap()
         }
 
         fn get_inside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
@@ -384,18 +456,20 @@ mod board {
         }
 
         pub fn enter_goal(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
-            match old_position  {
+            match old_position {
                 (0..=51) => {
-                    let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+                    let (piece, piece_idx) =
+                        self.get_outside_piece_and_index(old_position, piece_id);
                     self.remove_piece_from_outside_position(old_position, piece_idx);
                     self.add_piece_to_goal_position(player_id, piece);
                 }
                 (52..=71) => {
-                    let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
+                    let (piece, piece_idx) =
+                        self.get_inside_piece_and_index(old_position, piece_id);
                     self.add_piece_to_goal_position(player_id, piece);
                     self.remove_piece_from_inside_position(old_position, piece_idx);
                 }
-                _ => panic!("Invalid position")
+                _ => panic!("Invalid position"),
             };
         }
 
@@ -403,7 +477,7 @@ mod board {
             self.goal(player_id).pieces.push(piece);
             self.goal(player_id).player_id = Some(get_player_id(player_id).unwrap());
         }
-        
+
         pub fn is_occupied_more(&mut self, position: i8) -> bool {
             self.outside(position).pieces.len() > 1
         }
