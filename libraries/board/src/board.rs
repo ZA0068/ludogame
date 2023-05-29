@@ -294,13 +294,13 @@ mod board {
             self.home[player_id as usize].player_id = Some(get_player_id(player_id).unwrap());
         }
 
-        fn get_outside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Rc<RefCell<Piece>>, usize) {
+        pub fn get_outside_piece_and_index(&mut self, old_position: i8, piece_id: i8) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_outside_piece_index(old_position, piece_id);
             let piece = self.get_outside_piece(old_position, piece_idx);
             (piece, piece_idx)
         }
 
-        fn get_outside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
+        pub fn get_outside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
             self.outside(old_position).pieces[piece_idx].clone()
         }
 
