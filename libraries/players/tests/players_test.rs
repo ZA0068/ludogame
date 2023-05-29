@@ -53,13 +53,13 @@ mod player_tests {
 
         let piece = player.board().borrow_mut().home(0).piece(0);
         assert_eq!(piece.borrow().id(), 0);
-        
+
         let piece = player.board().borrow_mut().home(0).piece(1);
         assert_eq!(piece.borrow_mut().id(), 1);
 
         let piece = player.board().borrow_mut().home(0).piece(2);
         assert_eq!(piece.borrow().id(), 2);
-        
+
         let piece = player.board().borrow_mut().home(0).piece(3);
         assert_eq!(piece.borrow().id(), 3);
     }
@@ -133,7 +133,13 @@ mod move_single_piece_test {
         let piece = player.piece(piece_id);
 
         assert!(piece.borrow_mut().is_home());
-        assert!(player.board().borrow_mut().home(player_id).piece(0).borrow_mut().is_home());
+        assert!(player
+            .board()
+            .borrow_mut()
+            .home(player_id)
+            .piece(0)
+            .borrow_mut()
+            .is_home());
         assert_eq!(player.board().borrow_mut().home(player_id).pieces.len(), 4);
         player.free_piece(piece_id);
 
@@ -142,9 +148,29 @@ mod move_single_piece_test {
         assert_eq!(piece.borrow_mut().position(), 0);
 
         assert_eq!(player.board().borrow_mut().home(player_id).pieces.len(), 3);
-        assert_eq!(player.board().borrow_mut().outside(new_position).pieces.len(), 1);
-        assert!(!player.board().borrow_mut().outside(new_position).piece(piece_id).borrow_mut().is_home());
-        assert!(player.board().borrow_mut().outside(new_position).piece(piece_id).borrow_mut().is_dangerous());
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(new_position)
+                .pieces
+                .len(),
+            1
+        );
+        assert!(!player
+            .board()
+            .borrow_mut()
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_home());
+        assert!(player
+            .board()
+            .borrow_mut()
+            .outside(new_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_dangerous());
     }
 
     #[test]
@@ -161,8 +187,23 @@ mod move_single_piece_test {
         let piece = player.piece(piece_id);
         assert_eq!(piece.borrow_mut().position(), next_position);
         assert!(!piece.borrow_mut().is_safe());
-        assert!(!player.board().borrow_mut().outside(next_position).piece(piece_id).borrow_mut().is_safe());
-        assert_eq!(player.board().borrow_mut().outside(next_position).piece(piece_id).borrow_mut().position(), next_position);
+        assert!(!player
+            .board()
+            .borrow_mut()
+            .outside(next_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_safe());
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(next_position)
+                .piece(piece_id)
+                .borrow_mut()
+                .position(),
+            next_position
+        );
     }
 
     #[test]
@@ -170,7 +211,7 @@ mod move_single_piece_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(0, board, Some(dice));
-        
+
         let piece_id = 0;
         let mut next_position: i8 = 4;
 
@@ -180,9 +221,32 @@ mod move_single_piece_test {
         let piece = player.piece(piece_id);
         assert_eq!(piece.borrow_mut().position(), next_position);
         assert!(!piece.borrow_mut().is_safe());
-        assert!(!player.board().borrow_mut().outside(next_position).piece(piece_id).borrow_mut().is_safe());
-        assert_eq!(player.board().borrow_mut().outside(next_position).piece(piece_id).borrow_mut().position(), next_position);
-        assert_eq!(player.board().borrow_mut().outside(next_position).pieces.len(), 1);
+        assert!(!player
+            .board()
+            .borrow_mut()
+            .outside(next_position)
+            .piece(piece_id)
+            .borrow_mut()
+            .is_safe());
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(next_position)
+                .piece(piece_id)
+                .borrow_mut()
+                .position(),
+            next_position
+        );
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(next_position)
+                .pieces
+                .len(),
+            1
+        );
         assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 0);
 
         next_position = 2;
@@ -198,21 +262,21 @@ mod move_single_piece_test {
         let mut player = Player::new(0, board, Some(dice));
 
         let piece_id = 0;
-        let piece_move = player.valid_moves(piece_id, 1);
+        let piece_move = player.valid_moves(piece_id, 1).1;
         assert!(!piece_move);
 
-        let piece_move = player.valid_moves(piece_id, 7);
+        let piece_move = player.valid_moves(piece_id, 7).1;
         assert!(!piece_move);
 
-        let piece_move = player.valid_moves(piece_id, 6);
+        let piece_move = player.valid_moves(piece_id, 6).1;
         assert!(piece_move);
         player.free_piece(piece_id);
 
-        let piece_move = player.valid_moves(piece_id, 6);
+        let piece_move = player.valid_moves(piece_id, 6).1;
         assert!(piece_move);
 
         let piece_id = 4;
-        let piece_move = player.valid_moves(piece_id, 1);
+        let piece_move = player.valid_moves(piece_id, 1).1;
         assert!(!piece_move);
     }
 
@@ -226,16 +290,17 @@ mod move_single_piece_test {
         let dice_number: i8 = 6;
         let action = Act::Free;
 
-        let selected_action = player.select_choice(piece_id, dice_number, action);
+        let selected_action = player.valid_choices(piece_id, dice_number, action);
 
         assert_eq!(selected_action, Act::Free);
         assert_ne!(selected_action, Act::Nothing);
+        player.free_piece(piece_id);
 
         let piece_id: i8 = 0;
         let dice_number: i8 = 6;
         let action = Act::Move;
 
-        let selected_action = player.select_choice(piece_id, dice_number, action);
+        let selected_action = player.valid_choices(piece_id, dice_number, action);
 
         assert_eq!(selected_action, Act::Move);
         assert_ne!(selected_action, Act::Free);
@@ -276,11 +341,11 @@ mod move_single_piece_test {
 
             let piece_id = 0;
             let mut dice_roll = player.roll_dice();
-            let mut choice = player.select_choice(piece_id, dice_roll, Act::Free);
+            let mut choice = player.valid_choices(piece_id, dice_roll, Act::Free);
 
             while choice != Act::Free {
                 dice_roll = player.roll_dice();
-                choice = player.select_choice(piece_id, dice_roll, Act::Free);
+                choice = player.valid_choices(piece_id, dice_roll, Act::Free);
             }
 
             player.make_move(piece_id, dice_roll, choice);
@@ -291,13 +356,10 @@ mod move_single_piece_test {
                 Some(board::PlayerID::Player0)
             );
 
-            let choice = player.select_choice(piece_id, i, Act::Move);
+            let choice = player.valid_choices(piece_id, i, Act::Move);
             player.make_move(piece_id, i, choice);
             assert_eq!(player.piece(0).borrow_mut().position(), i);
-            assert_eq!(
-                player.board().borrow_mut().outside(i).pieces.len(),
-                1
-            );
+            assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 1);
             assert_eq!(
                 player.board().borrow_mut().outside[i as usize].player_id,
                 Some(board::PlayerID::Player0)
@@ -316,20 +378,23 @@ mod move_single_piece_test {
         let piece_id = 0;
         let mut dice_roll = player.roll_dice();
         let action = Act::Free;
-        let mut valid_choice = player.select_choice(piece_id, dice_roll, action);
+        let mut valid_choices = player.valid_choices(piece_id, dice_roll, action);
 
-        while valid_choice != Act::Free {
+        while valid_choices != Act::Free {
             dice_roll = player.roll_dice();
-            valid_choice = player.select_choice(piece_id, dice_roll, Act::Free);
+            valid_choices = player.valid_choices(piece_id, dice_roll, Act::Free);
         }
-        player.make_move(piece_id, dice_roll, valid_choice);
+        player.make_move(piece_id, dice_roll, valid_choices);
 
         dice_roll = 5;
 
         player.move_piece(piece_id, 50);
-        valid_choice = player.select_choice(piece_id, dice_roll, Act::Move);
-        player.make_move(piece_id, dice_roll, valid_choice);
-        assert_eq!(player.piece(piece_id).borrow_mut().position(), 51 + dice_roll);
+        valid_choices = player.valid_choices(piece_id, dice_roll, Act::Move);
+        player.make_move(piece_id, dice_roll, valid_choices);
+        assert_eq!(
+            player.piece(piece_id).borrow_mut().position(),
+            51 + dice_roll
+        );
         assert_eq!(
             player
                 .board()
@@ -340,11 +405,7 @@ mod move_single_piece_test {
             1
         );
         assert_eq!(
-            player
-                .board()
-                .borrow_mut()
-                .inside(51 + dice_roll)
-                .player_id,
+            player.board().borrow_mut().inside(51 + dice_roll).player_id,
             Some(board::PlayerID::Player0)
         );
     }
@@ -382,10 +443,7 @@ mod move_single_piece_test {
 
         assert_eq!(player.piece(piece_id).borrow().position(), 54);
         assert!(!player.piece(piece_id).borrow().is_goal());
-        assert_eq!(
-            player.board().borrow_mut().inside(54).pieces.len(),
-            1
-        );
+        assert_eq!(player.board().borrow_mut().inside(54).pieces.len(), 1);
         assert_eq!(
             player.board().borrow().inside[2].player_id,
             Some(board::PlayerID::Player0)
@@ -497,25 +555,25 @@ mod move_single_piece_test {
     }
 }
 
-    mod multipiece_test {
-        use super::*;
+mod multipiece_test {
+    use super::*;
 
-        #[test]
-        fn free_all_pieces_test() {
-            let board = Rc::new(RefCell::new(Board::new()));
-            let dice = Rc::new(RefCell::new(Dice::new()));
-            let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn free_all_pieces_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-            for piece_id in 0..4 {
-                player.free_piece(piece_id);
-                assert!(!player.piece(piece_id).borrow_mut().is_home());
-                assert!(player.piece(piece_id).borrow_mut().is_dangerous());
-                assert!(player.piece(piece_id).borrow_mut().is_safe());
-                assert_eq!(player.piece(piece_id).borrow_mut().position(), 0);
-            }
-            assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 0);
-            assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 4);
+        for piece_id in 0..4 {
+            player.free_piece(piece_id);
+            assert!(!player.piece(piece_id).borrow_mut().is_home());
+            assert!(player.piece(piece_id).borrow_mut().is_dangerous());
+            assert!(player.piece(piece_id).borrow_mut().is_safe());
+            assert_eq!(player.piece(piece_id).borrow_mut().position(), 0);
         }
+        assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 0);
+        assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 4);
+    }
 
     #[test]
     fn joining_other_pieces_test() {
@@ -633,7 +691,7 @@ mod move_single_piece_test {
         player.free_piece(1);
 
         player.make_move(0, 6, Act::Move);
-        let joining_choice = player.select_choice(1, 6, Act::Join);
+        let joining_choice = player.valid_choices(1, 6, Act::Join);
         assert_eq!(joining_choice, Act::Join);
     }
 
@@ -765,20 +823,49 @@ mod move_single_piece_test {
         assert_eq!(player.piece(0).borrow_mut().position(), 11);
         assert!(!player.piece(0).borrow_mut().is_dangerous());
         assert!(!player.piece(0).borrow_mut().is_safe());
-        
-        let choice = player.select_choice(1, 5, Act::Join);
-        assert_eq!(choice, Act::Join);
 
+        let choice = player.valid_choices(1, 5, Act::Join);
+        assert_eq!(choice, Act::Join);
 
         player.make_move(1, 5, Act::Join);
         assert_eq!(player.piece(1).borrow_mut().position(), 11);
         assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
         assert_eq!(player.board().borrow_mut().outside(5).pieces.len(), 0);
         assert_eq!(player.board().borrow_mut().outside(5).player_id, None);
-        assert_eq!(player.board().borrow_mut().outside(11).piece(0).borrow_mut().position(), 11);
-        assert_eq!(player.board().borrow_mut().outside(11).piece(1).borrow_mut().position(), 11);
-        assert!(player.board().borrow_mut().outside(11).piece(0).borrow_mut().is_dangerous());
-        assert!(player.board().borrow_mut().outside(11).piece(1).borrow_mut().is_dangerous());
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(11)
+                .piece(0)
+                .borrow_mut()
+                .position(),
+            11
+        );
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .outside(11)
+                .piece(1)
+                .borrow_mut()
+                .position(),
+            11
+        );
+        assert!(player
+            .board()
+            .borrow_mut()
+            .outside(11)
+            .piece(0)
+            .borrow_mut()
+            .is_dangerous());
+        assert!(player
+            .board()
+            .borrow_mut()
+            .outside(11)
+            .piece(1)
+            .borrow_mut()
+            .is_dangerous());
         assert!(player.piece(0).borrow_mut().is_dangerous());
         assert!(player.piece(1).borrow_mut().is_dangerous());
         assert!(player.piece(0).borrow_mut().is_safe());
@@ -790,24 +877,24 @@ mod move_single_piece_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(0, board, Some(dice));
-        
+
         player.free_piece(0);
         player.move_piece(0, 50);
         let mut diceroll = 6;
-        let choice = player.select_choice(0, diceroll, Act::Win);
+        let choice = player.valid_choices(0, diceroll, Act::Win);
         assert_eq!(choice, Act::Win);
 
         player.free_piece(1);
         player.move_piece(1, 49);
         diceroll = 1;
-        let choice = player.select_choice(1, diceroll, Act::Win);
+        let choice = player.valid_choices(1, diceroll, Act::Win);
         assert_eq!(choice, Act::Win);
 
         player.free_piece(2);
         player.move_piece(2, 49);
         player.move_piece(2, 4);
         diceroll = 3;
-        let choice = player.select_choice(2, diceroll, Act::Win);
+        let choice = player.valid_choices(2, diceroll, Act::Win);
         assert_eq!(choice, Act::Win);
     }
 
@@ -820,7 +907,7 @@ mod move_single_piece_test {
 
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            // player.random_play();
             println!(
                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
                 player.piece(0).borrow().position(),
@@ -831,7 +918,6 @@ mod move_single_piece_test {
         }
         assert!(player.is_finished());
     }
-
 }
 
 mod multiplayer_test {
@@ -855,7 +941,16 @@ mod multiplayer_test {
             Some(board::PlayerID::Player0)
         );
         assert_eq!(player2.board().borrow_mut().outside(13).pieces.len(), 1);
-        assert_eq!(player2.board().borrow_mut().outside(13).piece(0).borrow().position(), 13);
+        assert_eq!(
+            player2
+                .board()
+                .borrow_mut()
+                .outside(13)
+                .piece(0)
+                .borrow()
+                .position(),
+            13
+        );
         assert_eq!(
             player1.board().borrow().outside[13].player_id,
             Some(board::PlayerID::Player1)
@@ -880,7 +975,7 @@ mod multiplayer_test {
         assert_eq!(player2.piece(0).borrow().position(), 13);
         assert_eq!(player3.piece(0).borrow().position(), 26);
         assert_eq!(player4.piece(0).borrow().position(), 39);
-        
+
         assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
         assert_eq!(
             player1.board().borrow().outside[0].player_id,
@@ -993,7 +1088,7 @@ mod multiplayer_test {
         player2.move_piece(0, 36);
         player2.move_piece(0, 2);
         assert_eq!(player2.piece(0).borrow().position(), 51);
-        
+
         player2.free_piece(1);
         player2.move_piece(1, 36);
         player2.move_piece(1, 6);
@@ -1004,7 +1099,7 @@ mod multiplayer_test {
         player3.move_piece(0, 23);
         player3.move_piece(0, 2);
         assert_eq!(player3.piece(0).borrow().position(), 51);
-        
+
         player3.free_piece(1);
         player3.move_piece(1, 23);
         player3.move_piece(1, 6);
@@ -1031,25 +1126,31 @@ mod multiplayer_test {
 
         player1.free_piece(0);
         let diceroll1 = 3;
-        let choice1 = player1.select_choice(0, diceroll1, Act::Move);
+        let choice1 = player1.valid_choices(0, diceroll1, Act::Move);
         assert_eq!(choice1, Act::Move);
         player1.make_move(0, 17, choice1);
         assert_eq!(player1.piece(0).borrow().position(), 17);
-        
+
         player2.free_piece(0);
         assert_eq!(player2.piece(0).borrow().position(), 13);
 
         let diceroll2 = 4;
-        let choice2 = player2.select_choice(0, diceroll2, Act::Kill);
+        let choice2 = player2.valid_choices(0, diceroll2, Act::Kill);
         assert_eq!(choice2, Act::Kill);
         player2.make_move(0, diceroll2, choice2);
 
         assert_eq!(player1.piece(0).borrow().position(), -1);
         assert!(player1.piece(0).borrow().is_home());
-        assert_eq!(player1.board().borrow_mut().outside(17).player_id, Some(board::PlayerID::Player1));
-        
+        assert_eq!(
+            player1.board().borrow_mut().outside(17).player_id,
+            Some(board::PlayerID::Player1)
+        );
+
         assert_eq!(player2.piece(0).borrow().position(), 17);
-        assert_eq!(player1.board().borrow_mut().outside(17).player_id, Some(board::PlayerID::Player1));
+        assert_eq!(
+            player1.board().borrow_mut().outside(17).player_id,
+            Some(board::PlayerID::Player1)
+        );
     }
 
     #[test]
@@ -1062,34 +1163,70 @@ mod multiplayer_test {
         player1.free_piece(0);
         player1.free_piece(1);
         let diceroll1 = 3;
-        let choice1 = player1.select_choice(0, diceroll1, Act::Move);
+        let choice1 = player1.valid_choices(0, diceroll1, Act::Move);
         player1.make_move(0, 17, choice1);
-        let choice1 = player1.select_choice(1, diceroll1, Act::Move);
+        let choice1 = player1.valid_choices(1, diceroll1, Act::Move);
         player1.make_move(1, 17, choice1);
-        
+
         player2.free_piece(0);
         assert_eq!(player2.piece(0).borrow().position(), 13);
 
         let diceroll2 = 4;
-        let choice2 = player2.select_choice(0, diceroll2, Act::Kill);
+        let choice2 = player2.valid_choices(0, diceroll2, Act::Kill);
         assert_eq!(choice2, Act::Nothing);
-        let choice2 = player2.select_choice(0, diceroll2, Act::Die);
+        let choice2 = player2.valid_choices(0, diceroll2, Act::Die);
         assert_eq!(choice2, Act::Die);
         player2.make_move(0, diceroll2, choice2);
 
         assert_eq!(player1.piece(0).borrow().position(), 17);
         assert!(!player1.piece(0).borrow().is_home());
-        assert_eq!(player1.board().borrow_mut().outside(17).piece(0).borrow_mut().position(), 17);
-        assert!(!player1.board().borrow_mut().outside(17).piece(0).borrow_mut().is_home());
-        assert_eq!(player1.board().borrow_mut().outside(17).player_id, Some(board::PlayerID::Player0));
-        
+        assert_eq!(
+            player1
+                .board()
+                .borrow_mut()
+                .outside(17)
+                .piece(0)
+                .borrow_mut()
+                .position(),
+            17
+        );
+        assert!(!player1
+            .board()
+            .borrow_mut()
+            .outside(17)
+            .piece(0)
+            .borrow_mut()
+            .is_home());
+        assert_eq!(
+            player1.board().borrow_mut().outside(17).player_id,
+            Some(board::PlayerID::Player0)
+        );
+
         assert_eq!(player2.piece(0).borrow().position(), -1);
         assert!(player2.piece(0).borrow().is_home());
-        
-        assert_eq!(player2.board().borrow_mut().home(1).piece(0).borrow_mut().position(), -1);
-        assert!(player2.board().borrow_mut().home(1).piece(0).borrow_mut().is_home());
+
+        assert_eq!(
+            player2
+                .board()
+                .borrow_mut()
+                .home(1)
+                .piece(0)
+                .borrow_mut()
+                .position(),
+            -1
+        );
+        assert!(player2
+            .board()
+            .borrow_mut()
+            .home(1)
+            .piece(0)
+            .borrow_mut()
+            .is_home());
         assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);
-        assert_eq!(player2.board().borrow_mut().outside(17).player_id, Some(board::PlayerID::Player0));
+        assert_eq!(
+            player2.board().borrow_mut().outside(17).player_id,
+            Some(board::PlayerID::Player0)
+        );
     }
 
     #[test]
@@ -1106,14 +1243,14 @@ mod multiplayer_test {
         let mut dice_number = 18;
         player1.move_piece(piece_0, dice_number);
         assert_eq!(player1.piece(piece_0).borrow().position(), 18);
-        
+
         dice_number = 24;
         player1.move_piece(piece_1, dice_number);
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);
-        
+
         player2.free_piece(piece_0);
         dice_number = 5;
-        let choice2 = player2.select_choice(piece_0, dice_number, Act::Kill);
+        let choice2 = player2.valid_choices(piece_0, dice_number, Act::Kill);
         assert_eq!(choice2, Act::Kill);
         player2.make_move(piece_0, dice_number, choice2);
 
@@ -1123,15 +1260,17 @@ mod multiplayer_test {
         assert_eq!(player1.board().borrow_mut().outside(18).player_id, None);
         assert!(player1.piece(piece_0).borrow().is_home());
         assert!(player1.piece(piece_1).borrow().is_home());
-        
+
         assert_eq!(player2.piece(0).borrow().position(), 24);
         assert_eq!(player2.board().borrow_mut().outside(24).pieces.len(), 1);
-        assert_eq!(player2.board().borrow_mut().outside(24).player_id, Some(board::PlayerID::Player1));
+        assert_eq!(
+            player2.board().borrow_mut().outside(24).player_id,
+            Some(board::PlayerID::Player1)
+        );
     }
 
     #[test]
-    fn star_sucide_test()
-    {
+    fn star_sucide_test() {
         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
@@ -1146,30 +1285,32 @@ mod multiplayer_test {
         player1.move_piece(piece_1, dice_number);
         assert_eq!(player1.piece(piece_0).borrow().position(), 18);
         assert_eq!(player1.piece(piece_1).borrow().position(), 18);
-        
+
         player2.free_piece(piece_0);
         dice_number = 5;
 
-        let choice2 = player2.select_choice(piece_0, dice_number, Act::Kill);
+        let choice2 = player2.valid_choices(piece_0, dice_number, Act::Kill);
         assert_eq!(choice2, Act::Nothing);
 
-        let choice2 = player2.select_choice(piece_0, dice_number, Act::Die);
+        let choice2 = player2.valid_choices(piece_0, dice_number, Act::Die);
         assert_eq!(choice2, Act::Die);
         player2.make_move(piece_0, dice_number, choice2);
 
         assert_eq!(player1.piece(piece_0).borrow().position(), 18);
         assert_eq!(player1.piece(piece_1).borrow().position(), 18);
         assert_eq!(player1.board().borrow_mut().outside(18).pieces.len(), 2);
-        assert_eq!(player1.board().borrow_mut().outside(18).player_id, Some(board::PlayerID::Player0));
+        assert_eq!(
+            player1.board().borrow_mut().outside(18).player_id,
+            Some(board::PlayerID::Player0)
+        );
 
-        assert!(player2.piece(piece_0).borrow().is_home());        
-        assert_eq!(player2.piece(piece_0).borrow().position(), -1);        
-        assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);        
+        assert!(player2.piece(piece_0).borrow().is_home());
+        assert_eq!(player2.piece(piece_0).borrow().position(), -1);
+        assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);
     }
 
     #[test]
-    fn star_sucide_test_2()
-    {
+    fn star_sucide_test_2() {
         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
@@ -1184,14 +1325,14 @@ mod multiplayer_test {
         player1.move_piece(piece_1, dice_number);
         assert_eq!(player1.piece(piece_0).borrow().position(), 24);
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);
-        
+
         player2.free_piece(piece_0);
         dice_number = 5;
 
-        let choice2 = player2.select_choice(piece_0, dice_number, Act::Kill);
+        let choice2 = player2.valid_choices(piece_0, dice_number, Act::Kill);
         assert_eq!(choice2, Act::Nothing);
 
-        let choice2 = player2.select_choice(piece_0, dice_number, Act::Die);
+        let choice2 = player2.valid_choices(piece_0, dice_number, Act::Die);
         assert_eq!(choice2, Act::Die);
         player2.make_move(piece_0, dice_number, choice2);
 
@@ -1199,10 +1340,12 @@ mod multiplayer_test {
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);
         assert_eq!(player1.board().borrow_mut().outside(18).pieces.len(), 0);
         assert_eq!(player1.board().borrow_mut().outside(24).pieces.len(), 2);
-        assert_eq!(player1.board().borrow_mut().outside(24).player_id, Some(board::PlayerID::Player0));
-        assert!(player2.piece(piece_0).borrow().is_home());        
-        assert_eq!(player2.piece(piece_0).borrow().position(), -1);        
-        assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);        
+        assert_eq!(
+            player1.board().borrow_mut().outside(24).player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert!(player2.piece(piece_0).borrow().is_home());
+        assert_eq!(player2.piece(piece_0).borrow().position(), -1);
+        assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);
     }
-
 }
