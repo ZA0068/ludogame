@@ -899,7 +899,7 @@ mod multipiece_test {
     }
 
     #[test]
-    #[ignore = "Action selection not implemented"]
+    #[ignore = "This is a long test"]
     fn single_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
@@ -907,7 +907,7 @@ mod multipiece_test {
 
         while !player.is_finished() {
             player.my_turn();
-            // player.random_play();
+            player.random_play();
             println!(
                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
                 player.piece(0).borrow().position(),

@@ -14,7 +14,7 @@ mod players {
         pieces: Vec<Rc<RefCell<Piece>>>,
     }
 
-    #[derive(PartialEq, Debug)]
+    #[derive(PartialEq, Debug, Copy, Clone)]
     pub enum Act {
         Move,
         Free,
@@ -57,7 +57,7 @@ mod players {
             board.borrow_mut().home(player_id).pieces.clone()
         }
 
-        pub fn actions(self) -> Vec<Act> {
+        pub fn actions(&mut self) -> Vec<Act> {
             vec![
                 Act::Move,
                 Act::Free,
@@ -482,13 +482,15 @@ mod players {
             (is_home, is_valid)
         }
 
-        // pub fn select_choice(&mut self, dice_number: i8, action: Act) -> Act {
-        //     let mut reaction: Act = Act::Nothing;
-        //     for piece_id in 0..4 {
-        //         reaction = self.valid_choices(piece_id, dice_number, action);
-        //     }
-        //     reaction
-        // }
+        pub fn select_choice(&mut self, dice_number: i8, action: Act) -> (Act, i8) {
+            let mut reaction: Act = Act::Nothing;
+            let mut piece_id: i8 = 0;
+            for idx in 0..4 {
+                piece_id = idx;
+                reaction = self.valid_choices(piece_id, dice_number, action);
+            }
+            (reaction, piece_id)
+        }
 
         pub fn valid_choices(&mut self, piece_id: i8, dice_number: i8, action: Act) -> Act {
             let (is_home, is_valid) = self.valid_moves(piece_id, dice_number);
@@ -611,19 +613,25 @@ mod players {
             }
         }
 
-        // pub fn random_play(&mut self) {
-        //     while self.is_player_turn() {
-        //         let dice_number = self.roll_dice();
-        //         let mut choices = vec![];
-        //         for action in self.actions() {
-        //             let choice = self.select_choice(dice_number, action);
-        //             if choice != Act::Nothing {
-        //                 choices.push(choice);
-        //             }
-        //         }
-        //         let select_choice = choices.choose(&mut rand::thread_rng());
-        //     }
-        // }
+        pub fn random_play(&mut self) {
+            while self.is_player_turn() {
+                let dice_number = self.roll_dice();
+                println!("dice_number: {}", dice_number);
+                let mut choices = vec![];
+                let mut piece_id = 0;
+                for action in self.actions() {
+                    let (choice, id) = self.select_choice(dice_number, action);
+                    piece_id = id;
+                    if choice != Act::Nothing {
+                        choices.push(choice);
+                    }
+                }
+                let selected_choice = choices.choose(&mut rand::thread_rng());
+                if let Some(choice) = selected_choice {
+                    self.make_move(piece_id, dice_number, *choice);
+                }
+            }
+        }
 
         pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|piece| piece.borrow_mut().is_goal())
