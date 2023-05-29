@@ -1,5 +1,5 @@
 mod players {
-    use std::{cell::RefCell, rc::Rc, borrow::Borrow};
+    use std::{cell::RefCell, rc::Rc};
 
     use board::Board;
     use dice::Dice;
@@ -79,48 +79,43 @@ mod players {
                     self.free_piece(piece_id);
                 }
                 Act::Kill => {
-                    // self.kill_piece(piece_id, dice_number);
+                    self.kill_piece(piece_id, dice_number);
                 }
                 Act::Join => {
                     self.join_piece(piece_id, dice_number);
                 }
                 Act::Leave => {
-                    // self.leave_piece(piece_id, dice_number);
+                    self.leave_piece(piece_id, dice_number);
                 }
                 Act::Nothing => (),
             }
         }
 
 
-        // pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
-        //     let pos = self.piece(piece_id).borrow_mut().position() + dice_number;
-        //     let other_player_id = self.board.borrow_mut().outside(pos as usize).unwrap().player_id.unwrap() as i8;
-            
-        //     self.board.borrow_mut().move_into_home(other_player_id, pos as isize);
+        pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
+            let pos = self.piece(piece_id).borrow_mut().position() + dice_number;
+            let other_player_id = self.board.borrow_mut().outside(pos).player_id.unwrap() as i8;
+            self.board().borrow_mut().outside(pos).piece(other_player_id).borrow_mut().dead();
+            self.move_piece(piece_id, dice_number);
+        }
 
-        // }
-
-        // pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
-        //     self.move_piece(piece_id, dice_number);
+        pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.move_piece(piece_id, dice_number);
+              
+            for i in 0..4 {
+                if self.piece(i).borrow_mut().is_home() {
+                    continue;
+                }
         
-        //     let board = self.board().borrow_mut();
+                let pos = self.piece(i).borrow_mut().position();
         
-        //     for i in 0..4 {
-        //         let mut piece = self.piece(i).borrow_mut();
-        
-        //         if piece.is_home() {
-        //             continue;
-        //         }
-        
-        //         let pos = piece.position();
-        
-        //         if board.is_globe(pos) || board.is_occupied_more(pos) {
-        //             piece.dangerous();
-        //         } else {
-        //             piece.not_safe();
-        //         }
-        //     }
-        // }
+                if self.board().borrow_mut().is_globe(pos) || self.board().borrow_mut().is_occupied_more(pos) {
+                    self.piece(i).borrow_mut().dangerous();
+                } else {
+                    self.piece(i).borrow_mut().not_safe();
+                }
+            }
+        }
         
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -219,7 +214,7 @@ mod players {
             new_position: i8,
         ) -> Result<(), i8> {
             let new_position = match (self.id(), new_position) {
-                (1, 52..=58) | (2, 52..=58) | (3, 52..=58) => new_position - 52,
+                (1..=3, 52..=58) => new_position - 52,
                 _ => new_position,
             };
             self.update_outside(piece_id, new_position, old_position);
@@ -433,7 +428,7 @@ mod players {
             (Act::Kill, true) => {
                 let pos = self.piece(piece_id).borrow_mut().position();
                 let new_pos = pos + dice_number;
-                let occupied_by_other = self.board().borrow_mut().is_occupied_by_other(new_pos, self.id());
+                let occupied_by_other = self.board().borrow_mut().is_occupied_by_other(self.id(), new_pos);
                 if occupied_by_other {
                     Act::Kill
                 } else {
@@ -455,9 +450,9 @@ mod players {
     //     }
     // }
 
-    // pub fn is_finished(&self) -> bool {
-    //         self.pieces.iter().all(|p: &Piece| p.is_goal())
-    //     }
+    pub fn is_finished(&self) -> bool {
+            self.pieces.iter().all(|piece| piece.borrow_mut().is_goal())
+        }
     }
 }
 

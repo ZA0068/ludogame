@@ -140,15 +140,12 @@ mod board {
                 PlayerID::Player3,
             ];
 
-            let mut pieces = Vec::default();
-            for i in 0..4 {
-                pieces.push(Rc::new(RefCell::new(Piece::new(i))));
-            }
             for (position, player_id) in home.iter_mut().zip(player_ids.iter()) {
-                position.set(-1, pieces.clone(), Some(*player_id), State::Home);
+                position.set(-1, create_vector_of_pieces().clone(), Some(*player_id), State::Home);
             }
             home
         }
+
 
         fn initialize_goal() -> [BoardState; 4] {
             let mut goal = [
@@ -430,8 +427,13 @@ mod board {
         }
     }
 
-
-
+    fn create_vector_of_pieces() -> Vec<Rc<RefCell<Piece>>> {
+        let mut pieces = Vec::default();
+        for i in 0..4 {
+            pieces.push(Rc::new(RefCell::new(Piece::new(i))));
+        }
+        pieces
+    }
     impl Default for Board {
         fn default() -> Self {
             Self::new()

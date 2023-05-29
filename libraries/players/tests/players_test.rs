@@ -55,7 +55,7 @@ mod player_tests {
         assert_eq!(piece.borrow().id(), 0);
         
         let piece = player.board().borrow_mut().home(0).piece(1);
-        assert_eq!(piece.borrow().id(), 1);
+        assert_eq!(piece.borrow_mut().id(), 1);
 
         let piece = player.board().borrow_mut().home(0).piece(2);
         assert_eq!(piece.borrow().id(), 2);
@@ -340,646 +340,655 @@ mod move_single_piece_test {
             1
         );
         assert_eq!(
-            player.board().borrow_mut().inside(dice_roll).pieces.len(),
-            1
+            player
+                .board()
+                .borrow_mut()
+                .inside(51 + dice_roll)
+                .player_id,
+            Some(board::PlayerID::Player0)
         );
     }
 
-    // #[test]
-    // fn enter_goal_from_outside_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn enter_goal_from_outside_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 44);
-    //     player.move_piece(piece_id, 6);
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 44);
+        player.move_piece(piece_id, 6);
 
-    //     assert_eq!(player.piece(piece_id).position(), 99);
-    //     assert!(player.piece(piece_id).is_goal());
-    //     assert_eq!(player.board().borrow().goal[0].pieces, 1);
-    //     assert_eq!(
-    //         player.board().borrow().goal[0].player_id,
-    //         Some(board::PlayerID::Player0)
-    //     );
-    // }
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+        assert_eq!(player.board().borrow_mut().goal(0).pieces.len(), 1);
+        assert_eq!(
+            player.board().borrow().goal[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+    }
 
-    // #[test]
-    // fn enter_goal_from_inside_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn enter_goal_from_inside_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 49);
-    //     player.move_piece(piece_id, 4);
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 49);
+        player.move_piece(piece_id, 4);
 
-    //     assert_eq!(player.piece(piece_id).position(), 54);
-    //     assert!(!player.piece(piece_id).is_goal());
-    //     assert_eq!(
-    //         player.board().borrow().inside(54).unwrap().pieces,
-    //         1
-    //     );
-    //     assert_eq!(
-    //         player.board().borrow().inside[2].player_id,
-    //         Some(board::PlayerID::Player0)
-    //     );
+        assert_eq!(player.piece(piece_id).borrow().position(), 54);
+        assert!(!player.piece(piece_id).borrow().is_goal());
+        assert_eq!(
+            player.board().borrow_mut().inside(54).pieces.len(),
+            1
+        );
+        assert_eq!(
+            player.board().borrow().inside[2].player_id,
+            Some(board::PlayerID::Player0)
+        );
 
-    //     player.move_piece(piece_id, 3);
+        player.move_piece(piece_id, 3);
 
-    //     assert_eq!(player.piece(piece_id).position(), 99);
-    //     assert!(player.piece(piece_id).is_goal());
-    //     assert_eq!(player.board().borrow().goal[0].pieces, 1);
-    //     assert_eq!(
-    //         player.board().borrow().goal[0].player_id,
-    //         Some(board::PlayerID::Player0)
-    //     );
-    // }
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+        assert_eq!(player.board().borrow_mut().goal(0).pieces.len(), 1);
+        assert_eq!(
+            player.board().borrow().goal[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+    }
 
-    // #[test]
-    // fn move_back_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn move_back_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 50);
-    //     player.move_piece(piece_id, 4);
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 50);
+        player.move_piece(piece_id, 4);
 
-    //     assert_eq!(player.piece(piece_id).position(), 55);
-    //     assert_eq!(player.board().borrow().inside[3].pieces, 1);
+        assert_eq!(player.piece(piece_id).borrow_mut().position(), 55);
+        assert_eq!(player.board().borrow_mut().inside(55).pieces.len(), 1);
 
-    //     player.move_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).position(), 53);
-    //     assert_eq!(player.board().borrow().inside[1].pieces, 1);
-    // }
+        player.move_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).borrow_mut().position(), 53);
+        assert_eq!(player.board().borrow_mut().inside(53).pieces.len(), 1);
+    }
 
-    // #[test]
-    // fn death_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn death_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 50);
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 50);
 
-    //     player.die(piece_id);
-    //     assert_eq!(player.piece(piece_id).position(), -1);
-    //     assert_eq!(player.board().borrow().outside[50].pieces, 0);
-    //     assert_eq!(player.board().borrow().outside[0].pieces, 0);
-    //     assert_eq!(player.board().borrow().home[0].pieces, 4);
-    // }
+        player.die(piece_id);
+        assert_eq!(player.piece(piece_id).borrow_mut().position(), -1);
+        assert_eq!(player.board().borrow_mut().outside(50).pieces.len(), 0);
+        assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 0);
+        assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 4);
+    }
 
-    // #[test]
-    // fn in_globe_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn in_globe_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.make_move(piece_id, 2, Act::Move);
-    //     assert_eq!(player.piece(piece_id).position(), 2);
-    //     assert!(!player.piece(piece_id).is_safe());
-    //     assert!(!player.piece(piece_id).is_dangerous());
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.make_move(piece_id, 2, Act::Move);
+        assert_eq!(player.piece(piece_id).borrow().position(), 2);
+        assert!(!player.piece(piece_id).borrow().is_safe());
+        assert!(!player.piece(piece_id).borrow().is_dangerous());
 
-    //     player.make_move(piece_id, 6, Act::Move);
-    //     assert_eq!(player.piece(piece_id).position(), 8);
-    //     assert!(player.piece(piece_id).is_safe());
-    //     assert!(player.piece(piece_id).is_dangerous());
-    // }
+        player.make_move(piece_id, 6, Act::Move);
+        assert_eq!(player.piece(piece_id).borrow().position(), 8);
+        assert!(player.piece(piece_id).borrow().is_safe());
+        assert!(player.piece(piece_id).borrow().is_dangerous());
+    }
 
-    // #[test]
-    // fn star_jump_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn star_jump_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.make_move(piece_id, 5, Act::Move);
-    //     assert_eq!(player.piece(piece_id).position(), 11);
-    //     assert!(!player.piece(piece_id).is_safe());
-    //     assert!(!player.piece(piece_id).is_dangerous());
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.make_move(piece_id, 5, Act::Move);
+        assert_eq!(player.piece(piece_id).borrow().position(), 11);
+        assert!(!player.piece(piece_id).borrow().is_safe());
+        assert!(!player.piece(piece_id).borrow().is_dangerous());
 
-    //     player.move_piece(piece_id, 1);
-    //     player.move_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).position(), 24);
-    //     assert!(!player.piece(piece_id).is_safe());
-    //     assert!(!player.piece(piece_id).is_dangerous());
-    // }
+        player.move_piece(piece_id, 1);
+        player.move_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).borrow().position(), 24);
+        assert!(!player.piece(piece_id).borrow().is_safe());
+        assert!(!player.piece(piece_id).borrow().is_dangerous());
+    }
 
-    // #[test]
-    // fn starjump_to_goal_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let dice = Rc::new(RefCell::new(Dice::new()));
-    //     let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn starjump_to_goal_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 44);
-    //     player.move_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).position(), 99);
-    //     assert!(player.piece(piece_id).is_goal());
-    //     assert_eq!(player.board().borrow().goal[0].pieces, 1);
-    //     assert_eq!(
-    //         player.board().borrow().goal[0].player_id,
-    //         Some(board::PlayerID::Player0)
-    //     );
-    // }
+        let piece_id = 0;
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 44);
+        player.move_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+        assert_eq!(player.board().borrow_mut().goal(0).pieces.len(), 1);
+        assert_eq!(
+            player.board().borrow().goal[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+    }
 }
 
-// mod multipiece_test {
-//     use super::*;
+    mod multipiece_test {
+        use super::*;
 
-//     #[test]
-//     fn free_all_pieces_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+        #[test]
+        fn free_all_pieces_test() {
+            let board = Rc::new(RefCell::new(Board::new()));
+            let dice = Rc::new(RefCell::new(Dice::new()));
+            let mut player = Player::new(0, board, Some(dice));
 
-//         for piece_id in 0..4 {
-//             player.free_piece(piece_id);
-//             assert!(!player.piece(piece_id).is_home());
-//             assert!(player.piece(piece_id).is_dangerous());
-//             assert!(player.piece(piece_id).is_safe());
-//             assert_eq!(player.piece(piece_id).position(), 0);
-//         }
-//         assert_eq!(player.board().borrow().home[0].pieces, 0);
-//         assert_eq!(player.board().borrow().outside[0].pieces, 4);
-//     }
+            for piece_id in 0..4 {
+                player.free_piece(piece_id);
+                assert!(!player.piece(piece_id).borrow_mut().is_home());
+                assert!(player.piece(piece_id).borrow_mut().is_dangerous());
+                assert!(player.piece(piece_id).borrow_mut().is_safe());
+                assert_eq!(player.piece(piece_id).borrow_mut().position(), 0);
+            }
+            assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 0);
+            assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 4);
+        }
 
-//     #[test]
-//     fn joining_other_pieces_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
+    #[test]
+    fn joining_other_pieces_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+        player.free_piece(0);
+        player.free_piece(1);
 
-//         player.make_move(0, 6, Act::Move);
-//         player.make_move(1, 6, Act::Join);
+        player.make_move(0, 6, Act::Move);
+        player.make_move(1, 6, Act::Join);
 
-//         assert_eq!(player.piece(0).borrow().position(), 6);
-//         assert_eq!(player.piece(1).position(), 6);
-//         assert_eq!(player.board().borrow().outside[6].pieces, 2);
-//         assert!(player.piece(0).borrow().is_dangerous());
-//         assert!(player.piece(1).is_dangerous());
-//         assert!(player.piece(0).borrow().is_safe());
-//         assert!(player.piece(1).is_safe());
-//     }
+        assert_eq!(player.piece(0).borrow_mut().position(), 6);
+        assert_eq!(player.piece(1).borrow_mut().position(), 6);
+        assert_eq!(player.board().borrow_mut().outside(6).pieces.len(), 2);
+        assert!(player.piece(0).borrow_mut().is_dangerous());
+        assert!(player.piece(1).borrow_mut().is_dangerous());
+        assert!(player.piece(0).borrow_mut().is_safe());
+        assert!(player.piece(1).borrow_mut().is_safe());
+    }
 
-//     #[test]
-//     fn leaving_other_pieces_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
+    #[test]
+    fn leaving_other_pieces_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+        player.free_piece(0);
+        player.free_piece(1);
 
-//         player.make_move(0, 6, Act::Move);
-//         player.make_move(1, 6, Act::Join);
-//         assert_eq!(player.piece(0).borrow().position(), 6);
-//         assert_eq!(player.piece(1).position(), 6);
-//         assert_eq!(player.board().borrow().outside[6].pieces, 2);
-//         assert!(player.piece(0).borrow().is_dangerous());
-//         assert!(player.piece(1).is_dangerous());
+        player.make_move(0, 6, Act::Move);
+        player.make_move(1, 6, Act::Join);
+        assert_eq!(player.piece(0).borrow_mut().position(), 6);
+        assert_eq!(player.piece(1).borrow_mut().position(), 6);
+        assert_eq!(player.board().borrow_mut().outside(6).pieces.len(), 2);
+        assert!(player.piece(0).borrow_mut().is_dangerous());
+        assert!(player.piece(1).borrow_mut().is_dangerous());
 
-//         player.make_move(0, 6, Act::Leave);
-//         assert_eq!(player.piece(0).borrow().position(), 12);
-//         assert_eq!(player.piece(1).position(), 6);
-//         assert_eq!(player.board().borrow().outside[6].pieces, 1);
-//         assert_eq!(player.board().borrow().outside[12].pieces, 1);
-//         assert!(!player.piece(0).borrow().is_dangerous());
-//         assert!(!player.piece(1).is_dangerous());
-//     }
+        player.make_move(0, 6, Act::Leave);
+        assert_eq!(player.piece(0).borrow_mut().position(), 12);
+        assert_eq!(player.piece(1).borrow_mut().position(), 6);
+        assert_eq!(player.board().borrow_mut().outside(6).pieces.len(), 1);
+        assert_eq!(player.board().borrow_mut().outside(12).pieces.len(), 1);
+        assert!(!player.piece(0).borrow_mut().is_dangerous());
+        assert!(!player.piece(1).borrow_mut().is_dangerous());
+    }
 
-//     #[test]
-//     fn all_pieces_at_same_place_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn all_pieces_at_same_place_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
-//         player.free_piece(2);
-//         player.free_piece(3);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
 
-//         player.make_move(0, 6, Act::Move);
-//         player.make_move(1, 6, Act::Join);
-//         player.make_move(2, 6, Act::Join);
-//         player.make_move(3, 6, Act::Join);
+        player.make_move(0, 6, Act::Move);
+        player.make_move(1, 6, Act::Join);
+        player.make_move(2, 6, Act::Join);
+        player.make_move(3, 6, Act::Join);
 
-//         assert_eq!(player.piece(0).borrow().position(), 6);
-//         assert_eq!(player.piece(1).position(), 6);
-//         assert_eq!(player.piece(2).position(), 6);
-//         assert_eq!(player.piece(3).position(), 6);
+        assert_eq!(player.piece(0).borrow().position(), 6);
+        assert_eq!(player.piece(1).borrow_mut().position(), 6);
+        assert_eq!(player.piece(2).borrow_mut().position(), 6);
+        assert_eq!(player.piece(3).borrow_mut().position(), 6);
 
-//         assert!(player.piece(0).borrow().is_safe());
-//         assert!(player.piece(1).is_safe());
-//         assert!(player.piece(2).is_safe());
-//         assert!(player.piece(3).is_safe());
+        assert!(player.piece(0).borrow().is_safe());
+        assert!(player.piece(1).borrow_mut().is_safe());
+        assert!(player.piece(2).borrow_mut().is_safe());
+        assert!(player.piece(3).borrow_mut().is_safe());
 
-//         assert!(player.piece(0).borrow().is_dangerous());
-//         assert!(player.piece(1).is_dangerous());
-//         assert!(player.piece(2).is_dangerous());
-//         assert!(player.piece(3).is_dangerous());
+        assert!(player.piece(0).borrow().is_dangerous());
+        assert!(player.piece(1).borrow_mut().is_dangerous());
+        assert!(player.piece(2).borrow_mut().is_dangerous());
+        assert!(player.piece(3).borrow_mut().is_dangerous());
 
-//         player.make_move(0, 1, Act::Leave);
-//         assert_eq!(player.piece(0).borrow().position(), 7);
-//         assert!(!player.piece(0).borrow().is_safe());
-//         assert!(!player.piece(0).borrow().is_dangerous());
+        player.make_move(0, 1, Act::Leave);
+        assert_eq!(player.piece(0).borrow().position(), 7);
+        assert!(!player.piece(0).borrow().is_safe());
+        assert!(!player.piece(0).borrow().is_dangerous());
 
-//         assert!(player.piece(1).is_safe());
-//         assert!(player.piece(2).is_safe());
-//         assert!(player.piece(3).is_safe());
-//         assert!(player.piece(1).is_dangerous());
-//         assert!(player.piece(2).is_dangerous());
-//         assert!(player.piece(3).is_dangerous());
+        assert!(player.piece(1).borrow_mut().is_safe());
+        assert!(player.piece(2).borrow_mut().is_safe());
+        assert!(player.piece(3).borrow_mut().is_safe());
+        assert!(player.piece(1).borrow_mut().is_dangerous());
+        assert!(player.piece(2).borrow_mut().is_dangerous());
+        assert!(player.piece(3).borrow_mut().is_dangerous());
 
-//         player.make_move(1, 3, Act::Leave);
-//         assert_eq!(player.piece(1).position(), 9);
-//         assert!(!player.piece(1).is_safe());
-//         assert!(!player.piece(1).is_dangerous());
+        player.make_move(1, 3, Act::Leave);
+        assert_eq!(player.piece(1).borrow_mut().position(), 9);
+        assert!(!player.piece(1).borrow_mut().is_safe());
+        assert!(!player.piece(1).borrow_mut().is_dangerous());
 
-//         assert!(player.piece(2).is_safe());
-//         assert!(player.piece(3).is_safe());
-//         assert!(player.piece(2).is_dangerous());
-//         assert!(player.piece(3).is_dangerous());
+        assert!(player.piece(2).borrow_mut().is_safe());
+        assert!(player.piece(3).borrow_mut().is_safe());
+        assert!(player.piece(2).borrow_mut().is_dangerous());
+        assert!(player.piece(3).borrow_mut().is_dangerous());
 
-//         player.make_move(2, 4, Act::Leave);
-//         assert_eq!(player.piece(2).position(), 10);
-//         assert!(!player.piece(2).is_safe());
-//         assert!(!player.piece(2).is_dangerous());
-//         assert!(!player.piece(3).is_safe());
-//         assert!(!player.piece(3).is_dangerous());
-//     }
+        player.make_move(2, 4, Act::Leave);
+        assert_eq!(player.piece(2).borrow_mut().position(), 10);
+        assert!(!player.piece(2).borrow_mut().is_safe());
+        assert!(!player.piece(2).borrow_mut().is_dangerous());
+        assert!(!player.piece(3).borrow_mut().is_safe());
+        assert!(!player.piece(3).borrow_mut().is_dangerous());
+    }
 
-//     #[test]
-//     fn joining_choice_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn joining_choice_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
+        player.free_piece(0);
+        player.free_piece(1);
 
-//         player.make_move(0, 6, Act::Move);
-//         let joining_choice = player.select_choice(1, 6, Act::Join);
-//         assert_eq!(joining_choice, Act::Join);
-//     }
+        player.make_move(0, 6, Act::Move);
+        let joining_choice = player.select_choice(1, 6, Act::Join);
+        assert_eq!(joining_choice, Act::Join);
+    }
 
-//     #[test]
-//     fn all_pieces_in_goal_test_0() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn all_pieces_in_goal_test_0() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
-//         player.free_piece(2);
-//         player.free_piece(3);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
 
-//         player.move_piece(0, 99);
-//         player.move_piece(1, 99);
-//         player.move_piece(2, 99);
-//         player.move_piece(3, 99);
+        player.move_piece(0, 99);
+        player.move_piece(1, 99);
+        player.move_piece(2, 99);
+        player.move_piece(3, 99);
 
-//         assert!(player.piece(0).borrow().is_goal());
-//         assert!(player.piece(1).is_goal());
-//         assert!(player.piece(2).is_goal());
-//         assert!(player.piece(3).is_goal());
+        assert!(player.piece(0).borrow().is_goal());
+        assert!(player.piece(1).borrow_mut().is_goal());
+        assert!(player.piece(2).borrow_mut().is_goal());
+        assert!(player.piece(3).borrow_mut().is_goal());
 
-//         assert!(player.is_finished());
-//     }
+        assert!(player.is_finished());
+    }
 
-//     #[test]
-//     fn all_pieces_in_goal_test_1() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn all_pieces_in_goal_test_1() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
-//         player.free_piece(2);
-//         player.free_piece(3);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
 
-//         player.move_piece(0, 50);
-//         player.move_piece(1, 50);
-//         player.move_piece(2, 50);
-//         player.move_piece(3, 50);
+        player.move_piece(0, 50);
+        player.move_piece(1, 50);
+        player.move_piece(2, 50);
+        player.move_piece(3, 50);
 
-//         player.move_piece(0, 6);
-//         player.move_piece(1, 6);
-//         player.move_piece(2, 6);
-//         player.move_piece(3, 6);
+        player.move_piece(0, 6);
+        player.move_piece(1, 6);
+        player.move_piece(2, 6);
+        player.move_piece(3, 6);
 
-//         assert!(player.piece(0).borrow().is_goal());
-//         assert!(player.piece(1).is_goal());
-//         assert!(player.piece(2).is_goal());
-//         assert!(player.piece(3).is_goal());
+        assert!(player.piece(0).borrow().is_goal());
+        assert!(player.piece(1).borrow_mut().is_goal());
+        assert!(player.piece(2).borrow_mut().is_goal());
+        assert!(player.piece(3).borrow_mut().is_goal());
 
-//         assert!(player.is_finished());
-//     }
+        assert!(player.is_finished());
+    }
 
-//     #[test]
-//     fn all_pieces_in_goal_test_part_2() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn all_pieces_in_goal_test_part_2() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
-//         player.free_piece(2);
-//         player.free_piece(3);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
 
-//         player.move_piece(0, 49);
-//         player.move_piece(1, 49);
-//         player.move_piece(2, 49);
-//         player.move_piece(3, 49);
+        player.move_piece(0, 49);
+        player.move_piece(1, 49);
+        player.move_piece(2, 49);
+        player.move_piece(3, 49);
 
-//         player.move_piece(0, 4);
-//         player.move_piece(1, 4);
-//         player.move_piece(2, 4);
-//         player.move_piece(3, 4);
+        player.move_piece(0, 4);
+        player.move_piece(1, 4);
+        player.move_piece(2, 4);
+        player.move_piece(3, 4);
 
-//         player.move_piece(0, 3);
-//         player.move_piece(1, 3);
-//         player.move_piece(2, 3);
-//         player.move_piece(3, 3);
+        player.move_piece(0, 3);
+        player.move_piece(1, 3);
+        player.move_piece(2, 3);
+        player.move_piece(3, 3);
 
-//         assert!(player.piece(0).borrow().is_goal());
-//         assert!(player.piece(1).is_goal());
-//         assert!(player.piece(2).is_goal());
-//         assert!(player.piece(3).is_goal());
+        assert!(player.piece(0).borrow().is_goal());
+        assert!(player.piece(1).borrow_mut().is_goal());
+        assert!(player.piece(2).borrow_mut().is_goal());
+        assert!(player.piece(3).borrow_mut().is_goal());
 
-//         assert!(player.is_finished());
-//     }
+        assert!(player.is_finished());
+    }
 
-//     #[test]
-//     fn all_pieces_in_goal_test_part_3() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    #[test]
+    fn all_pieces_in_goal_test_part_3() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
 
-//         player.free_piece(0).borrow();
-//         player.free_piece(1);
-//         player.free_piece(2);
-//         player.free_piece(3);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
 
-//         player.move_piece(0, 49);
-//         player.move_piece(1, 49);
-//         player.move_piece(2, 49);
-//         player.move_piece(3, 49);
+        player.move_piece(0, 49);
+        player.move_piece(1, 49);
+        player.move_piece(2, 49);
+        player.move_piece(3, 49);
 
-//         player.move_piece(0, 1);
-//         player.move_piece(1, 1);
-//         player.move_piece(2, 1);
-//         player.move_piece(3, 1);
+        player.move_piece(0, 1);
+        player.move_piece(1, 1);
+        player.move_piece(2, 1);
+        player.move_piece(3, 1);
 
-//         assert!(player.piece(0).borrow().is_goal());
-//         assert!(player.piece(1).is_goal());
-//         assert!(player.piece(2).is_goal());
-//         assert!(player.piece(3).is_goal());
+        assert!(player.piece(0).borrow().is_goal());
+        assert!(player.piece(1).borrow_mut().is_goal());
+        assert!(player.piece(2).borrow_mut().is_goal());
+        assert!(player.piece(3).borrow_mut().is_goal());
 
-//         assert!(player.is_finished());
-//     }
+        assert!(player.is_finished());
+    }
 
-//     #[test]
-//     #[ignore = "Action selection not implemented"]
-//     fn single_player_test() {
-//         let board = Rc::new(RefCell::new(Board::new()));
-//         let dice = Rc::new(RefCell::new(Dice::new()));
-//         let mut player = Player::new(0, board, Some(dice));
+    // #[test]
+    // #[ignore = "Action selection not implemented"]
+    // fn single_player_test() {
+    //     let board = Rc::new(RefCell::new(Board::new()));
+    //     let dice = Rc::new(RefCell::new(Dice::new()));
+    //     let mut player = Player::new(0, board, Some(dice));
 
-//         while !player.is_finished() {
-//             player.my_turn();
-//             player.random_play();
-//             println!(
-//                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
-//                 player.piece(0).borrow().position(),
-//                 player.piece(1).position(),
-//                 player.piece(2).position(),
-//                 player.piece(3).position()
-//             );
-//         }
-//         assert!(player.is_finished());
-//     }
-// }
+    //     while !player.is_finished() {
+    //         player.my_turn();
+    //         player.random_play();
+    //         println!(
+    //             "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
+    //             player.piece(0).borrow().position(),
+    //             player.piece(1).borrow_mut().position(),
+    //             player.piece(2).borrow_mut().position(),
+    //             player.piece(3).borrow_mut().position()
+    //         );
+    //     }
+    //     assert!(player.is_finished());
+    // }
 
-// mod multiplayer_test {
-//     use super::*;
+}
 
-//     #[test]
-//     fn two_players_free_test() {
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
-//         let mut player2 = Player::new(1, board, Some(dice));
+mod multiplayer_test {
+    use super::*;
 
-//         player1.free_piece(0).borrow();
-//         player2.free_piece(0).borrow();
+    #[test]
+    fn two_players_free_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board, Some(dice));
 
-//         assert_eq!(player1.piece(0).borrow().position(), 0);
-//         assert_eq!(player2.piece(0).borrow().position(), 13);
-//         assert_eq!(player1.board().borrow().outside[0].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[0].player_id,
-//             Some(board::PlayerID::Player0)
-//         );
-//         assert_eq!(player2.board().borrow().outside[13].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[13].player_id,
-//             Some(board::PlayerID::Player1)
-//         );
-//     }
+        player1.free_piece(0);
+        player2.free_piece(0);
 
-//     #[test]
-//     fn all_players_free_test() {
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
-//         let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
-//         let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
-//         let mut player4 = Player::new(3, board, Some(dice));
+        assert_eq!(player1.piece(0).borrow().position(), 0);
+        assert_eq!(player2.piece(0).borrow().position(), 13);
+        assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(player2.board().borrow_mut().outside(13).pieces.len(), 1);
+        assert_eq!(player2.board().borrow_mut().outside(13).piece(0).borrow().position(), 13);
+        assert_eq!(
+            player1.board().borrow().outside[13].player_id,
+            Some(board::PlayerID::Player1)
+        );
+    }
 
-//         player1.free_piece(0).borrow();
-//         player2.free_piece(0).borrow();
-//         player3.free_piece(0).borrow();
-//         player4.free_piece(0).borrow();
+    #[test]
+    fn all_players_free_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
+        let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
+        let mut player4 = Player::new(3, board, Some(dice));
 
-//         assert_eq!(player1.piece(0).borrow().position(), 0);
-//         assert_eq!(player2.piece(0).borrow().position(), 13);
-//         assert_eq!(player3.piece(0).borrow().position(), 26);
-//         assert_eq!(player4.piece(0).borrow().position(), 39);
+        player1.free_piece(0);
+        player2.free_piece(0);
+        player3.free_piece(0);
+        player4.free_piece(0);
+
+        assert_eq!(player1.piece(0).borrow().position(), 0);
+        assert_eq!(player2.piece(0).borrow().position(), 13);
+        assert_eq!(player3.piece(0).borrow().position(), 26);
+        assert_eq!(player4.piece(0).borrow().position(), 39);
         
-//         assert_eq!(player1.board().borrow().outside[0].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[0].player_id,
-//             Some(board::PlayerID::Player0)
-//         );
-//         assert_eq!(player1.board().borrow().outside[13].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[13].player_id,
-//             Some(board::PlayerID::Player1)
-//         );
-//         assert_eq!(player1.board().borrow().outside[26].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[26].player_id,
-//             Some(board::PlayerID::Player2)
-//         );
-//         assert_eq!(player1.board().borrow().outside[39].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[39].player_id,
-//             Some(board::PlayerID::Player3)
-//         );
-//     }
+        assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(player1.board().borrow().outside[13].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[13].player_id,
+            Some(board::PlayerID::Player1)
+        );
+        assert_eq!(player1.board().borrow().outside[26].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[26].player_id,
+            Some(board::PlayerID::Player2)
+        );
+        assert_eq!(player1.board().borrow().outside[39].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[39].player_id,
+            Some(board::PlayerID::Player3)
+        );
+    }
 
-//     #[test]
-//     fn two_players_move_test() {
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
-//         let mut player2 = Player::new(1, board, Some(dice));
+    #[test]
+    fn two_players_move_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board, Some(dice));
 
-//         player1.free_piece(0).borrow();
-//         player2.free_piece(0).borrow();
+        player1.free_piece(0);
+        player2.free_piece(0);
 
-//         player1.move_piece(0, 6);
-//         player2.move_piece(0, 6);
+        player1.move_piece(0, 6);
+        player2.move_piece(0, 6);
 
-//         assert_eq!(player1.piece(0).borrow().position(), 6);
-//         assert_eq!(player2.piece(0).borrow().position(), 19);
+        assert_eq!(player1.piece(0).borrow().position(), 6);
+        assert_eq!(player2.piece(0).borrow().position(), 19);
 
-//         assert_eq!(player1.board().borrow().outside[0].pieces, 0);
-//         assert_eq!(player1.board().borrow().outside[6].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[6].player_id,
-//             Some(board::PlayerID::Player0)
-//         );
-//         assert_eq!(player2.board().borrow().outside[13].pieces, 0);
-//         assert_eq!(player2.board().borrow().outside[19].pieces, 1);
-//         assert_eq!(
-//             player2.board().borrow().outside[19].player_id,
-//             Some(board::PlayerID::Player1)
-//         );
-//     }
+        assert_eq!(player1.board().borrow().outside[0].pieces.len(), 0);
+        assert_eq!(player1.board().borrow().outside[6].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow().outside[6].player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(player2.board().borrow().outside[13].pieces.len(), 0);
+        assert_eq!(player2.board().borrow().outside[19].pieces.len(), 1);
+        assert_eq!(
+            player2.board().borrow().outside[19].player_id,
+            Some(board::PlayerID::Player1)
+        );
+    }
 
-//     #[test]
-//     fn all_players_move_test() {
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-//         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
-//         let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
-//         let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
-//         let mut player4 = Player::new(3, board, Some(dice));
+    #[test]
+    fn all_players_move_test() {
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
+        let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
+        let mut player4 = Player::new(3, board, Some(dice));
 
-//         player1.free_piece(0).borrow();
-//         player2.free_piece(0).borrow();
-//         player3.free_piece(0).borrow();
-//         player4.free_piece(0).borrow();
+        player1.free_piece(0);
+        player2.free_piece(0);
+        player3.free_piece(0);
+        player4.free_piece(0);
 
-//         player1.move_piece(0, 6);
-//         player2.move_piece(0, 6);
-//         player3.move_piece(0, 6);
-//         player4.move_piece(0, 6);
+        player1.move_piece(0, 6);
+        player2.move_piece(0, 6);
+        player3.move_piece(0, 6);
+        player4.move_piece(0, 6);
 
-//         assert_eq!(player1.piece(0).borrow().position(), 6);
-//         assert_eq!(player2.piece(0).borrow().position(), 19);
-//         assert_eq!(player3.piece(0).borrow().position(), 32);
-//         assert_eq!(player4.piece(0).borrow().position(), 45);
+        assert_eq!(player1.piece(0).borrow().position(), 6);
+        assert_eq!(player2.piece(0).borrow().position(), 19);
+        assert_eq!(player3.piece(0).borrow().position(), 32);
+        assert_eq!(player4.piece(0).borrow().position(), 45);
 
-//         assert_eq!(player1.board().borrow().outside[0].pieces, 0);
-//         assert_eq!(player1.board().borrow().outside[6].pieces, 1);
-//         assert_eq!(
-//             player1.board().borrow().outside[6].player_id,
-//             Some(board::PlayerID::Player0)
-//         );
-//         assert_eq!(player2.board().borrow().outside[13].pieces, 0);
-//         assert_eq!(player2.board().borrow().outside[19].pieces, 1);
-//         assert_eq!(
-//             player2.board().borrow().outside[19].player_id,
-//             Some(board::PlayerID::Player1)
-//         );
-//         assert_eq!(player3.board().borrow().outside[26].pieces, 0);
-//         assert_eq!(player3.board().borrow().outside[32].pieces, 1);
-//         assert_eq!(
-//             player3.board().borrow().outside[32].player_id,
-//             Some(board::PlayerID::Player2)
-//         );
-//         assert_eq!(player4.board().borrow().outside[39].pieces, 0);
-//         assert_eq!(player4.board().borrow().outside[45].pieces, 1);
-//         assert_eq!(
-//             player4.board().borrow().outside[45].player_id,
-//             Some(board::PlayerID::Player3)
-//         );
-//     }
+        assert_eq!(player1.board().borrow_mut().outside[0].pieces.len(), 0);
+        assert_eq!(player1.board().borrow_mut().outside[6].pieces.len(), 1);
+        assert_eq!(
+            player1.board().borrow_mut().outside[6].player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(player2.board().borrow_mut().outside[13].pieces.len(), 0);
+        assert_eq!(player2.board().borrow_mut().outside[19].pieces.len(), 1);
+        assert_eq!(
+            player2.board().borrow_mut().outside[19].player_id,
+            Some(board::PlayerID::Player1)
+        );
+        assert_eq!(player3.board().borrow_mut().outside[26].pieces.len(), 0);
+        assert_eq!(player3.board().borrow_mut().outside[32].pieces.len(), 1);
+        assert_eq!(
+            player3.board().borrow_mut().outside[32].player_id,
+            Some(board::PlayerID::Player2)
+        );
+        assert_eq!(player4.board().borrow_mut().outside[39].pieces.len(), 0);
+        assert_eq!(player4.board().borrow_mut().outside[45].pieces.len(), 1);
+        assert_eq!(
+            player4.board().borrow().outside[45].player_id,
+            Some(board::PlayerID::Player3)
+        );
+    }
 
-//     #[test]
-//     fn other_player_circumvent_player_1() {
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    #[test]
+    fn other_player_circumvent_player_1() {
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
 
-//         let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
-//         player2.free_piece(0).borrow();
-//         player2.piece(0).borrow().set_position(50);
-//         player2.move_piece(0, 1);
-//         assert_eq!(player2.piece(0).borrow().position(), 51);
+        let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
+        player2.free_piece(0);
+        player2.move_piece(0, 36);
+        player2.move_piece(0, 2);
+        assert_eq!(player2.piece(0).borrow().position(), 51);
+        
+        player2.free_piece(1);
+        player2.move_piece(1, 36);
+        player2.move_piece(1, 6);
+        assert_eq!(player2.piece(1).borrow().position(), 3);
 
-//         player2.piece(0).borrow().set_position(50);
-//         player2.move_piece(0, 6);
-//         assert_eq!(player2.piece(0).borrow().position(), 4);
+        let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
+        player3.free_piece(0);
+        player3.move_piece(0, 23);
+        player3.move_piece(0, 2);
+        assert_eq!(player3.piece(0).borrow().position(), 51);
+        
+        player3.free_piece(1);
+        player3.move_piece(1, 23);
+        player3.move_piece(1, 6);
+        assert_eq!(player3.piece(1).borrow().position(), 3);
 
-//         let mut player3 = Player::new(2, board.clone(), Some(dice.clone()));
-//         player3.free_piece(0).borrow();
-//         player3.piece(0).borrow().set_position(50);
-//         player3.move_piece(0, 1);
-//         assert_eq!(player3.piece(0).borrow().position(), 51);
+        let mut player4 = Player::new(3, board, Some(dice));
+        player4.free_piece(0);
+        player4.move_piece(0, 10);
+        player4.move_piece(0, 2);
+        assert_eq!(player4.piece(0).borrow().position(), 51);
 
-//         player3.piece(0).borrow().set_position(50);
-//         player3.move_piece(0, 6);
-//         assert_eq!(player3.piece(0).borrow().position(), 4);
+        player4.free_piece(1);
+        player4.move_piece(1, 10);
+        player4.move_piece(1, 6);
+        assert_eq!(player4.piece(1).borrow().position(), 3);
+    }
 
-//         let mut player4 = Player::new(3, board, Some(dice));
-//         player4.free_piece(0).borrow();
-//         player4.piece(0).borrow().set_position(50);
-//         player4.move_piece(0, 1);
-//         assert_eq!(player4.piece(0).borrow().position(), 51);
-//         player4.piece(0).borrow().set_position(50);
-//         player4.move_piece(0, 6);
-//         assert_eq!(player4.piece(0).borrow().position(), 4);
-//     }
+    #[test]
+    fn two_player_kill_test() {
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board, Some(dice));
 
-//     #[test]
-//     #[ignore = "not suceeded"]
-//     fn two_player_kill_test() {
-//         let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
-//         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-//         let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
-//         let mut player2 = Player::new(1, board, Some(dice));
+        player1.free_piece(0);
+        let diceroll1 = 3;
+        let choice1 = player1.select_choice(0, diceroll1, Act::Move);
+        assert_eq!(choice1, Act::Move);
+        player1.make_move(0, 17, choice1);
+        assert_eq!(player1.piece(0).borrow().position(), 17);
+        
+        player2.free_piece(0);
+        assert_eq!(player2.piece(0).borrow().position(), 13);
 
-//         player1.free_piece(0).borrow();
-//         player2.free_piece(0).borrow();
+        let diceroll2 = 4;
+        let choice2 = player2.select_choice(0, diceroll2, Act::Kill);
+        assert_eq!(choice2, Act::Kill);
+        player2.make_move(0, diceroll2, choice2);
 
-//         player1.piece(0).borrow().set_position(6);
-//         player2.piece(0).borrow().set_position(5);
+        assert_eq!(player1.piece(0).borrow().position(), -1);
+        assert!(player1.piece(0).borrow().is_home());
 
-//         let diceroll1 = 3;
-//         let diceroll2 = 4;
-
-//         let choice1 = player1.select_choice(0, diceroll1, Act::Move);
-//         let choice2 = player1.select_choice(0, diceroll2, Act::Kill);
-
-//         player1.make_move(0, diceroll1, choice1);
-//         player2.make_move(0, diceroll2, choice2);
-
-//         assert_eq!(player1.piece(0).borrow().position(), -1);
-//         assert!(player1.piece(0).borrow().is_home());
-
-//         assert_eq!(player2.piece(0).borrow().position(), 9);
-//     }
-// }
+        assert_eq!(player2.piece(0).borrow().position(), 17);
+    }
+}
