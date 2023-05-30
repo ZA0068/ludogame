@@ -3,7 +3,6 @@ name = "board"
 version = "1.0.0"
 edition = "2021"
 
-
 [lib]
 name = "board"
 path = "src/board.rs"

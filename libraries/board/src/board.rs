@@ -513,6 +513,60 @@ mod board {
             }
             self.outside(position).player_id != get_player_id(player_id)
         }
+
+        pub fn reset(&mut self) {
+            self.reset_goal();
+            self.reset_inside();
+            self.reset_outside();
+            self.reset_home();
+        }
+
+        fn reset_home(&mut self) {
+            for player_id in 0..4 {
+                self.home(player_id).pieces.sort_by_key(|a| a.borrow().id());
+            }
+        }
+
+        fn reset_goal(&mut self) {
+            for player_id in 0..4 {
+                if self.goal(player_id).player_id.is_some() {
+                    let pieces = self.goal(player_id).pieces.clone();
+                    for piece in pieces {
+                        self.home(player_id).pieces.push(piece);
+                    }
+                }
+                self.goal(player_id).pieces.clear();
+                self.goal(player_id).player_id = None;
+            }
+        }
+
+        fn reset_inside(&mut self) {
+            for position in 52..=72 {
+                if self.inside(position).player_id.is_some() {
+                    let id = self.inside(position).player_id.unwrap() as i8;
+                    let pieces = self.inside(position).pieces.clone();
+                    for piece in pieces {
+                        self.home(id).pieces.push(piece);
+                    }
+                }
+                self.inside(position).pieces.clear();
+                self.inside(position).player_id = None;
+            }
+        }
+
+        fn reset_outside(&mut self) {
+            for position in 0..52 {
+                if self.outside(position).player_id.is_some() {
+                    let player_id = self.outside(position).player_id.unwrap() as i8;
+                    let pieces = self.outside(position).pieces.clone();
+                    for piece in pieces {
+                        self.home(player_id).pieces.push(piece);
+                    }
+                }
+                self.outside(position).pieces.clear();
+                self.outside(position).player_id = None;
+            }
+        }
     }
 
     fn create_vector_of_pieces() -> Vec<Rc<RefCell<Piece>>> {

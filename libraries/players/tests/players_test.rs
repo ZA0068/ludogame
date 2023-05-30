@@ -1102,7 +1102,7 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (action, piece_id) = player.make_choice(dice_number, Act::Move);
+            let (action, piece_id) = player.make_random_choice(dice_number, Act::Move);
             println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
             println!(
@@ -1129,9 +1129,9 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Safe);
+            let (mut action, mut piece_id) = player.make_random_choice(dice_number, Act::Safe);
             if action == Act::Nothing {
-                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+                (action, piece_id) = player.make_random_choice(dice_number, Act::Move);
             }
             println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
@@ -1159,9 +1159,9 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Join);
+            let (mut action, mut piece_id) = player.make_random_choice(dice_number, Act::Join);
             if action == Act::Nothing {
-                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+                (action, piece_id) = player.make_random_choice(dice_number, Act::Move);
             }
             println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
@@ -1189,9 +1189,9 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Leave);
+            let (mut action, mut piece_id) = player.make_random_choice(dice_number, Act::Leave);
             if action == Act::Nothing {
-                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+                (action, piece_id) = player.make_random_choice(dice_number, Act::Move);
             }
             println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
@@ -1219,9 +1219,9 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Skip);
+            let (mut action, mut piece_id) = player.make_random_choice(dice_number, Act::Skip);
             if action == Act::Nothing {
-                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+                (action, piece_id) = player.make_random_choice(dice_number, Act::Move);
             }
             println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
@@ -1242,9 +1242,21 @@ mod multipiece_test {
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(0, board, Some(dice));
 
+        
+        let actions =    vec![Act::Move,
+                Act::Free,
+                Act::Kill,
+                Act::Join,
+                Act::Leave,
+                Act::Die,
+                Act::Win,
+                Act::Safe,
+                Act::Skip,
+                Act::Nothing];
+
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            player.random_play(actions.clone());
             println!(
                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
                 player.piece(0).borrow().position(),
@@ -1770,10 +1782,19 @@ mod multiplayer_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(0, board, Some(dice));
-
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            player.random_play(actions.clone());
             player.print_pieces();
         }
         assert!(player.is_finished());
@@ -1786,9 +1807,20 @@ mod multiplayer_test {
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(1, board, Some(dice));
 
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
+
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            player.random_play(actions.clone());
             player.print_pieces();
         }
         assert!(player.is_finished());
@@ -1800,10 +1832,20 @@ mod multiplayer_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(2, board, Some(dice));
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
 
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            player.random_play(actions.clone());
             player.print_pieces();
         }
         assert!(player.is_finished());
@@ -1815,10 +1857,19 @@ mod multiplayer_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player = Player::new(3, board, Some(dice));
-
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
         while !player.is_finished() {
             player.my_turn();
-            player.random_play();
+            player.random_play(actions.clone());
             player.print_pieces();
         }
         assert!(player.is_finished());
@@ -1828,12 +1879,24 @@ mod multiplayer_test {
     fn all_single_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Rc::new(RefCell::new(Dice::new()));
+
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
+
         for i in 0..4 {
             let mut player = Player::new(i, board.clone(), Some(dice.clone()));
 
             while !player.is_finished() {
                 player.my_turn();
-                player.random_play();
+                player.random_play(actions.clone());
                 player.print_pieces();
             }
             assert!(player.is_finished());
@@ -1847,17 +1910,26 @@ mod multiplayer_test {
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player0 = Player::new(0, board.clone(), Some(dice.clone()));
         let mut player1 = Player::new(1, board, Some(dice));
-
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
         loop {
             player0.my_turn();
-            player0.random_play();
+            player0.random_play(actions.clone());
             player0.print_pieces();
             if player0.is_finished() {
                 println!("Player 0 wins");
                 break;
             }
             player1.my_turn();
-            player1.random_play();
+            player1.random_play(actions.clone());
             player1.print_pieces();
             if player1.is_finished() {
                 println!("Player 1 wins");
@@ -1874,32 +1946,43 @@ mod multiplayer_test {
         let dice = Rc::new(RefCell::new(Dice::new()));
         let mut player0 = Player::new(0, board.clone(), Some(dice.clone()));
         let mut player1 = Player::new(1, board.clone(), Some(dice.clone()));
-        let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
-        let mut player3 = Player::new(1, board, Some(dice));
+        let mut player2 = Player::new(2, board.clone(), Some(dice.clone()));
+        let mut player3 = Player::new(3, board, Some(dice));
+        let actions =    vec![Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Win,
+        Act::Safe,
+        Act::Skip,
+        Act::Nothing];
+
         for _ in 0..10 {
             loop {
                 player0.my_turn();
-                player0.random_play();
+                player0.random_play(actions.clone());
                 if player0.is_finished() {
                     println!("Player 0 wins");
                     break;
                 }
                 player1.my_turn();
-                player1.random_play();
+                player1.random_play(actions.clone());
                 if player1.is_finished() {
                     println!("Player 1 wins");
                     break;
                 }
 
                 player2.my_turn();
-                player2.random_play();
+                player2.random_play(actions.clone());
                 if player2.is_finished() {
                     println!("Player 2 wins");
                     break;
                 }
 
                 player3.my_turn();
-                player3.random_play();
+                player3.random_play(actions.clone());
                 if player3.is_finished() {
                     println!("Player 3 wins");
                     break;
@@ -1911,6 +1994,26 @@ mod multiplayer_test {
                     || player2.is_finished()
                     || player3.is_finished()
             );
+            player0.reset();
+            player1.reset();
+            player2.reset();
+            player3.reset();
         }
+    }
+}
+
+#[cfg(test)]
+mod playstyle_tests {
+    use super::*;
+
+    #[test]
+    fn aggressive_player_test()
+    {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let aggressive_player = Player::new(0, board.clone(), Some(dice.clone()));
+        let random_player = Player::new(2, board.clone(), Some(dice.clone()));
+
+
     }
 }
