@@ -25,7 +25,7 @@ dependencies = [
 
 [[package]]
 name = "board"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "pieces",
 ]
@@ -393,7 +393,7 @@ dependencies = [
 
 [[package]]
 name = "ludogame"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "board",
  "players",
@@ -480,7 +480,7 @@ dependencies = [
 
 [[package]]
 name = "players"
-version = "0.1.1"
+version = "2.0.0"
 dependencies = [
  "board",
  "dice",
