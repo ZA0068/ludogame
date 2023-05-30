@@ -992,11 +992,99 @@ mod multipiece_test {
         let mut player = Player::new(0, board.clone(), Some(dice.clone()));
         let mut opponent = Player::new(1, board, Some(dice));
 
+        opponent.free_piece(0);
+        player.free_piece(0);
+        let action = player.try_to_kill(0, 13);
+        assert_eq!(action, Act::Nothing);
+        opponent.make_move(0, 1, Act::Move);
+        let action = player.try_to_kill(0, 14);
+        assert_eq!(action, Act::Kill);
+    }
+
+    #[test]
+    fn try_to_kill_2_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut opponent = Player::new(1, board, Some(dice));
+
+        opponent.free_piece(0);
+        opponent.make_move(0, 5, Act::Move);
+        assert_eq!(opponent.piece(0).borrow_mut().position(), 24);
+
+        player.free_piece(0);
+        player.move_piece(0, 17);
+        let action = player.try_to_kill(0, 1);
+        assert_eq!(action, Act::Kill);
+        player.make_move(0, 1, Act::Kill);
+        assert_eq!(player.piece(0).borrow_mut().position(), 24);
+        assert_eq!(opponent.piece(0).borrow_mut().position(), -1);
+    }
+
+    #[test]
+    fn try_to_kill_3_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut opponent = Player::new(1, board, Some(dice));
+
+        opponent.free_piece(0);
+        opponent.free_piece(1);
+        opponent.make_move(0, 5, Act::Skip);
+        opponent.make_move(1, 6, Act::Move);
+        opponent.make_move(1, 5, Act::Skip);
+        assert_eq!(opponent.piece(0).borrow_mut().position(), 24);
+        assert_eq!(opponent.piece(1).borrow_mut().position(), 31);
+
+        player.free_piece(0);
+        player.move_piece(0, 23);
+        let action = player.try_to_kill(0, 1);
+        assert_eq!(action, Act::Kill);
+        player.make_move(0, 1, Act::Kill);
+
+        assert_eq!(player.piece(0).borrow_mut().position(), 31);
+        assert_eq!(opponent.piece(0).borrow_mut().position(), -1);
+        assert_eq!(opponent.piece(1).borrow_mut().position(), -1);
+    }
+
+    #[test]
+    fn try_to_win_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
         for i in 0..4 {
-            opponent.free_piece(i);
             player.free_piece(i);
-            let action = player.try_to_kill(i, 13);
+            let action = player.try_to_win(i, 50);
             assert_eq!(action, Act::Nothing);
+            player.make_move(i, 50, Act::Move);
+
+            let action = player.try_to_win(i, 6);
+            assert_eq!(action, Act::Win);
+            player.make_move(i, 6, Act::Win);
+        }
+        assert!(player.is_finished());
+
+        let action = player.try_to_win(0, 1);
+        assert_eq!(action, Act::Nothing);
+        player.make_move(0, 1, Act::Move);
+    }
+
+    #[test]
+    fn try_to_skip_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
+        for i in 0..4 {
+            player.free_piece(i);
+            let action = player.try_to_skip(i, 2);
+            assert_eq!(action, Act::Nothing);
+            player.make_move(i, 2, action);
+
+            let action = player.try_to_skip(i, 5);
+            assert_eq!(action, Act::Skip);
+            player.make_move(i, 6, action);
         }
     }
 
@@ -1015,7 +1103,7 @@ mod multipiece_test {
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
             let (action, piece_id) = player.make_choice(dice_number, Act::Move);
-            println!("Action: {:?}, Piece ID: {:?}", action, piece_id);
+            println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
             println!(
                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
@@ -1041,8 +1129,101 @@ mod multipiece_test {
             player.my_turn();
             let dice_number = player.roll_dice();
             println!("Dice: {}", dice_number);
-            let (action, piece_id) = player.make_choice(dice_number, Act::Safe);
-            println!("Action: {:?}, Piece ID: {:?}", action, piece_id);
+            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Safe);
+            if action == Act::Nothing {
+                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+            }
+            println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
+            player.make_move(piece_id, dice_number, action);
+            println!(
+                "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
+                player.piece(0).borrow().position(),
+                player.piece(1).borrow_mut().position(),
+                player.piece(2).borrow_mut().position(),
+                player.piece(3).borrow_mut().position()
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn single_player_join_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+        while !player.is_finished() {
+            player.my_turn();
+            let dice_number = player.roll_dice();
+            println!("Dice: {}", dice_number);
+            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Join);
+            if action == Act::Nothing {
+                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+            }
+            println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
+            player.make_move(piece_id, dice_number, action);
+            println!(
+                "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
+                player.piece(0).borrow().position(),
+                player.piece(1).borrow_mut().position(),
+                player.piece(2).borrow_mut().position(),
+                player.piece(3).borrow_mut().position()
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn single_player_leave_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+        while !player.is_finished() {
+            player.my_turn();
+            let dice_number = player.roll_dice();
+            println!("Dice: {}", dice_number);
+            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Leave);
+            if action == Act::Nothing {
+                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+            }
+            println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
+            player.make_move(piece_id, dice_number, action);
+            println!(
+                "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
+                player.piece(0).borrow().position(),
+                player.piece(1).borrow_mut().position(),
+                player.piece(2).borrow_mut().position(),
+                player.piece(3).borrow_mut().position()
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn single_player_skip_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+        while !player.is_finished() {
+            player.my_turn();
+            let dice_number = player.roll_dice();
+            println!("Dice: {}", dice_number);
+            let (mut action, mut piece_id) = player.make_choice(dice_number, Act::Skip);
+            if action == Act::Nothing {
+                (action, piece_id) = player.make_choice(dice_number, Act::Move);
+            }
+            println!("Piece ID: {:?}, Action: {:?}", piece_id, action);
             player.make_move(piece_id, dice_number, action);
             println!(
                 "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
@@ -1500,5 +1681,239 @@ mod multiplayer_test {
         assert!(player2.piece(piece_0).borrow().is_home());
         assert_eq!(player2.piece(piece_0).borrow().position(), -1);
         assert_eq!(player2.board().borrow_mut().home(1).pieces.len(), 4);
+    }
+
+    #[test]
+    fn try_to_die_test() {
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board, Some(dice));
+
+        let piece_0 = 0;
+        let piece_1 = 1;
+        let dice_number = 18;
+        player1.free_piece(piece_0);
+        player1.free_piece(piece_1);
+        player1.move_piece(piece_0, dice_number);
+        player1.move_piece(piece_1, dice_number);
+        player2.free_piece(piece_0);
+
+        let action = player2.try_to_die(piece_0, 5);
+        assert_eq!(action, Act::Die);
+
+        player1.die(piece_0);
+        player1.die(piece_1);
+        player1.free_piece(piece_0);
+        player1.free_piece(piece_1);
+
+        let dice_number = 17;
+        player1.move_piece(piece_0, dice_number);
+        player1.move_piece(piece_1, dice_number);
+        let dice_number = 1;
+        player1.move_piece(piece_0, dice_number);
+        player1.move_piece(piece_1, dice_number);
+
+        let action = player2.try_to_die(piece_0, 5);
+        assert_eq!(action, Act::Die);
+
+        player1.free_piece(2);
+        player1.move_piece(2, 21);
+
+        let action = player2.try_to_die(piece_0, 8);
+        assert_eq!(action, Act::Die);
+    }
+
+    #[test]
+    fn try_to_kill_test() {
+        let dice: Rc<RefCell<Dice>> = Rc::new(RefCell::new(Dice::new()));
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player1 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board, Some(dice));
+
+        let piece_0 = 0;
+        let piece_1 = 1;
+        let dice_number = 18;
+        player1.free_piece(piece_0);
+        player1.free_piece(piece_1);
+        player1.move_piece(piece_0, dice_number);
+        player1.move_piece(piece_1, 15);
+        player2.free_piece(piece_0);
+
+        let action = player2.try_to_kill(piece_0, 5);
+        assert_eq!(action, Act::Kill);
+
+        let action = player2.try_to_kill(piece_0, 2);
+        assert_eq!(action, Act::Kill);
+
+        player1.die(piece_0);
+        player1.free_piece(piece_0);
+
+        let dice_number = 17;
+        player1.move_piece(piece_0, dice_number);
+        let dice_number = 1;
+        player1.move_piece(piece_0, dice_number);
+
+        let action = player2.try_to_kill(piece_0, 5);
+        assert_eq!(action, Act::Kill);
+
+        player1.free_piece(2);
+        player1.move_piece(2, 21);
+
+        let action = player2.try_to_kill(piece_0, 8);
+        assert_eq!(action, Act::Nothing);
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn first_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(0, board, Some(dice));
+
+        while !player.is_finished() {
+            player.my_turn();
+            player.random_play();
+            player.print_pieces();
+        }
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn second_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(1, board, Some(dice));
+
+        while !player.is_finished() {
+            player.my_turn();
+            player.random_play();
+            player.print_pieces();
+        }
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn third_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(2, board, Some(dice));
+
+        while !player.is_finished() {
+            player.my_turn();
+            player.random_play();
+            player.print_pieces();
+        }
+        assert!(player.is_finished());
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn fourth_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player = Player::new(3, board, Some(dice));
+
+        while !player.is_finished() {
+            player.my_turn();
+            player.random_play();
+            player.print_pieces();
+        }
+        assert!(player.is_finished());
+    }
+    #[test]
+    #[ignore = "long test"]
+    fn all_single_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        for i in 0..4 {
+            let mut player = Player::new(i, board.clone(), Some(dice.clone()));
+
+            while !player.is_finished() {
+                player.my_turn();
+                player.random_play();
+                player.print_pieces();
+            }
+            assert!(player.is_finished());
+        }
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn two_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player0 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player1 = Player::new(1, board, Some(dice));
+
+        loop {
+            player0.my_turn();
+            player0.random_play();
+            player0.print_pieces();
+            if player0.is_finished() {
+                println!("Player 0 wins");
+                break;
+            }
+            player1.my_turn();
+            player1.random_play();
+            player1.print_pieces();
+            if player1.is_finished() {
+                println!("Player 1 wins");
+                break;
+            }
+        }
+        assert!(player0.is_finished() || player1.is_finished());
+    }
+
+    #[test]
+    #[ignore = "super long test"]
+    fn all_player_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Rc::new(RefCell::new(Dice::new()));
+        let mut player0 = Player::new(0, board.clone(), Some(dice.clone()));
+        let mut player1 = Player::new(1, board.clone(), Some(dice.clone()));
+        let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
+        let mut player3 = Player::new(1, board, Some(dice));
+
+        loop {
+            player0.my_turn();
+            player0.random_play();
+            player0.print_pieces();
+            if player0.is_finished() {
+                println!("Player 0 wins");
+                break;
+            }
+            player1.my_turn();
+            player1.random_play();
+            player1.print_pieces();
+            if player1.is_finished() {
+                println!("Player 1 wins");
+                break;
+            }
+
+            player2.my_turn();
+            player2.random_play();
+            player2.print_pieces();
+            if player2.is_finished() {
+                println!("Player 2 wins");
+                break;
+            }
+
+            player3.my_turn();
+            player3.random_play();
+            player3.print_pieces();
+            if player3.is_finished() {
+                println!("Player 3 wins");
+                break;
+            }
+        }
+        assert!(
+            player0.is_finished()
+                || player1.is_finished()
+                || player2.is_finished()
+                || player3.is_finished()
+        );
     }
 }
