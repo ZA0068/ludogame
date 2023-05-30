@@ -421,13 +421,13 @@ mod board_update_test {
         let player_id: i8 = 0;
         let new_position: i8 = 0;
         board.move_from_home(player_id, piece_id, new_position);
-        assert!(board.is_occupied_self(new_position));
+        assert!(board.is_occupied_self(player_id, new_position));
 
         let old_position = new_position;
         let new_position = 4;
         board.update_outside(player_id, piece_id, old_position, new_position);
-        assert!(board.is_occupied_self(new_position));
-        assert!(!board.is_occupied_self(old_position));
+        assert!(board.is_occupied_self(player_id, new_position));
+        assert!(!board.is_occupied_self(player_id, old_position));
     }
 
     #[test]
