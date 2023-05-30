@@ -1876,7 +1876,7 @@ mod multiplayer_test {
         let mut player1 = Player::new(1, board.clone(), Some(dice.clone()));
         let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
         let mut player3 = Player::new(1, board, Some(dice));
-        for iterations in 0..10 {
+        for _ in 0..10 {
             loop {
                 player0.my_turn();
                 player0.random_play();
