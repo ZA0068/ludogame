@@ -486,6 +486,20 @@ mod board {
             !self.outside(position).pieces.is_empty()
         }
 
+        pub fn is_occupied_self(&mut self, player_id: i8, position: i8) -> bool {
+            if !self.is_occupied(position) {
+                return false;
+            }
+            self.outside(position).player_id == get_player_id(player_id)
+        }
+
+        pub fn is_occupied_by_more_self(&mut self, player_id: i8, position: i8) -> bool {
+            if !self.is_occupied_more(position) {
+                return false;
+            }
+            self.outside(position).player_id != get_player_id(player_id)
+        }
+
         pub fn is_occupied_by_other(&mut self, player_id: i8, position: i8) -> bool {
             if !self.is_occupied(position) {
                 return false;
@@ -493,7 +507,7 @@ mod board {
             self.outside(position).player_id != get_player_id(player_id)
         }
 
-        pub fn is_occupied_by_other_more(&mut self, player_id: i8, position: i8) -> bool {
+        pub fn is_occupied_by_more_other(&mut self, player_id: i8, position: i8) -> bool {
             if !self.is_occupied_more(position) {
                 return false;
             }

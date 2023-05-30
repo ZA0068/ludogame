@@ -421,13 +421,13 @@ mod board_update_test {
         let player_id: i8 = 0;
         let new_position: i8 = 0;
         board.move_from_home(player_id, piece_id, new_position);
-        assert!(board.is_occupied(new_position));
+        assert!(board.is_occupied_self(new_position));
 
         let old_position = new_position;
         let new_position = 4;
         board.update_outside(player_id, piece_id, old_position, new_position);
-        assert!(board.is_occupied(new_position));
-        assert!(!board.is_occupied(old_position));
+        assert!(board.is_occupied_self(new_position));
+        assert!(!board.is_occupied_self(old_position));
     }
 
     #[test]
@@ -479,12 +479,12 @@ mod board_update_test {
 
         board.move_from_home(player_0, piece_0, new_position);
         board.move_from_home(player_0, piece_1, new_position);
-        assert!(board.is_occupied_by_other_more(player_1, new_position));
+        assert!(board.is_occupied_by_more_other(player_1, new_position));
 
         let new_position: i8 = 4;
         board.move_from_home(player_1, piece_0, new_position);
         board.move_from_home(player_1, piece_1, new_position);
-        assert!(board.is_occupied_by_other_more(player_0, new_position));
+        assert!(board.is_occupied_by_more_other(player_0, new_position));
     }
 
     #[test]
