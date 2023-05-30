@@ -10,5 +10,5 @@ path = "src/players.rs"
 [dependencies]
 pieces = { path = "../pieces" }
 dice = { path = "../dice" }
-board = { path = "../board" }
+board = { path = "../board", version = "1.0.0"}
 rand = "0.8.4"
