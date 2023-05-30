@@ -1876,44 +1876,41 @@ mod multiplayer_test {
         let mut player1 = Player::new(1, board.clone(), Some(dice.clone()));
         let mut player2 = Player::new(1, board.clone(), Some(dice.clone()));
         let mut player3 = Player::new(1, board, Some(dice));
+        for iterations in 0..10 {
+            loop {
+                player0.my_turn();
+                player0.random_play();
+                if player0.is_finished() {
+                    println!("Player 0 wins");
+                    break;
+                }
+                player1.my_turn();
+                player1.random_play();
+                if player1.is_finished() {
+                    println!("Player 1 wins");
+                    break;
+                }
 
-        loop {
-            player0.my_turn();
-            player0.random_play();
-            player0.print_pieces();
-            if player0.is_finished() {
-                println!("Player 0 wins");
-                break;
-            }
-            player1.my_turn();
-            player1.random_play();
-            player1.print_pieces();
-            if player1.is_finished() {
-                println!("Player 1 wins");
-                break;
-            }
+                player2.my_turn();
+                player2.random_play();
+                if player2.is_finished() {
+                    println!("Player 2 wins");
+                    break;
+                }
 
-            player2.my_turn();
-            player2.random_play();
-            player2.print_pieces();
-            if player2.is_finished() {
-                println!("Player 2 wins");
-                break;
+                player3.my_turn();
+                player3.random_play();
+                if player3.is_finished() {
+                    println!("Player 3 wins");
+                    break;
+                }
             }
-
-            player3.my_turn();
-            player3.random_play();
-            player3.print_pieces();
-            if player3.is_finished() {
-                println!("Player 3 wins");
-                break;
-            }
+            assert!(
+                player0.is_finished()
+                    || player1.is_finished()
+                    || player2.is_finished()
+                    || player3.is_finished()
+            );
         }
-        assert!(
-            player0.is_finished()
-                || player1.is_finished()
-                || player2.is_finished()
-                || player3.is_finished()
-        );
     }
 }
