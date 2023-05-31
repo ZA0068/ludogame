@@ -281,10 +281,6 @@ mod board {
             piece_id: i8,
         ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_home_piece_index(player_id, piece_id);
-            if piece_idx.is_none() {
-                panic!("Piece not found in home");
-            }
-            let piece_idx = piece_idx.unwrap();
             let piece = self.get_home_piece(player_id, piece_idx);
             (piece, piece_idx)
         }
@@ -293,11 +289,11 @@ mod board {
             self.home(player_id).pieces[piece_idx].clone()
         }
 
-        fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> Option<usize> {
+        fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
             self.home(player_id)
                 .pieces
                 .iter()
-                .position(|piece| piece.borrow().id() == piece_id)
+                .position(|piece| piece.borrow().id() == piece_id).unwrap()
         }
 
         fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
@@ -334,10 +330,6 @@ mod board {
             piece_id: i8,
         ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_outside_piece_index(old_position, piece_id);
-            if piece_idx.is_none() {
-                panic!("Piece not found in outside");
-            }
-            let piece_idx = piece_idx.unwrap();
             let piece = self.get_outside_piece(old_position, piece_idx);
             (piece, piece_idx)
         }
@@ -350,13 +342,12 @@ mod board {
             self.outside(old_position).pieces[piece_idx].clone()
         }
 
-        fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> Option<usize> {
-            let piece_idx = self
+        fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+            self
                 .outside(old_position)
                 .pieces
                 .iter()
-                .position(|piece| piece.borrow().id() == piece_id);
-            piece_idx
+                .position(|piece| piece.borrow().id() == piece_id).unwrap()
         }
 
         pub fn update_outside(

@@ -1009,7 +1009,7 @@ mod multipiece_test {
         let mut opponent = Player::new(1, board, Some(dice));
 
         opponent.free_piece(0);
-        opponent.make_move(0, 5, Act::Move);
+        opponent.make_move(0, 5, Act::Skip);
         assert_eq!(opponent.piece(0).borrow_mut().position(), 24);
 
         player.free_piece(0);
