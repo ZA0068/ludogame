@@ -326,7 +326,7 @@ mod players {
 
         fn correct_position_for_player_1_to_3(&mut self, old_position: i8, new_position: i8) -> i8 {
             match (self.id(), old_position, new_position) {
-                (1..=3, 0..=51, 52..=58) => new_position % 52,
+                (1..=3, 0..=51, 52..=58) => new_position - 52,
                 _ => new_position,
             }
         }

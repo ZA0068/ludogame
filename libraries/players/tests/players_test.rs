@@ -2531,9 +2531,9 @@ mod playstyle_tests {
             fast_aggressive_player.reset();
             aggressive_player.reset();
         }
-        println!("fastest_player winrate: {}", winrate[0] / 1000.0);
-        println!("safe player winrate: {}", winrate[1] / 1000.0);
-        println!("fast aggressive_player winrate: {}", winrate[2] / 1000.0);
-        println!("aggressive_player winrate: {}", winrate[3] / 1000.0);
+        println!("fastest_player winrate: {}", winrate[0] / 100.0);
+        println!("safe player winrate: {}", winrate[1] / 100.0);
+        println!("fast aggressive_player winrate: {}", winrate[2] / 100.0);
+        println!("aggressive_player winrate: {}", winrate[3] / 100.0);
     }
 }
