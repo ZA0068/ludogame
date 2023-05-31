@@ -396,7 +396,10 @@ name = "ludogame"
 version = "1.0.0"
 dependencies = [
  "board",
+ "dice",
+ "pieces",
  "players",
+ "rand",
  "yew",
 ]
 

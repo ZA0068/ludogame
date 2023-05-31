@@ -16,4 +16,7 @@ path = "src/game.rs"
 [dependencies]
 board = { path = "libraries/board" }
 players = { path = "libraries/players" }
+dice = { path = "libraries/dice" }
+pieces = { path = "libraries/pieces" }
+rand = "0.8.4"
 yew = "0.20.0"

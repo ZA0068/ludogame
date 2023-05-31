@@ -5,7 +5,7 @@ mod players {
     use dice::Dice;
     use pieces::Piece;
     use rand::seq::SliceRandom;
-    #[derive(PartialEq, Debug)]
+    #[derive(PartialEq, Debug, Clone)]
     pub struct Player {
         id: i8,
         turn: bool,
