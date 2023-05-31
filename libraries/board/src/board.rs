@@ -533,9 +533,9 @@ mod board {
                     for piece in pieces {
                         self.home(player_id).pieces.push(piece);
                     }
-                    self.goal(player_id).pieces.clear();
-                    self.goal(player_id).player_id = None;
                 }
+                self.goal(player_id).pieces.clear();
+                self.goal(player_id).player_id = None;
             }
         }
 
@@ -547,9 +547,9 @@ mod board {
                     for piece in pieces {
                         self.home(id).pieces.push(piece);
                     }
-                    self.inside(position).pieces.clear();
-                    self.inside(position).player_id = None;
                 }
+                self.inside(position).pieces.clear();
+                self.inside(position).player_id = None;
             }
         }
 
@@ -561,9 +561,9 @@ mod board {
                     for piece in pieces {
                         self.home(player_id).pieces.push(piece);
                     }
-                    self.outside(position).pieces.clear();
-                    self.outside(position).player_id = None;
                 }
+                self.outside(position).pieces.clear();
+                self.outside(position).player_id = None;
             }
         }
     }
