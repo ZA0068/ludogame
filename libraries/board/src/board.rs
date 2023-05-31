@@ -293,7 +293,8 @@ mod board {
             self.home(player_id)
                 .pieces
                 .iter()
-                .position(|piece| piece.borrow().id() == piece_id).unwrap()
+                .position(|piece| piece.borrow().id() == piece_id)
+                .unwrap()
         }
 
         fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
@@ -343,11 +344,11 @@ mod board {
         }
 
         fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
-            self
-                .outside(old_position)
+            self.outside(old_position)
                 .pieces
                 .iter()
-                .position(|piece| piece.borrow().id() == piece_id).unwrap()
+                .position(|piece| piece.borrow().id() == piece_id)
+                .unwrap()
         }
 
         pub fn update_outside(
