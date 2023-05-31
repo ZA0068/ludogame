@@ -123,12 +123,12 @@ mod players {
             }
         }
 
-        fn goal(&mut self, piece_id: i8) {
+        pub fn goal(&mut self, piece_id: i8) {
             let old_position = self.piece(piece_id).borrow_mut().position();
             self.enter_goal(piece_id, old_position);
         }
 
-        fn skip(&mut self, piece_id: i8, dice_number: i8) {
+        pub fn skip(&mut self, piece_id: i8, dice_number: i8) {
             let (old_position, new_position) = self.update_position(piece_id, dice_number);
             let star_position = self.star_position(old_position, new_position);
             self.starjump(piece_id, old_position, star_position);
@@ -228,7 +228,7 @@ mod players {
 
         pub fn move_to_safety(&mut self, piece_id: i8, dice_number: i8) {
             let (old_position, new_position) = self.update_position(piece_id, dice_number);
-            self.enter_globe(piece_id, new_position, old_position);
+            self.enter_globe(piece_id, old_position, new_position);
         }
 
         fn update_position(&mut self, piece_id: i8, dice_number: i8) -> (i8, i8) {

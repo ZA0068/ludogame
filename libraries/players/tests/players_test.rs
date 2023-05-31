@@ -419,7 +419,8 @@ mod move_single_piece_test {
         let piece_id = 0;
         player.free_piece(piece_id);
         player.move_piece(piece_id, 44);
-        player.move_piece(piece_id, 6);
+        let choice = player.valid_choices(piece_id, 6, Act::Goal);
+        player.make_move(piece_id, 6, choice);
 
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
@@ -444,12 +445,9 @@ mod move_single_piece_test {
         assert_eq!(player.piece(piece_id).borrow().position(), 54);
         assert!(!player.piece(piece_id).borrow().is_goal());
         assert_eq!(player.board().borrow_mut().inside(54).pieces.len(), 1);
-        assert_eq!(
-            player.board().borrow().inside[2].player_id,
-            Some(board::PlayerID::Player0)
-        );
+        assert_eq!(player.board().borrow().inside[2].player_id, Some(board::PlayerID::Player0));
 
-        player.move_piece(piece_id, 3);
+        player.goal(piece_id);
 
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
@@ -509,7 +507,7 @@ mod move_single_piece_test {
         assert!(!player.piece(piece_id).borrow().is_safe());
         assert!(!player.piece(piece_id).borrow().is_dangerous());
 
-        player.make_move(piece_id, 6, Act::Move);
+        player.make_move(piece_id, 6, Act::Safe);
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
         assert!(player.piece(piece_id).borrow().is_safe());
         assert!(player.piece(piece_id).borrow().is_dangerous());
@@ -523,13 +521,13 @@ mod move_single_piece_test {
 
         let piece_id = 0;
         player.free_piece(piece_id);
-        player.make_move(piece_id, 5, Act::Move);
+        player.make_move(piece_id, 5, Act::Skip);
         assert_eq!(player.piece(piece_id).borrow().position(), 11);
         assert!(!player.piece(piece_id).borrow().is_safe());
         assert!(!player.piece(piece_id).borrow().is_dangerous());
 
         player.move_piece(piece_id, 1);
-        player.move_piece(piece_id, 6);
+        player.skip(piece_id, 6);
         assert_eq!(player.piece(piece_id).borrow().position(), 24);
         assert!(!player.piece(piece_id).borrow().is_safe());
         assert!(!player.piece(piece_id).borrow().is_dangerous());
@@ -544,7 +542,8 @@ mod move_single_piece_test {
         let piece_id = 0;
         player.free_piece(piece_id);
         player.move_piece(piece_id, 44);
-        player.move_piece(piece_id, 6);
+        let choice = player.valid_choices(piece_id, 6, Act::Goal);
+        player.make_move(piece_id, 6, choice);
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
         assert_eq!(player.board().borrow_mut().goal(0).pieces.len(), 1);
