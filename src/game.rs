@@ -3,9 +3,9 @@ mod game {
     use dice::Dice;
     use players::{Act, Player};
     use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
-    use std::error::Error;
+    
     use rayon::prelude::*;
-    use std::panic::{self, AssertUnwindSafe};
+    
     use std::{cell::RefCell, rc::Rc};
     
     const NUM_GENERATIONS: usize = 50;
@@ -281,15 +281,16 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
 
         fn mutate_population(&mut self, children: &mut Vec<Vec<Act>>, mutation_rate: f64) {
             let mut rng = rand::thread_rng();
-
-            for i in 0..POPULATION_SIZE {
-                for j in 0..10 {
+        
+            for i in 0..children.len() {
+                for j in 0..children[i].len() {
                     if rng.gen_range(0.0..1.0) < mutation_rate {
                         children[i][j] = DEFAULT_ACTIONS[rng.gen_range(0..DEFAULT_ACTIONS.len())];
                     }
                 }
             }
         }
+        
 
         fn initialize_population(&mut self) -> Vec<Vec<Act>> {
             let mut population = Vec::new();
@@ -322,22 +323,6 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         Ok(fitness_scores)
     }
         
-    fn run_the_game(&mut self, genetic_action: Vec<Act>) -> Result<Vec<f32>, Box<dyn std::error::Error>>  {
-            self.beginning();
-            self.first_round();
-            let mut winrate = vec![0.0; 5];
-        
-            for _ in 0..100 {
-                let result = self.play_game(genetic_action.as_slice())?;
-        
-                winrate[result as usize] += 1.0;
-                for iplayer in self.iplayers.iter_mut() {
-                    iplayer.player.reset();
-                }
-            }
-        
-            Ok(winrate)
-        }
         
         fn play_game(&mut self, genetic_action: &[Act]) -> Result<i8, Box<dyn std::error::Error>> {
             loop {
