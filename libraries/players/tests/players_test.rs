@@ -881,21 +881,21 @@ mod multipiece_test {
         player.free_piece(0);
         player.move_piece(0, 50);
         let mut diceroll = 6;
-        let choice = player.valid_choices(0, diceroll, Act::Win);
-        assert_eq!(choice, Act::Win);
+        let choice = player.valid_choices(0, diceroll, Act::Goal);
+        assert_eq!(choice, Act::Goal);
 
         player.free_piece(1);
         player.move_piece(1, 49);
         diceroll = 1;
-        let choice = player.valid_choices(1, diceroll, Act::Win);
-        assert_eq!(choice, Act::Win);
+        let choice = player.valid_choices(1, diceroll, Act::Goal);
+        assert_eq!(choice, Act::Goal);
 
         player.free_piece(2);
         player.move_piece(2, 49);
         player.move_piece(2, 4);
         diceroll = 3;
-        let choice = player.valid_choices(2, diceroll, Act::Win);
-        assert_eq!(choice, Act::Win);
+        let choice = player.valid_choices(2, diceroll, Act::Goal);
+        assert_eq!(choice, Act::Goal);
     }
 
     #[test]
@@ -925,8 +925,8 @@ mod multipiece_test {
             player.make_move(i, 3, Act::Move);
 
             let action = player.try_to_move(i, 2);
-            assert_eq!(action, Act::Win);
-            player.make_move(i, 2, Act::Win);
+            assert_eq!(action, Act::Goal);
+            player.make_move(i, 2, Act::Goal);
         }
         assert!(player.is_finished());
     }
@@ -1060,8 +1060,8 @@ mod multipiece_test {
             player.make_move(i, 50, Act::Move);
 
             let action = player.try_to_win(i, 6);
-            assert_eq!(action, Act::Win);
-            player.make_move(i, 6, Act::Win);
+            assert_eq!(action, Act::Goal);
+            player.make_move(i, 6, Act::Goal);
         }
         assert!(player.is_finished());
 
@@ -1249,7 +1249,7 @@ mod multipiece_test {
                 Act::Join,
                 Act::Leave,
                 Act::Die,
-                Act::Win,
+                Act::Goal,
                 Act::Safe,
                 Act::Skip,
                 Act::Nothing];
@@ -1788,7 +1788,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1813,7 +1813,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1838,7 +1838,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1863,7 +1863,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1886,7 +1886,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1916,7 +1916,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];
@@ -1954,7 +1954,7 @@ mod multiplayer_test {
         Act::Join,
         Act::Leave,
         Act::Die,
-        Act::Win,
+        Act::Goal,
         Act::Safe,
         Act::Skip,
         Act::Nothing];

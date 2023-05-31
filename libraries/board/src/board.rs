@@ -281,6 +281,10 @@ mod board {
             piece_id: i8,
         ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_home_piece_index(player_id, piece_id);
+            if piece_idx.is_none() {
+                panic!("Piece not found in home");
+            }
+            let piece_idx = piece_idx.unwrap();
             let piece = self.get_home_piece(player_id, piece_idx);
             (piece, piece_idx)
         }
@@ -289,12 +293,11 @@ mod board {
             self.home(player_id).pieces[piece_idx].clone()
         }
 
-        fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
+        fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> Option<usize> {
             self.home(player_id)
                 .pieces
                 .iter()
                 .position(|piece| piece.borrow().id() == piece_id)
-                .unwrap()
         }
 
         fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
@@ -331,6 +334,10 @@ mod board {
             piece_id: i8,
         ) -> (Rc<RefCell<Piece>>, usize) {
             let piece_idx = self.get_outside_piece_index(old_position, piece_id);
+            if piece_idx.is_none() {
+                panic!("Piece not found in outside");
+            }
+            let piece_idx = piece_idx.unwrap();
             let piece = self.get_outside_piece(old_position, piece_idx);
             (piece, piece_idx)
         }
@@ -343,13 +350,12 @@ mod board {
             self.outside(old_position).pieces[piece_idx].clone()
         }
 
-        fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+        fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> Option<usize> {
             let piece_idx = self
                 .outside(old_position)
                 .pieces
                 .iter()
-                .position(|piece| piece.borrow().id() == piece_id)
-                .unwrap();
+                .position(|piece| piece.borrow().id() == piece_id);
             piece_idx
         }
 
@@ -514,10 +520,12 @@ mod board {
             self.outside(position).player_id != get_player_id(player_id)
         }
 
-        pub fn reset(&mut self) {
-            self.reset_goal();
-            self.reset_inside();
-            self.reset_outside();
+        pub fn reset(&mut self, player_id: i8) {
+            if self.home(player_id).pieces.len() != 4 {
+                self.reset_goal();
+                self.reset_inside();
+                self.reset_outside();
+            }
             self.reset_home();
         }
 
@@ -534,23 +542,23 @@ mod board {
                     for piece in pieces {
                         self.home(player_id).pieces.push(piece);
                     }
+                    self.goal(player_id).pieces.clear();
+                    self.goal(player_id).player_id = None;
                 }
-                self.goal(player_id).pieces.clear();
-                self.goal(player_id).player_id = None;
             }
         }
 
         fn reset_inside(&mut self) {
-            for position in 52..=72 {
+            for position in 52..72 {
                 if self.inside(position).player_id.is_some() {
                     let id = self.inside(position).player_id.unwrap() as i8;
                     let pieces = self.inside(position).pieces.clone();
                     for piece in pieces {
                         self.home(id).pieces.push(piece);
                     }
+                    self.inside(position).pieces.clear();
+                    self.inside(position).player_id = None;
                 }
-                self.inside(position).pieces.clear();
-                self.inside(position).player_id = None;
             }
         }
 
@@ -562,9 +570,9 @@ mod board {
                     for piece in pieces {
                         self.home(player_id).pieces.push(piece);
                     }
+                    self.outside(position).pieces.clear();
+                    self.outside(position).player_id = None;
                 }
-                self.outside(position).pieces.clear();
-                self.outside(position).player_id = None;
             }
         }
     }
