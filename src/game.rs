@@ -5,8 +5,8 @@ mod game {
     use players::{Act, Player};
     use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
     use std::fs::File;
-
     use std::{cell::RefCell, rc::Rc};
+    type GeneticResult = Result<Vec<(Vec<Vec<Act>>, Vec<f32>)>, Box<dyn std::error::Error>>;
 
     const NUM_GENERATIONS: usize = 50;
     const POPULATION_SIZE: usize = 10;
@@ -141,7 +141,7 @@ mod game {
 
         fn genetic(&mut self, actions: Vec<Act>) {
             self.player.my_turn();
-            self.player.ordered_play(actions, true); // Pass `actions` to `ordered_play` instead of cloning `genetic_actions`
+            self.player.ordered_play(actions, true); 
         }
     }
 
@@ -164,28 +164,45 @@ mod game {
                 dice,
             }
         }
-        pub fn actions_to_string(&mut self, actions: &[Act]) -> String {
-            actions.iter().map(|act| format!("{}", act)).collect::<Vec<String>>().join(", ")
+
+        pub fn reset(&mut self)
+        {
+            let board = Rc::new(RefCell::new(Board::new()));
+            let dice = Rc::new(RefCell::new(Dice::new()));
+            let player0 = Player::new(0, board.clone(), Some(dice.clone()));
+            let player1 = Player::new(1, board.clone(), Some(dice.clone()));
+            let player2 = Player::new(2, board.clone(), Some(dice.clone()));
+            let player3 = Player::new(3, board, Some(dice));
+            self.iplayers = vec![
+                IPlayer::new(player0),
+                IPlayer::new(player1),
+                IPlayer::new(player2),
+                IPlayer::new(player3),
+            ];
         }
-        
+
+        pub fn actions_to_string(&mut self, actions: &[Act]) -> String {
+            actions
+                .iter()
+                .map(|act| format!("{}", act))
+                .collect::<Vec<String>>()
+                .join(", ")
+        }
+
         pub fn start_the_game(&mut self) {
             let result = self.genetic_algorithm();
-        
+
             match result {
                 Ok(all_generations) => {
                     let file_path = "generations.csv";
                     let file = File::create(file_path).expect("Unable to create file");
                     let mut wtr = Writer::from_writer(file);
-        
-                    wtr.write_record(&["generation", "individual", "fitness_score"])
+
+                    wtr.write_record(["generation", "individual", "fitness_score"])
                         .expect("Unable to write headers");
-        
-                    for (generation_num, (population, fitness_scores)) in
-                        all_generations.iter().enumerate()
-                    {
-                        for (individual_num, fitness_score) in
-                            fitness_scores.iter().enumerate()
-                        {
+
+                    all_generations.iter().enumerate().for_each(|(generation_num, (_population, fitness_scores))| {
+                        for (individual_num, fitness_score) in fitness_scores.iter().enumerate() {
                             wtr.write_record(&[
                                 format!("{}", generation_num),
                                 format!("{}", individual_num),
@@ -193,10 +210,11 @@ mod game {
                             ])
                             .expect("Unable to write record");
                         }
-                    }
-        
+                    });
+
                     wtr.flush().expect("Unable to flush writer");
-        
+
+                    // Write out the action sequence of the winning last generation
                     // Write out the action sequence of the winning last generation
                     let last_generation = all_generations.last().unwrap();
                     let last_fitness_scores = self.evaluate_population(&last_generation.0).unwrap();
@@ -206,18 +224,17 @@ mod game {
                         .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
                         .unwrap()
                         .0;
-        
+
                     let winning_sequence = &last_generation.0[max_fitness_score_index];
                     let file_path = "winning_sequence.csv";
                     let file = File::create(file_path).expect("Unable to create file");
                     let mut wtr = Writer::from_writer(file);
-        
-                    for act in winning_sequence {
-                        wtr.write_record(&[self.actions_to_string(act)])
-                            .expect("Unable to write record");
-                    }
+
+                    wtr.write_record(&[self.actions_to_string(winning_sequence)])
+                        .expect("Unable to write record");
+
                     wtr.flush().expect("Unable to flush writer");
-        
+
                     println!(
                         "The winning sequence of the last generation is: {:?}",
                         winning_sequence
@@ -228,11 +245,11 @@ mod game {
                 }
             }
         }
-        
 
+        
         fn genetic_algorithm(
             &mut self,
-        ) -> Result<Vec<(Vec<Vec<Act>>, Vec<f32>)>, Box<dyn std::error::Error>> {
+        ) -> GeneticResult  {
             // Initialization
             let mut population = self.initialize_population();
             let mut all_generations: Vec<(Vec<Vec<Act>>, Vec<f32>)> =
@@ -377,10 +394,18 @@ mod game {
             for individual in population {
                 let mut winrate = vec![0.0; 5];
 
-                for _ in 0..1000 {
+                let mut count = 0;
+                while count < 1000 {
                     match self.play_game(individual) {
-                        Ok(result) => winrate[result as usize] += 1.0,
-                        Err(_) => continue, // if there is an error, we skip this game and move to the next
+                        Ok(result) => {
+                            winrate[result as usize] += 1.0;
+                            count += 1;
+                            self.reset();
+                        }
+                        Err(_) => {
+                            self.iplayers[0].player.reset();
+                            continue // if there is an error, we skip this game and move to the next
+                        }
                     }
                 }
 

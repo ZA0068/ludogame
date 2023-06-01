@@ -1,251 +1,501 @@
-generation,population,fitness_score
-0,"Kill, Die, Die, Leave, Join, Move, Free, Nothing, Goal, Safe",0.972
-0,"Kill, Die, Move, Join, Nothing, Goal, Skip, Leave, Free, Safe",1
-0,"Free, Goal, Die, Skip, Join, Safe, Nothing, Kill, Join, Move",1
-0,"Free, Safe, Kill, Leave, Leave, Safe, Skip, Join, Goal, Move",1
-0,"Nothing, Die, Move, Leave, Free, Skip, Goal, Safe, Nothing, Kill",1
-1,"Free, Die, Move, Join, Nothing, Goal, Skip, Leave, Join, Safe",1
-1,"Kill, Safe, Kill, Leave, Free, Die, Skip, Die, Goal, Move",1
-1,"Nothing, Safe, Kill, Leave, Free, Die, Skip, Join, Goal, Move",1
-1,"Free, Safe, Kill, Leave, Leave, Safe, Skip, Join, Goal, Move",1
-1,"Free, Safe, Kill, Leave, Leave, Nothing, Skip, Die, Goal, Move",1
-2,"Free, Safe, Kill, Leave, Leave, Nothing, Skip, Join, Goal, Move",1
-2,"Safe, Safe, Kill, Leave, Free, Die, Skip, Goal, Free, Skip",1
-2,"Nothing, Die, Move, Leave, Free, Die, Skip, Safe, Nothing, Kill",1
-2,"Safe, Leave, Die, Leave, Join, Move, Free, Join, Skip, Nothing",1
-2,"Safe, Leave, Kill, Move, Free, Die, Skip, Join, Skip, Move",1
-3,"Kill, Nothing, Die, Kill, Goal, Move, Free, Nothing, Goal, Safe",1
-3,"Nothing, Leave, Kill, Move, Free, Skip, Skip, Join, Skip, Move",1
-3,"Safe, Leave, Kill, Move, Free, Die, Skip, Join, Free, Skip",1
-3,"Skip, Leave, Safe, Kill, Free, Free, Join, Leave, Skip, Move",1
-3,"Nothing, Safe, Move, Leave, Free, Die, Goal, Goal, Nothing, Kill",1
-4,"Safe, Leave, Kill, Move, Free, Safe, Skip, Join, Skip, Move",1
-4,"Kill, Nothing, Die, Kill, Goal, Die, Nothing, Nothing, Free, Safe",1
-4,"Skip, Nothing, Safe, Kill, Free, Free, Join, Leave, Die, Move",1
-4,"Kill, Leave, Kill, Move, Free, Die, Free, Join, Skip, Safe",1
-4,"Skip, Leave, Safe, Kill, Free, Free, Join, Leave, Skip, Move",1
-5,"Kill, Die, Die, Leave, Free, Die, Goal, Nothing, Nothing, Safe",1
-5,"Kill, Nothing, Move, Leave, Free, Die, Free, Goal, Nothing, Safe",1
-5,"Kill, Leave, Safe, Kill, Free, Free, Free, Nothing, Skip, Safe",1
-5,"Nothing, Safe, Move, Leave, Free, Die, Goal, Goal, Nothing, Kill",1
-5,"Free, Safe, Move, Leave, Leave, Safe, Skip, Join, Goal, Kill",1
-6,"Kill, Nothing, Die, Kill, Free, Move, Join, Leave, Skip, Safe",1
-6,"Skip, Die, Die, Leave, Free, Free, Goal, Leave, Skip, Safe",1
-6,"Kill, Die, Die, Move, Free, Die, Goal, Join, Skip, Safe",1
-6,"Skip, Leave, Safe, Kill, Free, Free, Join, Leave, Skip, Move",1
-6,"Kill, Nothing, Die, Kill, Goal, Move, Free, Nothing, Goal, Safe",1
-7,"Kill, Nothing, Die, Kill, Goal, Move, Free, Nothing, Goal, Safe",1
-7,"Skip, Leave, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-7,"Free, Safe, Move, Kill, Free, Safe, Join, Join, Skip, Move",1
-7,"Kill, Nothing, Move, Kill, Free, Free, Join, Goal, Skip, Safe",1
-7,"Skip, Die, Die, Leave, Free, Free, Goal, Leave, Skip, Safe",1
-8,"Skip, Leave, Safe, Kill, Free, Free, Join, Leave, Skip, Move",1
-8,"Kill, Die, Die, Move, Goal, Die, Goal, Join, Skip, Safe",1
-8,"Free, Nothing, Move, Kill, Goal, Safe, Join, Nothing, Skip, Move",1
-8,"Kill, Nothing, Move, Leave, Free, Die, Free, Goal, Nothing, Safe",1
-8,"Skip, Die, Safe, Kill, Free, Free, Free, Leave, Skip, Safe",1
-9,"Skip, Nothing, Safe, Leave, Free, Free, Join, Leave, Skip, Move",1
-9,"Skip, Nothing, Safe, Kill, Free, Free, Join, Leave, Skip, Move",1
-9,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-9,"Skip, Die, Safe, Kill, Free, Free, Free, Leave, Skip, Safe",1
-9,"Kill, Die, Die, Move, Free, Die, Goal, Join, Skip, Safe",1
-10,"Kill, Die, Die, Move, Free, Die, Goal, Leave, Skip, Safe",1
-10,"Skip, Die, Die, Move, Free, Die, Goal, Leave, Skip, Safe",1
-10,"Skip, Leave, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-10,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Move",1
-10,"Kill, Die, Die, Move, Free, Die, Goal, Join, Skip, Safe",1
-11,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Move",1
-11,"Skip, Die, Die, Kill, Free, Free, Free, Leave, Skip, Safe",1
-11,"Skip, Nothing, Safe, Leave, Goal, Move, Join, Leave, Skip, Move",1
-11,"Skip, Leave, Safe, Leave, Free, Free, Free, Leave, Skip, Move",1
-11,"Kill, Nothing, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-12,"Skip, Die, Safe, Kill, Free, Free, Free, Leave, Skip, Safe",1
-12,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Move",1
-12,"Skip, Die, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-12,"Kill, Nothing, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-12,"Skip, Nothing, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-13,"Skip, Nothing, Die, Leave, Free, Die, Free, Join, Skip, Move",1
-13,"Skip, Leave, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-13,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-13,"Kill, Die, Die, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-13,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-14,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-14,"Skip, Leave, Safe, Kill, Goal, Move, Free, Leave, Skip, Safe",1
-14,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-14,"Kill, Die, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-14,"Skip, Die, Safe, Leave, Goal, Die, Free, Leave, Skip, Safe",1
-15,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-15,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-15,"Skip, Nothing, Die, Leave, Free, Free, Goal, Join, Skip, Safe",1
-15,"Skip, Die, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-15,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-16,"Kill, Die, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-16,"Skip, Nothing, Safe, Leave, Goal, Die, Free, Join, Skip, Safe",1
-16,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-16,"Kill, Die, Die, Leave, Free, Free, Goal, Join, Skip, Safe",1
-16,"Skip, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-17,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-17,"Kill, Die, Die, Leave, Free, Die, Free, Leave, Skip, Safe",1
-17,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-17,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-17,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-18,"Skip, Nothing, Safe, Leave, Goal, Die, Free, Join, Skip, Safe",1
-18,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-18,"Kill, Die, Die, Leave, Free, Die, Goal, Join, Skip, Safe",1
-18,"Skip, Nothing, Die, Leave, Free, Free, Goal, Join, Skip, Safe",1
-18,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-19,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-19,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-19,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-19,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-19,"Kill, Die, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-20,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-20,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-20,"Skip, Nothing, Die, Leave, Free, Free, Goal, Join, Skip, Safe",1
-20,"Skip, Nothing, Safe, Leave, Goal, Die, Free, Join, Skip, Safe",1
-20,"Kill, Nothing, Safe, Leave, Goal, Die, Free, Leave, Skip, Safe",1
-21,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-21,"Kill, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-21,"Skip, Nothing, Safe, Leave, Goal, Free, Free, Join, Skip, Safe",1
-21,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-21,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-22,"Kill, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-22,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-22,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-22,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-22,"Kill, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-23,"Kill, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-23,"Kill, Nothing, Safe, Leave, Free, Free, Goal, Join, Skip, Safe",1
-23,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-23,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-23,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-24,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-24,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-24,"Kill, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-24,"Kill, Die, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-24,"Kill, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-25,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-25,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-25,"Kill, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-25,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-25,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-26,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-26,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-26,"Kill, Die, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-26,"Skip, Die, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-26,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-27,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-27,"Kill, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-27,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-27,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-27,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-28,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-28,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-28,"Kill, Die, Safe, Leave, Free, Free, Goal, Leave, Skip, Safe",1
-28,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-28,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-29,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-29,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-29,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Join, Skip, Safe",1
-29,"Kill, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-29,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-30,"Skip, Die, Safe, Leave, Free, Free, Goal, Leave, Skip, Safe",1
-30,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-30,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-30,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-30,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-31,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-31,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-31,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-31,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-31,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-32,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-32,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-32,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-32,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-32,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-33,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-33,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-33,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-33,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-33,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-34,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-34,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-34,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-34,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-34,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-35,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-35,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-35,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-35,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-35,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-36,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-36,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-36,"Kill, Nothing, Safe, Leave, Free, Die, Goal, Leave, Skip, Safe",1
-36,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-36,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-37,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-37,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-37,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-37,"Kill, Nothing, Safe, Leave, Goal, Die, Free, Leave, Skip, Safe",1
-37,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-38,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-38,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-38,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-38,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-38,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-39,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-39,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-39,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-39,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-39,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-40,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-40,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-40,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-40,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-40,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-41,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-41,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-41,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-41,"Skip, Nothing, Safe, Leave, Free, Die, Free, Join, Skip, Safe",1
-41,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-42,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-42,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-42,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-42,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-42,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-43,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-43,"Skip, Nothing, Safe, Leave, Free, Free, Free, Join, Skip, Safe",1
-43,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-43,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-43,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-44,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-44,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-44,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-44,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-44,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-45,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-45,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-45,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-45,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-45,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-46,"Skip, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-46,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-46,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-46,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-46,"Skip, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-47,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-47,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-47,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-47,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-47,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-48,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-48,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-48,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-48,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-48,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-49,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-49,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-49,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
-49,"Kill, Nothing, Safe, Leave, Free, Free, Free, Leave, Skip, Safe",1
-49,"Kill, Nothing, Safe, Leave, Free, Die, Free, Leave, Skip, Safe",1
+generation,individual,fitness_score
+0,0,0.961
+0,1,1
+0,2,1
+0,3,1
+0,4,1
+0,5,1
+0,6,1
+0,7,1
+0,8,1
+0,9,1
+1,0,1
+1,1,1
+1,2,1
+1,3,1
+1,4,1
+1,5,1
+1,6,1
+1,7,1
+1,8,1
+1,9,1
+2,0,1
+2,1,1
+2,2,1
+2,3,1
+2,4,1
+2,5,1
+2,6,1
+2,7,1
+2,8,1
+2,9,1
+3,0,1
+3,1,1
+3,2,1
+3,3,1
+3,4,1
+3,5,1
+3,6,1
+3,7,1
+3,8,1
+3,9,1
+4,0,1
+4,1,1
+4,2,1
+4,3,1
+4,4,1
+4,5,1
+4,6,1
+4,7,1
+4,8,1
+4,9,1
+5,0,1
+5,1,1
+5,2,1
+5,3,1
+5,4,1
+5,5,1
+5,6,1
+5,7,1
+5,8,1
+5,9,1
+6,0,1
+6,1,1
+6,2,1
+6,3,1
+6,4,1
+6,5,1
+6,6,1
+6,7,1
+6,8,1
+6,9,1
+7,0,1
+7,1,1
+7,2,1
+7,3,1
+7,4,1
+7,5,1
+7,6,1
+7,7,1
+7,8,1
+7,9,1
+8,0,1
+8,1,1
+8,2,1
+8,3,1
+8,4,1
+8,5,1
+8,6,1
+8,7,1
+8,8,1
+8,9,1
+9,0,1
+9,1,1
+9,2,1
+9,3,1
+9,4,1
+9,5,1
+9,6,1
+9,7,1
+9,8,1
+9,9,1
+10,0,1
+10,1,1
+10,2,1
+10,3,1
+10,4,1
+10,5,1
+10,6,1
+10,7,1
+10,8,1
+10,9,1
+11,0,1
+11,1,1
+11,2,1
+11,3,1
+11,4,1
+11,5,1
+11,6,1
+11,7,1
+11,8,1
+11,9,1
+12,0,1
+12,1,1
+12,2,1
+12,3,1
+12,4,1
+12,5,1
+12,6,1
+12,7,1
+12,8,1
+12,9,1
+13,0,1
+13,1,1
+13,2,1
+13,3,1
+13,4,1
+13,5,1
+13,6,1
+13,7,1
+13,8,1
+13,9,1
+14,0,1
+14,1,1
+14,2,1
+14,3,1
+14,4,1
+14,5,1
+14,6,1
+14,7,1
+14,8,1
+14,9,1
+15,0,1
+15,1,1
+15,2,1
+15,3,1
+15,4,1
+15,5,1
+15,6,1
+15,7,1
+15,8,1
+15,9,1
+16,0,1
+16,1,1
+16,2,1
+16,3,1
+16,4,1
+16,5,1
+16,6,1
+16,7,1
+16,8,1
+16,9,1
+17,0,1
+17,1,1
+17,2,1
+17,3,1
+17,4,1
+17,5,1
+17,6,1
+17,7,1
+17,8,1
+17,9,1
+18,0,1
+18,1,1
+18,2,1
+18,3,1
+18,4,1
+18,5,1
+18,6,1
+18,7,1
+18,8,1
+18,9,1
+19,0,1
+19,1,1
+19,2,1
+19,3,1
+19,4,1
+19,5,1
+19,6,1
+19,7,1
+19,8,1
+19,9,1
+20,0,1
+20,1,1
+20,2,1
+20,3,1
+20,4,1
+20,5,1
+20,6,1
+20,7,1
+20,8,1
+20,9,1
+21,0,1
+21,1,1
+21,2,1
+21,3,1
+21,4,1
+21,5,1
+21,6,1
+21,7,1
+21,8,1
+21,9,1
+22,0,1
+22,1,1
+22,2,1
+22,3,1
+22,4,1
+22,5,1
+22,6,1
+22,7,1
+22,8,1
+22,9,1
+23,0,1
+23,1,1
+23,2,1
+23,3,1
+23,4,1
+23,5,1
+23,6,1
+23,7,1
+23,8,1
+23,9,1
+24,0,1
+24,1,1
+24,2,1
+24,3,1
+24,4,1
+24,5,1
+24,6,1
+24,7,1
+24,8,1
+24,9,1
+25,0,1
+25,1,1
+25,2,1
+25,3,1
+25,4,1
+25,5,1
+25,6,1
+25,7,1
+25,8,1
+25,9,1
+26,0,1
+26,1,1
+26,2,1
+26,3,1
+26,4,1
+26,5,1
+26,6,1
+26,7,1
+26,8,1
+26,9,1
+27,0,1
+27,1,1
+27,2,1
+27,3,1
+27,4,1
+27,5,1
+27,6,1
+27,7,1
+27,8,1
+27,9,1
+28,0,1
+28,1,1
+28,2,1
+28,3,1
+28,4,1
+28,5,1
+28,6,1
+28,7,1
+28,8,1
+28,9,1
+29,0,1
+29,1,1
+29,2,1
+29,3,1
+29,4,1
+29,5,1
+29,6,1
+29,7,1
+29,8,1
+29,9,1
+30,0,1
+30,1,1
+30,2,1
+30,3,1
+30,4,1
+30,5,1
+30,6,1
+30,7,1
+30,8,1
+30,9,1
+31,0,1
+31,1,1
+31,2,1
+31,3,1
+31,4,1
+31,5,1
+31,6,1
+31,7,1
+31,8,1
+31,9,1
+32,0,1
+32,1,1
+32,2,1
+32,3,1
+32,4,1
+32,5,1
+32,6,1
+32,7,1
+32,8,1
+32,9,1
+33,0,1
+33,1,1
+33,2,1
+33,3,1
+33,4,1
+33,5,1
+33,6,1
+33,7,1
+33,8,1
+33,9,1
+34,0,1
+34,1,1
+34,2,1
+34,3,1
+34,4,1
+34,5,1
+34,6,1
+34,7,1
+34,8,1
+34,9,1
+35,0,1
+35,1,1
+35,2,1
+35,3,1
+35,4,1
+35,5,1
+35,6,1
+35,7,1
+35,8,1
+35,9,1
+36,0,1
+36,1,1
+36,2,1
+36,3,1
+36,4,1
+36,5,1
+36,6,1
+36,7,1
+36,8,1
+36,9,1
+37,0,1
+37,1,1
+37,2,1
+37,3,1
+37,4,1
+37,5,1
+37,6,1
+37,7,1
+37,8,1
+37,9,1
+38,0,1
+38,1,1
+38,2,1
+38,3,1
+38,4,1
+38,5,1
+38,6,1
+38,7,1
+38,8,1
+38,9,1
+39,0,1
+39,1,1
+39,2,1
+39,3,1
+39,4,1
+39,5,1
+39,6,1
+39,7,1
+39,8,1
+39,9,1
+40,0,1
+40,1,1
+40,2,1
+40,3,1
+40,4,1
+40,5,1
+40,6,1
+40,7,1
+40,8,1
+40,9,1
+41,0,1
+41,1,1
+41,2,1
+41,3,1
+41,4,1
+41,5,1
+41,6,1
+41,7,1
+41,8,1
+41,9,1
+42,0,1
+42,1,1
+42,2,1
+42,3,1
+42,4,1
+42,5,1
+42,6,1
+42,7,1
+42,8,1
+42,9,1
+43,0,1
+43,1,1
+43,2,1
+43,3,1
+43,4,1
+43,5,1
+43,6,1
+43,7,1
+43,8,1
+43,9,1
+44,0,1
+44,1,1
+44,2,1
+44,3,1
+44,4,1
+44,5,1
+44,6,1
+44,7,1
+44,8,1
+44,9,1
+45,0,1
+45,1,1
+45,2,1
+45,3,1
+45,4,1
+45,5,1
+45,6,1
+45,7,1
+45,8,1
+45,9,1
+46,0,1
+46,1,1
+46,2,1
+46,3,1
+46,4,1
+46,5,1
+46,6,1
+46,7,1
+46,8,1
+46,9,1
+47,0,1
+47,1,1
+47,2,1
+47,3,1
+47,4,1
+47,5,1
+47,6,1
+47,7,1
+47,8,1
+47,9,1
+48,0,1
+48,1,1
+48,2,1
+48,3,1
+48,4,1
+48,5,1
+48,6,1
+48,7,1
+48,8,1
+48,9,1
+49,0,1
+49,1,1
+49,2,1
+49,3,1
+49,4,1
+49,5,1
+49,6,1
+49,7,1
+49,8,1
+49,9,1
