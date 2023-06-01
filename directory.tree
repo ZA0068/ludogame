@@ -11,13 +11,16 @@ ludogame
 │   │   ├── src
 │   │   └── tests
 │   │       └── dice_test.rs
+│   │
+│   │   
+│   ├── pieces
+│   │   ├── Cargo.toml
+│   │   ├── src
+│   │   │   └── pieces_test.rs
+│   │   └── tests
+│   │
 │   └── players
 │       ├── Cargo.toml
-│       ├── pieces
-│       │   ├── Cargo.toml
-│       │   ├── src
-│       │   └── tests
-│       │       └── pieces_test.rs
 │       ├── src
 │       └── tests
 │           └── players_test.rs

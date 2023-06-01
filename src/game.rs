@@ -1,13 +1,13 @@
 mod game {
     use board::Board;
+    use csv::Writer;
     use dice::Dice;
     use players::{Act, Player};
     use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
-    
-    use rayon::prelude::*;
-    
+    use std::fs::File;
+
     use std::{cell::RefCell, rc::Rc};
-    
+
     const NUM_GENERATIONS: usize = 50;
     const POPULATION_SIZE: usize = 10;
 
@@ -164,30 +164,96 @@ mod game {
                 dice,
             }
         }
-
-        pub fn start_the_game(&mut self)
-        {
-            self.genetic_algorithm();
+        pub fn actions_to_string(&mut self, actions: &[Act]) -> String {
+            actions.iter().map(|act| format!("{}", act)).collect::<Vec<String>>().join(", ")
         }
+        
+        pub fn start_the_game(&mut self) {
+            let result = self.genetic_algorithm();
+        
+            match result {
+                Ok(all_generations) => {
+                    let file_path = "generations.csv";
+                    let file = File::create(file_path).expect("Unable to create file");
+                    let mut wtr = Writer::from_writer(file);
+        
+                    wtr.write_record(&["generation", "individual", "fitness_score"])
+                        .expect("Unable to write headers");
+        
+                    for (generation_num, (population, fitness_scores)) in
+                        all_generations.iter().enumerate()
+                    {
+                        for (individual_num, fitness_score) in
+                            fitness_scores.iter().enumerate()
+                        {
+                            wtr.write_record(&[
+                                format!("{}", generation_num),
+                                format!("{}", individual_num),
+                                format!("{}", fitness_score),
+                            ])
+                            .expect("Unable to write record");
+                        }
+                    }
+        
+                    wtr.flush().expect("Unable to flush writer");
+        
+                    // Write out the action sequence of the winning last generation
+                    let last_generation = all_generations.last().unwrap();
+                    let last_fitness_scores = self.evaluate_population(&last_generation.0).unwrap();
+                    let max_fitness_score_index = last_fitness_scores
+                        .iter()
+                        .enumerate()
+                        .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+                        .unwrap()
+                        .0;
+        
+                    let winning_sequence = &last_generation.0[max_fitness_score_index];
+                    let file_path = "winning_sequence.csv";
+                    let file = File::create(file_path).expect("Unable to create file");
+                    let mut wtr = Writer::from_writer(file);
+        
+                    for act in winning_sequence {
+                        wtr.write_record(&[self.actions_to_string(act)])
+                            .expect("Unable to write record");
+                    }
+                    wtr.flush().expect("Unable to flush writer");
+        
+                    println!(
+                        "The winning sequence of the last generation is: {:?}",
+                        winning_sequence
+                    );
+                }
+                Err(e) => {
+                    println!("Error: {}", e);
+                }
+            }
+        }
+        
 
-fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-    // Initialization
-    let mut population = self.initialize_population();
+        fn genetic_algorithm(
+            &mut self,
+        ) -> Result<Vec<(Vec<Vec<Act>>, Vec<f32>)>, Box<dyn std::error::Error>> {
+            // Initialization
+            let mut population = self.initialize_population();
+            let mut all_generations: Vec<(Vec<Vec<Act>>, Vec<f32>)> =
+                Vec::with_capacity(NUM_GENERATIONS);
 
-    for _ in 0..NUM_GENERATIONS {
-        // Evaluation
-        let fitness_scores = self.evaluate_population(&population)?;
-        let parents = self.select_parents(&population, &fitness_scores);
+            for _ in 0..NUM_GENERATIONS {
+                // Evaluation
+                let fitness_scores = self.evaluate_population(&population)?;
 
-        // Crossover and mutation
-        let children = self.crossover_and_mutate(&parents);
+                let parents = self.select_parents(&population, &fitness_scores);
 
-        // Replacement
-        population = self.replace_worst(&population, &children);
-    }
-    Ok(())
-}
+                // Crossover and mutation
+                let children = self.crossover_and_mutate(&parents);
+                all_generations.push((children.clone(), fitness_scores.clone()));
 
+                // Replacement
+                population = self.replace_worst(&population, &children);
+            }
+
+            Ok(all_generations)
+        }
 
         fn replace_worst(
             &mut self,
@@ -211,7 +277,7 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
             let mut parents = Vec::new();
             let mut rng = rand::thread_rng();
 
-            for _ in 0..10 {
+            for _ in 0..POPULATION_SIZE {
                 let parent1_index = self.select_parent_index(fitness_scores, &mut rng);
                 let parent2_index = self.select_parent_index(fitness_scores, &mut rng);
 
@@ -281,7 +347,7 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
 
         fn mutate_population(&mut self, children: &mut Vec<Vec<Act>>, mutation_rate: f64) {
             let mut rng = rand::thread_rng();
-        
+
             for i in 0..children.len() {
                 for j in 0..children[i].len() {
                     if rng.gen_range(0.0..1.0) < mutation_rate {
@@ -290,7 +356,6 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
-        
 
         fn initialize_population(&mut self) -> Vec<Vec<Act>> {
             let mut population = Vec::new();
@@ -303,41 +368,47 @@ fn genetic_algorithm(&mut self) -> Result<(), Box<dyn std::error::Error>> {
             population
         }
 
-        fn evaluate_population(&mut self, population: &[Vec<Act>]) -> Result<Vec<f32>, Box<dyn std::error::Error>> {
-        let mut fitness_scores = Vec::new();
+        fn evaluate_population(
+            &mut self,
+            population: &[Vec<Act>],
+        ) -> Result<Vec<f32>, Box<dyn std::error::Error>> {
+            let mut fitness_scores = Vec::new();
 
-        for individual in population {
-            let mut winrate = vec![0.0; 5];
+            for individual in population {
+                let mut winrate = vec![0.0; 5];
 
-            for _ in 0..100 {
-                match self.play_game(individual) {
-                    Ok(result) => winrate[result as usize] += 1.0,
-                    Err(_) => continue, // if there is an error, we skip this game and move to the next
+                for _ in 0..1000 {
+                    match self.play_game(individual) {
+                        Ok(result) => winrate[result as usize] += 1.0,
+                        Err(_) => continue, // if there is an error, we skip this game and move to the next
+                    }
                 }
-            }
 
-            let total_games = winrate.iter().sum::<f32>();
-            let normalized_winrate: Vec<f32> = winrate.iter().map(|&score| score / total_games).collect();
-            fitness_scores.push(normalized_winrate[0]); // Assuming fitness score is based on player 0's win rate
+                let total_games = winrate.iter().sum::<f32>();
+                let normalized_winrate: Vec<f32> =
+                    winrate.iter().map(|&score| score / total_games).collect();
+                fitness_scores.push(normalized_winrate[0]); // Assuming fitness score is based on player 0's win rate
+            }
+            Ok(fitness_scores)
         }
-        Ok(fitness_scores)
-    }
-        
-        
+
         fn play_game(&mut self, genetic_action: &[Act]) -> Result<i8, Box<dyn std::error::Error>> {
             loop {
                 self.iplayers[0].genetic(genetic_action.to_vec());
                 self.iplayers[2].safe();
                 self.iplayers[1].fast();
                 self.iplayers[3].aggressive();
-        
-                match self.iplayers.iter_mut().find(|iplayer| iplayer.player.is_finished()) {
+
+                match self
+                    .iplayers
+                    .iter_mut()
+                    .find(|iplayer| iplayer.player.is_finished())
+                {
                     Some(iplayer) => return Ok(iplayer.player.id()),
                     None => continue,
                 }
             }
         }
-        
 
         pub fn first_round(&mut self) {
             let mut rng = rand::thread_rng();

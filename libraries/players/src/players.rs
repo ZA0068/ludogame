@@ -1,10 +1,10 @@
 mod players {
-    use std::{cell::RefCell, rc::Rc};
-
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
     use rand::seq::SliceRandom;
+    use std::fmt;
+    use std::{cell::RefCell, rc::Rc};
     #[derive(PartialEq, Debug, Clone)]
     pub struct Player {
         id: i8,
@@ -26,6 +26,38 @@ mod players {
         Safe,
         Skip,
         Nothing,
+    }
+
+    impl fmt::Display for Act {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match *self {
+                Act::Move => write!(f, "Move"),
+                Act::Free => write!(f, "Free"),
+                Act::Kill => write!(f, "Kill"),
+                Act::Join => write!(f, "Join"),
+                Act::Leave => write!(f, "Leave"),
+                Act::Die => write!(f, "Die"),
+                Act::Goal => write!(f, "Goal"),
+                Act::Safe => write!(f, "Safe"),
+                Act::Skip => write!(f, "Skip"),
+                Act::Nothing => write!(f, "Nothing"),
+            }
+        }
+    }
+
+    #[derive(PartialEq, Debug, Clone)]
+    pub struct ActionSequence(Vec<Act>);
+
+    impl fmt::Display for ActionSequence {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            for (index, action) in self.0.iter().enumerate() {
+                if index > 0 {
+                    write!(f, ", ")?;
+                }
+                write!(f, "{}", action)?;
+            }
+            Ok(())
+        }
     }
 
     // Playstyles {

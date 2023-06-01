@@ -20,6 +20,4 @@ dice = { path = "libraries/dice" }
 pieces = { path = "libraries/pieces" }
 rand = "0.8.4"
 yew = "0.20.0"
-tokio = "1.12.0"
-rayon = "1.5.1"
-futures = "0.3.0"
+csv = "1.1.6"
