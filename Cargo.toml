@@ -8,7 +8,6 @@ edition = "2021"
 members = [
     "libraries/players",
 ]
-
 [lib]
 name = "game"
 path = "src/game.rs"

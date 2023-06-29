@@ -9,8 +9,8 @@ mod dice {
     }
 
     impl Dice {
-        pub fn new() -> Dice {
-            let dist = Uniform::new_inclusive(1, 6);
+        pub fn new(high_value: i8) -> Dice {
+            let dist = Uniform::new_inclusive(1, high_value);
             Dice { value: 0, dist }
         }
 
@@ -26,7 +26,7 @@ mod dice {
 
     impl Default for Dice {
         fn default() -> Self {
-            Self::new()
+            Self::new(6)
         }
     }
 }
