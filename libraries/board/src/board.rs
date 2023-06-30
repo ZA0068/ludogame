@@ -141,7 +141,11 @@ mod board {
         fn initialize_outside() -> [BoardState; 52] {
             let mut outside: Vec<BoardState> = vec![];
             (0..52).for_each(|position| {
-                outside.push(BoardState::new(position as i8, Vec::default(), None));
+                outside.push(BoardState::new(
+                    position as i8,
+                    Vec::default(),
+                    None,
+                ));
             });
             outside.try_into().unwrap()
         }
@@ -149,7 +153,11 @@ mod board {
         fn initialize_inside() -> [BoardState; 20] {
             let mut inside: Vec<BoardState> = vec![];
             (0..20).for_each(|position| {
-                inside.push(BoardState::new((position + 52) as i8, Vec::default(), None));
+                inside.push(BoardState::new(
+                    (position + 52) as i8,
+                    Vec::default(),
+                    None,
+                ));
             });
             inside.try_into().unwrap()
         }

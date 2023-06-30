@@ -18,6 +18,7 @@ mod board_tests {
         let board = Board::default();
         assert_eq!(TypeId::of::<Board>(), board.type_id());
     }
+
 }
 
 mod board_state_tests {
@@ -62,6 +63,21 @@ mod board_state_tests {
         assert_eq!(boardstate_get.pieces, Vec::default());
         assert_eq!(boardstate_get.player_id, None);
     }
+
+    #[test]
+    fn pieces_test() {
+        let pieces = vec![
+            Rc::new(RefCell::new(Piece::new(0))),
+            Rc::new(RefCell::new(Piece::new(1))),
+            Rc::new(RefCell::new(Piece::new(2))),
+            Rc::new(RefCell::new(Piece::new(3))),
+        ];
+        let mut board_state = BoardState::new(-1, pieces.clone(), Some(PlayerID::Player0));
+        for i in 0..4 {
+            assert_eq!(board_state.piece(i), pieces[i as usize]);
+            assert_eq!(board_state.piece(i).borrow().id(), i);
+        }
+    }
 }
 
 mod player_id_tests {
@@ -89,6 +105,8 @@ mod player_id_tests {
                 Some(player_id[id as usize].clone())
             );
         }
+
+        assert_eq!(board.get_player_id(4), None);
     }
 }
 
