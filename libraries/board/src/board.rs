@@ -227,97 +227,97 @@ mod board {
             self.star.contains(&(position as usize))
         }
 
-        //     pub fn move_from_home(&mut self, player_id: i8, piece_id: i8, new_position: i8) {
-        //         let (piece, piece_idx) = self.get_home_piece_and_index(player_id, piece_id);
-        //         self.add_piece_to_outside_position(new_position, player_id, piece);
-        //         self.remove_piece_from_home_position(player_id, piece_idx);
-        //     }
+        pub fn move_from_home(&mut self, player_id: i8, piece_id: i8, new_position: i8) {
+                let (piece, piece_idx) = self.get_home_piece_and_index(player_id, piece_id);
+                self.add_piece_to_outside_position(new_position, player_id, piece);
+                self.remove_piece_from_home_position(player_id, piece_idx);
+            }
 
-        //     fn add_piece_to_outside_position(
-        //         &mut self,
-        //         new_position: i8,
-        //         player_id: i8,
-        //         piece: Rc<RefCell<Piece>>,
-        //     ) {
-        //         self.outside(new_position).player_id = self.clone().get_player_id(player_id);
-        //         self.outside(new_position).pieces.push(piece);
-        //     }
+            fn add_piece_to_outside_position(
+                &mut self,
+                new_position: i8,
+                player_id: i8,
+                piece: Rc<RefCell<Piece>>,
+            ) {
+                self.outside(new_position).player_id = self.clone().get_player_id(player_id);
+                self.outside(new_position).pieces.push(piece);
+            }
 
-        //     fn get_home_piece_and_index(
-        //         &mut self,
-        //         player_id: i8,
-        //         piece_id: i8,
-        //     ) -> (Rc<RefCell<Piece>>, usize) {
-        //         let piece_idx = self.get_home_piece_index(player_id, piece_id);
-        //         let piece = self.get_home_piece(player_id, piece_idx);
-        //         (piece, piece_idx)
-        //     }
+            fn get_home_piece_and_index(
+                &mut self,
+                player_id: i8,
+                piece_id: i8,
+            ) -> (Rc<RefCell<Piece>>, usize) {
+                let piece_idx = self.get_home_piece_index(player_id, piece_id);
+                let piece = self.get_home_piece(player_id, piece_idx);
+                (piece, piece_idx)
+            }
 
-        //     fn get_home_piece(&mut self, player_id: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
-        //         self.home(player_id).pieces[piece_idx].clone()
-        //     }
+            fn get_home_piece(&mut self, player_id: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
+                self.home(player_id).pieces[piece_idx].clone()
+            }
 
-        //     fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
-        //         self.home(player_id)
-        //             .pieces
-        //             .iter()
-        //             .position(|piece| piece.borrow().id() == piece_id)
-        //             .unwrap()
-        //     }
+            fn get_home_piece_index(&mut self, player_id: i8, piece_id: i8) -> usize {
+                self.home(player_id)
+                    .pieces
+                    .iter()
+                    .position(|piece| piece.borrow().id() == piece_id)
+                    .unwrap()
+            }
 
-        //     fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
-        //         self.remove_home_piece_if_not_empty(player_id, piece_idx);
-        //         self.set_home_player_id_to_none_if_empty(player_id);
-        //     }
+            fn remove_piece_from_home_position(&mut self, player_id: i8, piece_idx: usize) {
+                self.remove_home_piece_if_not_empty(player_id, piece_idx);
+                self.set_home_player_id_to_none_if_empty(player_id);
+            }
 
-        //     fn set_home_player_id_to_none_if_empty(&mut self, player_id: i8) {
-        //         if self.home(player_id).pieces.is_empty() {
-        //             self.home(player_id).player_id = None;
-        //         }
-        //     }
+            fn set_home_player_id_to_none_if_empty(&mut self, player_id: i8) {
+                if self.home(player_id).pieces.is_empty() {
+                    self.home(player_id).player_id = None;
+                }
+            }
 
-        //     fn remove_home_piece_if_not_empty(&mut self, player_id: i8, piece_idx: usize) {
-        //         if !self.home(player_id).pieces.is_empty() {
-        //             self.home(player_id).pieces.remove(piece_idx);
-        //         }
-        //     }
+            fn remove_home_piece_if_not_empty(&mut self, player_id: i8, piece_idx: usize) {
+                if !self.home(player_id).pieces.is_empty() {
+                    self.home(player_id).pieces.remove(piece_idx);
+                }
+            }
 
-        //     pub fn move_into_home(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
-        //         let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
-        //         self.add_piece_to_home_position(player_id, piece);
-        //         self.remove_piece_from_outside_position(old_position, piece_idx);
-        //     }
+            pub fn move_into_home(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
+                let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+                self.add_piece_to_home_position(player_id, piece);
+                self.remove_piece_from_outside_position(old_position, piece_idx);
+            }
 
-        //     fn add_piece_to_home_position(&mut self, player_id: i8, piece: Rc<RefCell<Piece>>) {
-        //         self.home[player_id as usize].pieces.push(piece);
-        //         self.home[player_id as usize].player_id = self.clone().get_player_id(player_id);
-        //     }
+            fn add_piece_to_home_position(&mut self, player_id: i8, piece: Rc<RefCell<Piece>>) {
+                self.home[player_id as usize].pieces.push(piece);
+                self.home[player_id as usize].player_id = self.clone().get_player_id(player_id);
+            }
 
-        //     pub fn get_outside_piece_and_index(
-        //         &mut self,
-        //         old_position: i8,
-        //         piece_id: i8,
-        //     ) -> (Rc<RefCell<Piece>>, usize) {
-        //         let piece_idx = self.get_outside_piece_index(old_position, piece_id);
-        //         let piece = self.get_outside_piece(old_position, piece_idx);
-        //         (piece, piece_idx)
-        //     }
+            pub fn get_outside_piece_and_index(
+                &mut self,
+                old_position: i8,
+                piece_id: i8,
+            ) -> (Rc<RefCell<Piece>>, usize) {
+                let piece_idx = self.get_outside_piece_index(old_position, piece_id);
+                let piece = self.get_outside_piece(old_position, piece_idx);
+                (piece, piece_idx)
+            }
 
-        //     pub fn get_outside_piece(
-        //         &mut self,
-        //         old_position: i8,
-        //         piece_idx: usize,
-        //     ) -> Rc<RefCell<Piece>> {
-        //         self.outside(old_position).pieces[piece_idx].clone()
-        //     }
+            pub fn get_outside_piece(
+                &mut self,
+                old_position: i8,
+                piece_idx: usize,
+            ) -> Rc<RefCell<Piece>> {
+                self.outside(old_position).pieces[piece_idx].clone()
+            }
 
-        //     fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
-        //         self.outside(old_position)
-        //             .pieces
-        //             .iter()
-        //             .position(|piece| piece.borrow().id() == piece_id)
-        //             .unwrap()
-        //     }
+            fn get_outside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+                self.outside(old_position)
+                    .pieces
+                    .iter()
+                    .position(|piece| piece.borrow().id() == piece_id)
+                    .unwrap()
+            }
 
         //     pub fn update_outside(
         //         &mut self,
@@ -331,22 +331,22 @@ mod board {
         //         self.add_piece_to_outside_position(new_position, player_id, piece);
         //     }
 
-        //     fn remove_piece_from_outside_position(&mut self, old_position: i8, piece_idx: usize) {
-        //         self.remove_outside_piece_if_not_empty(old_position, piece_idx);
-        //         self.set_outside_player_id_to_none_if_empty(old_position);
-        //     }
+            fn remove_piece_from_outside_position(&mut self, old_position: i8, piece_idx: usize) {
+                self.remove_outside_piece_if_not_empty(old_position, piece_idx);
+                self.set_outside_player_id_to_none_if_empty(old_position);
+            }
 
-        //     fn set_outside_player_id_to_none_if_empty(&mut self, old_position: i8) {
-        //         if self.outside(old_position).pieces.is_empty() {
-        //             self.outside(old_position).player_id = None;
-        //         }
-        //     }
+            fn set_outside_player_id_to_none_if_empty(&mut self, old_position: i8) {
+                if self.outside(old_position).pieces.is_empty() {
+                    self.outside(old_position).player_id = None;
+                }
+            }
 
-        //     fn remove_outside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
-        //         if !self.outside(old_position).pieces.is_empty() {
-        //             self.outside(old_position).pieces.remove(piece_idx);
-        //         }
-        //     }
+            fn remove_outside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
+                if !self.outside(old_position).pieces.is_empty() {
+                    self.outside(old_position).pieces.remove(piece_idx);
+                }
+            }
 
         //     pub fn move_inside(
         //         &mut self,
