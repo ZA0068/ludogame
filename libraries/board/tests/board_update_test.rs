@@ -247,6 +247,12 @@ mod board_update_test {
     #[test]
     fn update_outside_test_3() {
         let mut board = Board::new();
+        let player_ids = vec![
+            PlayerID::Player0,
+            PlayerID::Player1,
+            PlayerID::Player2,
+            PlayerID::Player3,
+        ];
         for player_id in 0..4 {
             let start_position = board.invincible[player_id as usize] as i8;
             for piece_id in 0..4 {
@@ -258,11 +264,12 @@ mod board_update_test {
                 let new_position = old_position + 1;
                 for piece_id in 0..4 {
                     board.update_outside(player_id, piece_id, old_position, new_position);
-                    assert_eq!(board.outside(new_position).pieces.len(), piece_id as usize + 1);
+                    assert_eq!(board.outside(new_position).player_id, Some(player_ids[player_id as usize].clone()));
                     // assert!(board.outside(old_position).pieces.len() <= 3 - piece_id as usize);
                 }
                 old_position = new_position;
             }
+
         }
     }
 
