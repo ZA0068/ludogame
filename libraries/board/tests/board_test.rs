@@ -1,8 +1,5 @@
-use board::{Board, PlayerID};
-use pieces::Piece;
+use board::{Board};
 use std::any::{Any, TypeId};
-use std::{cell::RefCell, rc::Rc};
-
 #[cfg(test)]
 mod board_tests {
     use super::*;

@@ -10,7 +10,6 @@ mod board_update_test {
     #[test]
     fn move_from_home_test() {
         let mut board = Board::new();
-
         let piece_id = 0;
         let player_id = 0;
         let new_position = 0;
@@ -179,35 +178,93 @@ mod board_update_test {
             assert_eq!(board.invincible(player_id).player_id, None);
         }
     }
-    // #[test]
-    // fn move_pieces_test() {
-    //     let mut board = Board::new();
-    //     let piece_id = 0;
-    //     let player_id = 0;
-    //     let mut new_position = 0;
 
-    //     board.move_from_home(player_id, piece_id, new_position);
-    //     assert_eq!(board.outside(new_position).pieces.len(), 1);
-    //     assert_ne!(board.outside(1).pieces.len(), 1);
+    #[test]
+    fn update_outside_test() {
+        let mut board = Board::new();
+        let piece_id = 0;
+        let player_id = 0;
+        let mut new_position = 0;
 
-    //     let mut old_position = new_position;
-    //     new_position = 1;
-    //     board.update_outside(player_id, piece_id, old_position, new_position);
-    //     assert_eq!(board.outside(new_position).pieces.len(), 1);
-    //     assert_ne!(board.outside(old_position).pieces.len(), 1);
+        board.move_from_home(player_id, piece_id, new_position);
+        assert_eq!(board.outside(new_position).pieces.len(), 1);
+        assert_ne!(board.outside(1).pieces.len(), 1);
 
-    //     old_position = new_position;
-    //     new_position = 9;
-    //     board.update_outside(player_id, piece_id, old_position, new_position);
-    //     assert_eq!(board.outside(new_position).pieces.len(), 1);
-    //     assert_ne!(board.outside(old_position).pieces.len(), 1);
+        let mut old_position = new_position;
+        new_position = 1;
+        board.update_outside(player_id, piece_id, old_position, new_position);
+        assert_eq!(board.outside(new_position).pieces.len(), 1);
+        assert_ne!(board.outside(old_position).pieces.len(), 1);
 
-    //     old_position = new_position;
-    //     new_position = 10;
-    //     board.update_outside(player_id, piece_id, old_position, new_position);
-    //     assert_eq!(board.outside(new_position).pieces.len(), 1);
-    //     assert_ne!(board.outside(old_position).pieces.len(), 1);
-    // }
+        old_position = new_position;
+        new_position = 9;
+        board.update_outside(player_id, piece_id, old_position, new_position);
+        assert_eq!(board.outside(new_position).pieces.len(), 1);
+        assert_ne!(board.outside(old_position).pieces.len(), 1);
+
+        old_position = new_position;
+        new_position = 10;
+        board.update_outside(player_id, piece_id, old_position, new_position);
+        assert_eq!(board.outside(new_position).pieces.len(), 1);
+        assert_ne!(board.outside(old_position).pieces.len(), 1);
+    }
+
+    #[test]
+    fn update_outside_test_2() {
+        let mut board = Board::new();
+        for player_id in 0..4 {
+            let start_position = board.invincible[player_id as usize] as i8;
+            for piece_id in 0..4 {
+                board.move_from_home(player_id, piece_id, start_position);
+                assert_eq!(board.outside(start_position).pieces.len(), piece_id as usize + 1);
+                assert!(board.outside(start_position + 1).pieces.len() < piece_id as usize + 1);
+            }
+            let mut old_position = start_position;
+            let mut new_position = old_position + 1;
+            for piece_id in 0..4 {
+
+                board.update_outside(player_id, piece_id, old_position, new_position);
+                assert_eq!(board.outside(new_position).pieces.len(), piece_id as usize + 1);
+                assert!(board.outside(old_position).pieces.len() <= 3 - piece_id as usize);
+            }
+            old_position = new_position;
+            new_position = old_position + 9;
+            for piece_id in 0..4 {
+                board.update_outside(player_id, piece_id, old_position, new_position);
+                assert_eq!(board.outside(new_position).pieces.len(), piece_id as usize + 1);
+                assert!(board.outside(old_position).pieces.len() <= 3 - piece_id as usize);
+            }
+            old_position = new_position;
+            new_position = old_position + 10;
+            for piece_id in 0..4 {
+                board.update_outside(player_id, piece_id, old_position, new_position);
+                assert_eq!(board.outside(new_position).pieces.len(), piece_id as usize + 1);
+                assert!(board.outside(old_position).pieces.len() <= 3 - piece_id as usize);
+            }
+        }
+    }
+
+    #[test]
+    fn update_outside_test_3() {
+        let mut board = Board::new();
+        for player_id in 0..4 {
+            let start_position = board.invincible[player_id as usize] as i8;
+            for piece_id in 0..4 {
+                board.move_from_home(player_id, piece_id, start_position);
+                assert_eq!(board.outside(start_position).pieces.len(), piece_id as usize + 1);
+            }
+            let mut old_position = start_position;
+            for _ in 0..52 {
+                let new_position = old_position + 1;
+                for piece_id in 0..4 {
+                    board.update_outside(player_id, piece_id, old_position, new_position);
+                    assert_eq!(board.outside(new_position).pieces.len(), piece_id as usize + 1);
+                    // assert!(board.outside(old_position).pieces.len() <= 3 - piece_id as usize);
+                }
+                old_position = new_position;
+            }
+        }
+    }
 
     // #[test]
     // fn move_pieces_inside_test() {

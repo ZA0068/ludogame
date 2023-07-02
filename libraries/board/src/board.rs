@@ -195,7 +195,7 @@ mod board {
         }
 
         pub fn outside(&mut self, position: i8) -> &mut BoardState {
-            &mut self.outside[position as usize]
+            &mut self.outside[(position % 52) as usize]
         }
 
         pub fn inside(&mut self, position: i8) -> &mut BoardState {
@@ -319,17 +319,17 @@ mod board {
                     .unwrap()
             }
 
-        //     pub fn update_outside(
-        //         &mut self,
-        //         player_id: i8,
-        //         piece_id: i8,
-        //         old_position: i8,
-        //         new_position: i8,
-        //     ) {
-        //         let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
-        //         self.remove_piece_from_outside_position(old_position, piece_idx);
-        //         self.add_piece_to_outside_position(new_position, player_id, piece);
-        //     }
+            pub fn update_outside(
+                &mut self,
+                player_id: i8,
+                piece_id: i8,
+                old_position: i8,
+                new_position: i8,
+            ) {
+                let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+                self.remove_piece_from_outside_position(old_position, piece_idx);
+                self.add_piece_to_outside_position(new_position, player_id, piece);
+            }
 
             fn remove_piece_from_outside_position(&mut self, old_position: i8, piece_idx: usize) {
                 self.remove_outside_piece_if_not_empty(old_position, piece_idx);
