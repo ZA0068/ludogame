@@ -1,8 +1,7 @@
 mod board {
 
     use std::{cell::RefCell, rc::Rc};
-
-    use pieces::Piece;
+    use pieces::{Piece, Color};
 
     #[derive(Clone, Debug, PartialEq)]
     pub enum PlayerID {
@@ -119,10 +118,17 @@ mod board {
                 PlayerID::Player3,
             ];
 
-            for (position, player_id) in home.iter_mut().zip(player_ids.iter()) {
+            let colors = [
+                Color::Green,
+                Color::Yellow,
+                Color::Blue,
+                Color::Red,
+            ];
+
+            for ((position, player_id), color) in home.iter_mut().zip(player_ids.iter()).zip(colors.iter()) {
                 position.set(
                     -1,
-                    create_vector_of_pieces().clone(),
+                    create_vector_of_pieces(color.clone()).clone(),
                     Some(player_id.clone()),
                 );
             }
@@ -348,78 +354,78 @@ mod board {
                 }
             }
 
-        //     pub fn move_inside(
-        //         &mut self,
-        //         player_id: i8,
-        //         piece_id: i8,
-        //         old_position: i8,
-        //         new_position: i8,
-        //     ) {
-        //         let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
-        //         self.add_piece_to_inside_position(new_position, piece, player_id);
-        //         self.remove_piece_from_outside_position(old_position, piece_idx);
-        //     }
+            pub fn move_inside(
+                &mut self,
+                player_id: i8,
+                piece_id: i8,
+                old_position: i8,
+                new_position: i8,
+            ) {
+                let (piece, piece_idx) = self.get_outside_piece_and_index(old_position, piece_id);
+                self.add_piece_to_inside_position(new_position, piece, player_id);
+                self.remove_piece_from_outside_position(old_position, piece_idx);
+            }
 
-        //     fn add_piece_to_inside_position(
-        //         &mut self,
-        //         new_position: i8,
-        //         piece: Rc<RefCell<Piece>>,
-        //         player_id: i8,
-        //     ) {
-        //         self.inside(new_position).pieces.push(piece);
-        //         self.inside(new_position).player_id = self.clone().get_player_id(player_id);
-        //     }
+            fn add_piece_to_inside_position(
+                &mut self,
+                new_position: i8,
+                piece: Rc<RefCell<Piece>>,
+                player_id: i8,
+            ) {
+                self.inside(new_position).pieces.push(piece);
+                self.inside(new_position).player_id = self.clone().get_player_id(player_id);
+            }
 
-        //     pub fn update_inside(
-        //         &mut self,
-        //         player_id: i8,
-        //         piece_id: i8,
-        //         old_position: i8,
-        //         new_position: i8,
-        //     ) {
-        //         let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
-        //         self.remove_piece_from_inside_position(old_position, piece_idx);
-        //         self.add_piece_to_inside_position(new_position, piece, player_id);
-        //     }
+            pub fn update_inside(
+                &mut self,
+                player_id: i8,
+                piece_id: i8,
+                old_position: i8,
+                new_position: i8,
+            ) {
+                let (piece, piece_idx) = self.get_inside_piece_and_index(old_position, piece_id);
+                self.remove_piece_from_inside_position(old_position, piece_idx);
+                self.add_piece_to_inside_position(new_position, piece, player_id);
+            }
 
-        //     fn get_inside_piece_and_index(
-        //         &mut self,
-        //         old_position: i8,
-        //         piece_id: i8,
-        //     ) -> (Rc<RefCell<Piece>>, usize) {
-        //         let piece_idx = self.get_inside_piece_index(old_position, piece_id);
-        //         let piece = self.get_inside_piece(old_position, piece_idx);
-        //         (piece, piece_idx)
-        //     }
+            fn get_inside_piece_and_index(
+                &mut self,
+                old_position: i8,
+                piece_id: i8,
+            ) -> (Rc<RefCell<Piece>>, usize) {
+                let piece_idx = self.get_inside_piece_index(old_position, piece_id);
+                let piece = self.get_inside_piece(old_position, piece_idx);
+                (piece, piece_idx)
+            }
 
-        //     fn remove_piece_from_inside_position(&mut self, old_position: i8, piece_idx: usize) {
-        //         self.remove_inside_piece_if_not_empty(old_position, piece_idx);
-        //         self.set_inside_player_id_to_none_if_empty(old_position);
-        //     }
+            fn remove_piece_from_inside_position(&mut self, old_position: i8, piece_idx: usize) {
+                self.remove_inside_piece_if_not_empty(old_position, piece_idx);
+                self.set_inside_player_id_to_none_if_empty(old_position);
+            }
 
-        //     fn set_inside_player_id_to_none_if_empty(&mut self, old_position: i8) {
-        //         if self.inside(old_position).pieces.is_empty() {
-        //             self.inside(old_position).player_id = None;
-        //         }
-        //     }
+            fn set_inside_player_id_to_none_if_empty(&mut self, old_position: i8) {
+                if self.inside(old_position).pieces.is_empty() {
+                    self.inside(old_position).player_id = None;
+                }
+            }
 
-        //     fn remove_inside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
-        //         if !self.inside(old_position).pieces.is_empty() {
-        //             self.inside(old_position).pieces.remove(piece_idx);
-        //         }
-        //     }
+            fn remove_inside_piece_if_not_empty(&mut self, old_position: i8, piece_idx: usize) {
+                if !self.inside(old_position).pieces.is_empty() {
+                    self.inside(old_position).pieces.remove(piece_idx);
+                }
+            }
 
-        //     fn get_inside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
-        //         self.inside(old_position)
-        //             .pieces
-        //             .iter()
-        //             .position(|piece| piece.borrow().id() == piece_id)
-        //             .unwrap()
-        //     }
+            fn get_inside_piece_index(&mut self, old_position: i8, piece_id: i8) -> usize {
+                self.inside(old_position)
+                    .pieces
+                    .iter()
+                    .position(|piece| piece.borrow().id() == piece_id)
+                    .unwrap()
+            }
 
-        //     fn get_inside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
-        //         self.inside(old_position).pieces[piece_idx].clone()
-        //     }
+            fn get_inside_piece(&mut self, old_position: i8, piece_idx: usize) -> Rc<RefCell<Piece>> {
+                self.inside(old_position).pieces[piece_idx].clone()
+            }
 
         //     pub fn enter_goal(&mut self, player_id: i8, piece_id: i8, old_position: i8) {
         //         match old_position {
@@ -480,67 +486,65 @@ mod board {
         //         self.outside(position).player_id != self.get_player_id(player_id)
         //     }
 
-        //     pub fn reset(&mut self, player_id: i8) {
-        //         if self.home(player_id).pieces.len() != 4 {
-        //             self.reset_goal();
-        //             self.reset_inside();
-        //             self.reset_outside();
-        //         }
-        //         self.reset_home();
-        //     }
+            pub fn reset(&mut self) {
+                self.reset_goal();
+                self.reset_inside();
+                self.reset_outside();
+                self.reset_home();
+            }
 
-        //     fn reset_home(&mut self) {
-        //         for player_id in 0..4 {
-        //             self.home(player_id).pieces.sort_by_key(|a| a.borrow().id());
-        //         }
-        //     }
+            fn reset_home(&mut self) {
+                for player_id in 0..4 {
+                    self.home(player_id).pieces.sort_by_key(|a| a.borrow().id());
+                }
+            }
 
-        //     fn reset_goal(&mut self) {
-        //         for player_id in 0..4 {
-        //             if self.goal(player_id).player_id.is_some() {
-        //                 let pieces = self.goal(player_id).pieces.clone();
-        //                 for piece in pieces {
-        //                     self.home(player_id).pieces.push(piece);
-        //                 }
-        //             }
-        //             self.goal(player_id).pieces.clear();
-        //             self.goal(player_id).player_id = None;
-        //         }
-        //     }
+            fn reset_goal(&mut self) {
+                for player_id in 0..4 {
+                    if self.goal(player_id).player_id.is_some() {
+                        let pieces = self.goal(player_id).pieces.clone();
+                        for piece in pieces {
+                            self.home(player_id).pieces.push(piece);
+                        }
+                    }
+                    self.goal(player_id).pieces.clear();
+                    self.goal(player_id).player_id = None;
+                }
+            }
 
-        //     fn reset_inside(&mut self) {
-        //         for position in 52..72 {
-        //             if self.inside(position).player_id.is_some() {
-        //                 let id = self.inside(position).player_id.unwrap() as i8;
-        //                 let pieces = self.inside(position).pieces.clone();
-        //                 for piece in pieces {
-        //                     self.home(id).pieces.push(piece);
-        //                 }
-        //             }
-        //             self.inside(position).pieces.clear();
-        //             self.inside(position).player_id = None;
-        //         }
-        //     }
+            fn reset_inside(&mut self) {
+                for position in 52..72 {
+                    if self.inside(position).player_id.is_some() {
+                        let id = self.inside(position).player_id.as_ref().unwrap().clone() as i8;
+                        let pieces = self.inside(position).pieces.clone();
+                        for piece in pieces {
+                            self.home(id).pieces.push(piece);
+                        }
+                    }
+                    self.inside(position).pieces.clear();
+                    self.inside(position).player_id = None;
+                }
+            }
 
-        //     fn reset_outside(&mut self) {
-        //         for position in 0..52 {
-        //             if self.outside(position).player_id.is_some() {
-        //                 let player_id = self.outside(position).player_id.unwrap() as i8;
-        //                 let pieces = self.outside(position).pieces.clone();
-        //                 for piece in pieces {
-        //                     self.home(player_id).pieces.push(piece);
-        //                 }
-        //             }
-        //             self.outside(position).pieces.clear();
-        //             self.outside(position).player_id = None;
-        //         }
-        //     }
+            fn reset_outside(&mut self) {
+                for position in 0..52 {
+                    if self.outside(position).player_id.is_some() {
+                        let player_id = self.outside(position).player_id.as_ref().unwrap().clone() as i8;
+                        let pieces = self.outside(position).pieces.clone();
+                        for piece in pieces {
+                            self.home(player_id).pieces.push(piece);
+                        }
+                    }
+                    self.outside(position).pieces.clear();
+                    self.outside(position).player_id = None;
+                }
+            }
     }
 
-    fn create_vector_of_pieces() -> Vec<Rc<RefCell<Piece>>> {
+    fn create_vector_of_pieces(color: Color) -> Vec<Rc<RefCell<Piece>>> {
         let mut pieces = Vec::default();
         for i in 0..4 {
-            pieces.push(Rc::new(RefCell::new(Piece::new(i))));
+            pieces.push(Rc::new(RefCell::new(Piece::new(i, color.clone()))));
         }
         pieces
     }

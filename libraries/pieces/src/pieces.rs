@@ -10,15 +10,26 @@ mod pieces {
     }
 
     #[derive(PartialEq, Debug, Clone)]
+
+    pub enum Color {
+        Red,
+        Blue,
+        Green,
+        Yellow,
+    }
+
+    #[derive(PartialEq, Debug, Clone)]
     pub struct Piece {
         id: i8,
+        color: Color,
         state: State,
     }
 
     impl Piece {
-        pub fn new(id: i8) -> Piece {
+        pub fn new(id: i8,  color: Color) -> Piece {
             Piece {
                 id,
+                color,
                 state: State {
                     home: true,
                     goal: false,
@@ -31,6 +42,10 @@ mod pieces {
 
         pub fn id(&self) -> i8 {
             self.id
+        }
+
+        pub fn color(&self) -> Color {
+            self.color.clone()
         }
 
         pub fn is_home(&self) -> bool {
@@ -103,6 +118,24 @@ mod pieces {
             self.state.home = false;
         }
     }
+
+    impl Default for Piece {
+        fn default() -> Piece {
+            Piece {
+                id: -1,
+                color: Color::Red,
+                state: State {
+                    position: -1,
+                    home: true,
+                    goal: false,
+                    safe: true,
+                    dangerous: false,
+                },
+            }
+        }
+    }
+        
 }
 
 pub use pieces::Piece;
+pub use pieces::Color;

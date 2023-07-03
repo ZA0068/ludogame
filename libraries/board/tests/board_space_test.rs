@@ -1,5 +1,5 @@
 use board::{Board, PlayerID};
-use pieces::Piece;
+use pieces::{Piece, Color};
 use std::{cell::RefCell, rc::Rc};
 
 mod board_space_tests {
@@ -8,10 +8,10 @@ mod board_space_tests {
     fn board_home_spaces_test() {
         let mut board = Board::new();
         let pieces = vec![
-            Rc::new(RefCell::new(Piece::new(0))),
-            Rc::new(RefCell::new(Piece::new(1))),
-            Rc::new(RefCell::new(Piece::new(2))),
-            Rc::new(RefCell::new(Piece::new(3))),
+            Rc::new(RefCell::new(Piece::new(0, Color::Red))),
+            Rc::new(RefCell::new(Piece::new(1, Color::Red))),
+            Rc::new(RefCell::new(Piece::new(2, Color::Red))),
+            Rc::new(RefCell::new(Piece::new(3, Color::Red))),
         ];
         let player_ids = vec![
             PlayerID::Player0,

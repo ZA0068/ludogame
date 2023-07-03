@@ -1,4 +1,4 @@
-use pieces::Piece;
+use pieces::{Piece, Color};
 
 #[cfg(test)]
 mod pieces_test {
@@ -6,8 +6,8 @@ mod pieces_test {
 
     #[test]
     fn creating_a_piece_test() {
-        let piece = Piece::new(1);
-        assert_eq!(piece.id(), 1);
+        let piece = Piece::default();
+        assert_eq!(piece.id(), 0);
         assert!(piece.is_home());
         assert!(!piece.is_goal());
         assert!(piece.is_safe());
@@ -17,7 +17,7 @@ mod pieces_test {
 
     #[test]
     fn move_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         piece.set_position(3);
         assert_eq!(piece.id(), 1);
         assert_eq!(piece.position(), 3);
@@ -25,7 +25,7 @@ mod pieces_test {
 
     #[test]
     fn free_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.free();
         assert_eq!(piece.position(), 0);
@@ -37,7 +37,7 @@ mod pieces_test {
 
     #[test]
     fn dangerous_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.dangerous();
         assert!(!piece.is_home());
@@ -48,7 +48,7 @@ mod pieces_test {
 
     #[test]
     fn unsafe_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.not_safe();
         assert!(!piece.is_home());
@@ -59,7 +59,7 @@ mod pieces_test {
 
     #[test]
     fn safe_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.safe();
         assert!(!piece.is_home());
@@ -70,7 +70,7 @@ mod pieces_test {
 
     #[test]
     fn death_pieces_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.dead();
         assert_eq!(piece.position(), -1);
@@ -79,7 +79,7 @@ mod pieces_test {
         assert!(piece.is_safe());
         assert!(!piece.is_dangerous());
 
-        let mut piece = Piece::new(2);
+        let mut piece = Piece::new(2, Color::Green);
         assert_eq!(piece.id(), 2);
         piece.home();
         assert_eq!(piece.position(), -1);
@@ -91,7 +91,7 @@ mod pieces_test {
 
     #[test]
     fn goal_piece_test() {
-        let mut piece = Piece::new(1);
+        let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.goal();
         assert_eq!(piece.position(), 99);

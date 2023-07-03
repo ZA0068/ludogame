@@ -1,5 +1,5 @@
 use board::{BoardState, PlayerID};
-use pieces::Piece;
+use pieces::{Piece, Color};
 use std::any::{Any, TypeId};
 use std::{cell::RefCell, rc::Rc};
 
@@ -25,10 +25,10 @@ mod board_state_tests {
     #[test]
     fn create_a_board_state_test_2() {
         let pieces = vec![
-            Rc::new(RefCell::new(Piece::new(0))),
-            Rc::new(RefCell::new(Piece::new(1))),
-            Rc::new(RefCell::new(Piece::new(2))),
-            Rc::new(RefCell::new(Piece::new(3))),
+            Rc::new(RefCell::new(Piece::new(0, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(1, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(2, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(3, Color::Green))),
         ];
         let board_state = BoardState::new(-1, pieces.clone(), Some(PlayerID::Player1));
         assert_eq!(TypeId::of::<BoardState>(), board_state.type_id());
@@ -49,10 +49,10 @@ mod board_state_tests {
     #[test]
     fn pieces_test() {
         let pieces = vec![
-            Rc::new(RefCell::new(Piece::new(0))),
-            Rc::new(RefCell::new(Piece::new(1))),
-            Rc::new(RefCell::new(Piece::new(2))),
-            Rc::new(RefCell::new(Piece::new(3))),
+            Rc::new(RefCell::new(Piece::new(0, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(1, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(2, Color::Green))),
+            Rc::new(RefCell::new(Piece::new(3, Color::Green))),
         ];
         let mut board_state = BoardState::new(-1, pieces.clone(), Some(PlayerID::Player0));
         for i in 0..4 {
