@@ -1,6 +1,6 @@
 use board::Board;
-use dice::Dice;
-use players::{Act, Player};
+
+use players::{Player};
 use std::{cell::RefCell, rc::Rc};
 
 #[cfg(test)]

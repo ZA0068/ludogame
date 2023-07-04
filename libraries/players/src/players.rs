@@ -2,7 +2,7 @@ mod players {
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
-    use rand::seq::SliceRandom;
+    
     // use std::fmt;
     use std::{cell::RefCell, rc::Rc};
 
