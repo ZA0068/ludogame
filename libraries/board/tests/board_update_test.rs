@@ -658,7 +658,7 @@ mod board_update_test {
         assert!(board.is_occupied_by_other(player_0, new_position));
         assert!(!board.is_occupied_by_other(player_0, new_position + 1));
     }
-    
+
     #[test]
     fn is_occupied_by_other_more_test() {
         let mut board = Board::new();
@@ -766,7 +766,7 @@ mod board_update_test {
         for _ in 0..10 {
                 let new_position1 = rng.gen_range(0..=51);
                 let new_position2 = rng.gen_range(0..=51);
-                let new_inside_position = rng.gen_range((52 + player_id * 5) .. (57 + player_id * 5));
+                let new_inside_position = rng.gen_range(52..72);
                 board.update_outside(player_id, 1, old_position1, new_position1);
                 board.update_outside(player_id, 2, old_position2, new_position2);
                 board.update_inside(player_id, 0, old_inside_position, new_inside_position);
@@ -776,11 +776,23 @@ mod board_update_test {
             }
         }
 
+
         board.reset();
+        let player_ids = vec![
+            PlayerID::Player0,
+            PlayerID::Player1,
+            PlayerID::Player2,
+            PlayerID::Player3,
+        ];
         for i in 0..4 {
             assert_eq!(board.home(i).pieces.len(), 4);
             for j in 0..4 {
                 assert_eq!(board.home(i).piece(j).borrow().id(), j);
+                assert_eq!(board.home(i).player_id, Some(player_ids[i as usize].clone()));
+                assert!(board.home(i).piece(j).borrow().is_home());
+                assert!(board.home(i).piece(j).borrow().is_safe());
+                assert!(!board.home(i).piece(j).borrow().is_goal());
+                assert_eq!(board.home(i).piece(j).borrow().position(), -1);
             }
         }
     }

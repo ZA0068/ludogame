@@ -245,8 +245,8 @@ mod board {
                 player_id: i8,
                 piece: Rc<RefCell<Piece>>,
             ) {
-                self.outside(new_position).player_id = self.clone().get_player_id(player_id);
                 self.outside(new_position).pieces.push(piece);
+                self.outside(new_position).player_id = self.clone().get_player_id(player_id);
             }
 
             fn get_home_piece_and_index(
@@ -500,6 +500,8 @@ mod board {
             fn reset_home(&mut self) {
                 for player_id in 0..4 {
                     self.home(player_id).pieces.sort_by_key(|a| a.borrow().id());
+                    self.home(player_id).pieces.iter_mut().for_each(|piece| piece.borrow_mut().home());
+                    self.home(player_id).player_id = self.clone().get_player_id(player_id);
                 }
             }
 
