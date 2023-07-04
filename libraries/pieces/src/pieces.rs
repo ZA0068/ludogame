@@ -12,10 +12,10 @@ mod pieces {
     #[derive(PartialEq, Debug, Clone)]
 
     pub enum Color {
-        Red,
-        Blue,
         Green,
         Yellow,
+        Blue,
+        Red,
     }
 
     #[derive(PartialEq, Debug, Clone)]
@@ -26,7 +26,7 @@ mod pieces {
     }
 
     impl Piece {
-        pub fn new(id: i8,  color: Color) -> Piece {
+        pub fn new(id: i8, color: Color) -> Piece {
             Piece {
                 id,
                 color,
@@ -69,6 +69,7 @@ mod pieces {
         }
 
         pub fn set_position(&mut self, position: i8) {
+            assert!((-1..=71).contains(&position) && position != 99);
             self.state.position = position;
         }
 
@@ -122,7 +123,7 @@ mod pieces {
     impl Default for Piece {
         fn default() -> Piece {
             Piece {
-                id: -1,
+                id: 0,
                 color: Color::Red,
                 state: State {
                     position: -1,
@@ -134,8 +135,7 @@ mod pieces {
             }
         }
     }
-        
 }
 
-pub use pieces::Piece;
 pub use pieces::Color;
+pub use pieces::Piece;

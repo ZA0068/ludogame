@@ -8,4 +8,5 @@ name = "board"
 path = "src/board.rs"
 
 [dependencies]
+rand = { version = "0.8.4", features = ["std"] }
 pieces = { path = "../pieces" }

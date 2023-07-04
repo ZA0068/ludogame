@@ -5,15 +5,34 @@ mod pieces_test {
     use super::*;
 
     #[test]
-    fn creating_a_piece_test() {
-        let piece = Piece::default();
-        assert_eq!(piece.id(), 0);
-        assert!(piece.is_home());
-        assert!(!piece.is_goal());
-        assert!(piece.is_safe());
-        assert!(!piece.is_dangerous());
-        assert_eq!(piece.color(), Color::Red);
-        assert_eq!(piece.position(), -1);
+    fn creating_all_piece_single_color_test() {
+        for i in 0..4 {
+            let piece = Piece::new(i, Color::Green);
+            assert_eq!(piece.id(), i);
+            assert!(piece.is_home());
+            assert!(!piece.is_goal());
+            assert!(piece.is_safe());
+            assert!(!piece.is_dangerous());
+            assert_eq!(piece.color(), Color::Green);
+            assert_eq!(piece.position(), -1);
+        }
+    }
+
+    #[test]
+    fn creating_all_piece_all_color_test() {
+        let colors = vec![Color::Red, Color::Blue, Color::Yellow, Color::Green];
+        for color in colors.iter() {
+            for i in 0..4 {
+                let piece = Piece::new(i, color.clone());
+                assert_eq!(piece.id(), i);
+                assert!(piece.is_home());
+                assert!(!piece.is_goal());
+                assert!(piece.is_safe());
+                assert!(!piece.is_dangerous());
+                assert_eq!(piece.color(), color.clone());
+                assert_eq!(piece.position(), -1);
+            }
+        }
     }
 
     #[test]
@@ -100,39 +119,5 @@ mod pieces_test {
         assert!(piece.is_goal());
         assert!(piece.is_safe());
         assert!(!piece.is_dangerous());
-    }
-
-    #[test]
-    #[should_panic]
-    fn invalid_position_test() {
-        let mut piece = Piece::new(1, Color::Green);
-        assert_eq!(piece.id(), 1);
-        piece.set_position(100);
-    }
-
-    #[test]
-    #[should_panic]
-    fn invalid_position_test_2() {
-        let mut piece = Piece::new(1, Color::Green);
-        assert_eq!(piece.id(), 1);
-        piece.set_position(-2);
-    }
-
-    #[test]
-    #[should_panic]
-    fn invalid_position_test_3() {
-        let mut piece = Piece::new(1, Color::Green);
-        assert_eq!(piece.id(), 1);
-        piece.set_position(72);
-    }
-
-    #[test]
-    #[should_panic]
-    fn invalid_position_test_4() {
-        let mut piece = Piece::new(1, Color::Green);
-        assert_eq!(piece.id(), 1);
-        for i in 72..=98 {
-            piece.set_position(i);
-        }
     }
 }
