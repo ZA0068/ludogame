@@ -29,7 +29,6 @@ mod pieces_test {
         let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
         piece.free();
-        assert_eq!(piece.position(), 0);
         assert!(!piece.is_home());
         assert!(!piece.is_goal());
         assert!(piece.is_safe());

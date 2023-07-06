@@ -1,19 +1,20 @@
 use board::Board;
-use players::{Player};
-use std::{cell::RefCell, rc::Rc};
 use pieces::Color;
+use players::Player;
+use std::{cell::RefCell, rc::Rc};
 
 #[cfg(test)]
-mod player_0_tests {
+mod player_2_tests {
 
     use super::*;
-    static PLAYER_ID: i8 = 0;
+
+    static PLAYER_ID: i8 = 2;
 
     #[test]
     fn add_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let player = Player::new(PLAYER_ID, board.clone(), None);
-        assert_eq!(player.id(), 0);
+        assert_eq!(player.id(), 2);
         assert_eq!(player.board().as_ptr(), board.as_ptr());
     }
 
@@ -24,9 +25,9 @@ mod player_0_tests {
         (0..4).for_each(|i| {
             let piece = player.piece(i);
             assert_eq!(piece.borrow().id(), i);
-            assert_eq!(piece.borrow().color(), Color::Green);
+            assert_eq!(piece.borrow().color(), Color::Blue);
             assert_ne!(piece.borrow().color(), Color::Yellow);
-            assert_ne!(piece.borrow().color(), Color::Blue);
+            assert_ne!(piece.borrow().color(), Color::Green);
             assert_ne!(piece.borrow().color(), Color::Red);
         });
     }
@@ -38,7 +39,7 @@ mod player_0_tests {
         let player = Player::new(PLAYER_ID, board, None);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
-        assert_eq!(piece.borrow().color(), Color::Yellow);
+        assert_ne!(piece.borrow().color(), Color::Blue);
     }
 
     #[test]
@@ -58,7 +59,7 @@ mod player_0_tests {
         let player = Player::new(PLAYER_ID, board, None);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
-        assert_eq!(piece.borrow().color(), Color::Blue);
+        assert_eq!(piece.borrow().color(), Color::Yellow);
     }
 
     #[test]
@@ -68,6 +69,6 @@ mod player_0_tests {
         let player = Player::new(PLAYER_ID, board, None);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
-        assert_ne!(piece.borrow().color(), Color::Green);
+        assert_eq!(piece.borrow().color(), Color::Green);
     }
 }

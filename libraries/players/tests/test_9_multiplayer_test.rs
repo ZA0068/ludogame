@@ -1,12 +1,12 @@
 use board::Board;
 
-use players::{Player};
+use players::Player;
 use std::{cell::RefCell, rc::Rc};
 
 #[cfg(test)]
 mod init_players_tests {
     use super::*;
-        #[test]
+    #[test]
     fn add_all_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let board2 = Rc::new(RefCell::new(Board::new()));
