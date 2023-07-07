@@ -130,10 +130,10 @@ mod players {
                 //     self.skip(piece_id, dice_number);
                 //     self.can_continue();
                 // }
-                // Act::Goal => {
-                //     self.goal(piece_id);
-                //     self.my_turn();
-                // }
+                Act::Goal => {
+                    self.win(piece_id);
+                    // self.my_turn();
+                }
                 Act::Free => {
                     self.free_piece(piece_id);
                     // self.my_turn();
@@ -161,10 +161,9 @@ mod players {
             }
         }
 
-        // pub fn goal(&mut self, piece_id: i8) {
-        //     let old_position = self.piece(piece_id).borrow_mut().position();
-        //     self.enter_goal(piece_id, old_position);
-        // }
+        pub fn win(&mut self, piece_id: i8) {
+            self.enter_goal(piece_id, self.old_position);
+        }
 
         // pub fn skip(&mut self, piece_id: i8, dice_number: i8) {
         //     let (old_position, new_position) = self.update_position(piece_id, dice_number);
@@ -237,20 +236,19 @@ mod players {
         //     }
         // }
 
-        // pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
-        //     let (old_position, new_position) = self.update_position(piece_id, dice_number);
-        //     let new_position = self.star_position(old_position, new_position);
-        //     self.update_outside(piece_id, old_position, new_position);
+        pub fn join_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            let new_position = self.star_position(old_position, new_position);
+            self.update_outside(piece_id, old_position, new_position);
 
-        //     for i in 0..4 {
-        //         let piece = self.piece(i);
-        //         let pos = piece.borrow_mut().position();
+            for i in 0..4 {
+                let piece = self.piece(i);
+                let pos = piece.borrow_mut().position();
 
-        //         if pos == new_position {
-        //             piece.borrow_mut().dangerous();
-        //         }
-        //     }
-        // }
+                if pos == new_position {
+                    piece.borrow_mut().dangerous();
+                }
+            }
+        }
 
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
@@ -268,58 +266,23 @@ mod players {
         }
 
         pub fn update_piece(&mut self, piece_id: i8) {
-            // let _ = self
-            //     .try_enter_inside(piece_id, old_position, new_position)
-            //     .or_else(|err| self.try_update_inside(piece_id, old_position, err))
-            //     .or_else(|err| self.try_move_back(piece_id, old_position, err))
-            //     .or_else(|err| self.try_enter_goal(piece_id, old_position, err))
-            //     .or_else(|err| self.try_update_outside(piece_id, old_position, err));
-            self.update_outside(piece_id, self.old_position, self.new_position);
+            match (self.id(), self.old_position, self.new_position) {
+                (0, 52..=56, 52..=62) => self.update_inside(piece_id, self.old_position, self.new_position),
+                (0, 0..=50, 0..=50) => self.update_outside(piece_id, self.old_position, self.new_position),
+                _ => panic!("invalid move!"),
+            };
         }
 
-        // pub fn try_enter_goal(
-        //     &mut self,
-        //     piece_id: i8,
-        //     old_position: i8,
-        //     new_position: i8,
-        // ) -> Result<(), i8> {
-        //     let goal_position = self.goal_positions(old_position, new_position);
-        //     match goal_position {
-        //         99 => {
-        //             self.enter_goal(piece_id, old_position);
-        //             Ok(())
-        //         }
-        //         _ => Err(new_position),
-        //     }
-        // }
-
-        // pub fn try_update_inside(
-        //     &mut self,
-        //     piece_id: i8,
-        //     old_position: i8,
-        //     new_position: i8,
-        // ) -> Result<(), i8> {
-        //     match (self.id(), old_position, new_position) {
-        //         (0, 52..=56, 52..=56)
-        //         | (1, 57..=61, 57..=61)
-        //         | (2, 62..=66, 62..=66)
-        //         | (3, 67..=71, 67..=71) => {
-        //             self.update_inside(piece_id, old_position, new_position);
-        //             Ok(())
-        //         }
-        //         _ => Err(new_position),
-        //     }
-        // }
-
-        // pub fn update_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-        //     self.piece(piece_id).borrow_mut().set_position(new_position);
-        //     self.board().borrow_mut().update_inside(
-        //         self.id(),
-        //         piece_id,
-        //         old_position,
-        //         new_position,
-        //     );
-        // }
+        pub fn update_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            let new_position = self.move_back_if_overshoot(old_position, new_position);
+            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.board().borrow_mut().update_inside(
+                self.id(),
+                piece_id,
+                old_position,
+                new_position,
+            );
+        }
 
         pub fn star_position(&mut self, old_position: i8, new_position: i8) -> i8 {
             match (old_position, new_position) {
@@ -335,21 +298,21 @@ mod players {
             }
         }
 
-        // pub fn starjump(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-        //     let new_position = self.star_position(old_position, new_position);
-        //     self.update_outside(piece_id, old_position, new_position)
-        // }
+        pub fn starjump(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            let new_position = self.star_position(old_position, new_position);
+            self.update_outside(piece_id, old_position, new_position)
+        }
 
-        // pub fn enter_globe(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-        //     self.piece(piece_id).borrow_mut().set_position(new_position);
-        //     self.piece(piece_id).borrow_mut().dangerous();
-        //     self.board().borrow_mut().update_outside(
-        //         self.id(),
-        //         piece_id,
-        //         old_position,
-        //         new_position,
-        //     );
-        // }
+        pub fn enter_globe(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.piece(piece_id).borrow_mut().dangerous();
+            self.board().borrow_mut().update_outside(
+                self.id(),
+                piece_id,
+                old_position,
+                new_position,
+            );
+        }
 
         // pub fn try_update_outside(
         //     &mut self,
@@ -358,7 +321,7 @@ mod players {
         //     // self.update_outside(piece_id);
         // }
 
-        // fn correct_position_for_player_1_to_3(&mut self, old_position: i8, new_position: i8) -> i8 {
+        // fn correct_positions(&mut self, old_position: i8, new_position: i8) -> i8 {
         //     match (self.id(), old_position, new_position) {
         //         (1..=3, 0..=51, 52..=58) => new_position - 52,
         //         _ => new_position,
@@ -376,45 +339,24 @@ mod players {
             );
         }
 
-        // fn try_move_back(
-        //     &mut self,
-        //     piece_id: i8,
-        //     old_position: i8,
-        //     new_position: i8,
-        // ) -> Result<(), i8> {
-        //     let subtract = match self.subtract_if_overshoot(old_position, new_position) {
-        //         Ok(value) => value,
-        //         Err(value) => return value,
-        //     };
-        //     self.move_back(old_position, new_position, piece_id, subtract);
-        //     Ok(())
-        // }
+        pub fn move_back_if_overshoot(
+            &mut self,
+            old_position: i8,
+            new_position: i8,
+        ) -> i8 {
+            let subtract = self.get_subtraction_position(old_position, new_position);
+            subtract - (new_position - subtract)
+        }
 
-        // fn subtract_if_overshoot(
-        //     &mut self,
-        //     old_position: i8,
-        //     new_position: i8,
-        // ) -> Result<i8, Result<(), i8>> {
-        //     let subtract: i8 = match (self.id, old_position, new_position) {
-        //         (0, 52..=56, 58..=62) => 57,
-        //         (1, 57..=61, 63..=67) => 62,
-        //         (2, 62..=66, 68..=72) => 67,
-        //         (3, 67..=71, 73..=77) => 72,
-        //         _ => return Err(Err(new_position)),
-        //     };
-        //     Ok(subtract)
-        // }
-
-        // fn move_back(&mut self, old_position: i8, new_position: i8, piece_id: i8, subtract: i8) {
-        //     let new_position = subtract - (new_position - subtract);
-        //     self.piece(piece_id).borrow_mut().set_position(new_position);
-        //     self.board().borrow_mut().update_inside(
-        //         self.id(),
-        //         piece_id,
-        //         old_position,
-        //         new_position,
-        //     );
-        // }
+        pub fn get_subtraction_position(&mut self, old_position: i8, new_position: i8) -> i8 {
+            match (self.id, old_position, new_position) {
+                (0, 52..=56, 58..=62) => 57,
+                (1, 57..=61, 63..=67) => 62,
+                (2, 62..=66, 68..=72) => 67,
+                (3, 67..=71, 73..=77) => 72,
+                _ => new_position,
+            }
+        }
 
         fn goal_positions(&mut self, old_position: i8, new_position: i8) -> i8 {
             match (self.id(), old_position, new_position) {
@@ -439,20 +381,6 @@ mod players {
             }
         }
 
-        // fn try_enter_inside(
-        //     &mut self,
-        //     piece_id: i8,
-        //     old_position: i8,
-        //     new_position: i8,
-        // ) -> Result<(), i8> {
-        //     let new_position = match self.correct_position(old_position, new_position) {
-        //         Ok(value) => value,
-        //         Err(value) => return value,
-        //     };
-        //     self.enter_inside(piece_id, old_position, new_position);
-        //     Ok(())
-        // }
-
         pub fn correct_position(&mut self) {
             match (self.id, self.old_position, self.new_position) {
                 (0, 45..=51, 51..=55) => self.new_position + 1,
@@ -471,12 +399,12 @@ mod players {
                 .move_inside(self.id(), piece_id, old_position, new_position);
         }
 
-        // fn enter_goal(&mut self, piece_id: i8, old_position: i8) {
-        //     self.piece(piece_id).borrow_mut().goal();
-        //     self.board()
-        //         .borrow_mut()
-        //         .enter_goal(self.id(), piece_id, old_position);
-        // }
+        pub fn enter_goal(&mut self, piece_id: i8, old_position: i8) {
+            self.piece(piece_id).borrow_mut().goal();
+            self.board()
+                .borrow_mut()
+                .enter_goal(self.id(), piece_id, old_position);
+        }
 
         pub fn free_piece(&mut self, piece_id: i8) {
             self.new_position = self.invincible_positions();

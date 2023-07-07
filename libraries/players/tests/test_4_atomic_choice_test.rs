@@ -4,7 +4,7 @@ use players::{Act, Player};
 use std::{cell::RefCell, rc::Rc};
 
 #[cfg(test)]
-mod atomic_choice_test_player_0 {
+mod atomic_choice_test {
     use super::*;
     const PLAYER_ID: i8 = 0;
 
@@ -90,8 +90,7 @@ mod atomic_choice_test_player_0 {
         assert_eq!(boardspace.piece(piece_id).borrow().position(), 1);
         assert_eq!(boardspace.pieces.len(), 1);
 
-        let dice_number = 4 - 13;
-        other_player.move_piece(piece_id, dice_number);
+        other_player.update_outside(piece_id, 13, 4);
         assert_eq!(other_player.piece(piece_id).borrow().position(), 4);
         let mut boardspace = board.borrow_mut().outside(4).clone();
         assert_eq!(boardspace.piece(piece_id).borrow().position(), 4);

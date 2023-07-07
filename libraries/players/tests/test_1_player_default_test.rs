@@ -51,4 +51,49 @@ mod default_player_tests {
         let result = player.roll_dice();
         assert!(result == 0);
     }
+
+    #[test]
+    fn star_position_test(){
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(0, board.clone());
+
+        for i in 0..5 {
+            let position = player.star_position(i, 5);
+            assert_eq!(position, 11);
+        }
+
+        let position = player.star_position(51, 5);
+        assert_eq!(position, 11);
+
+        for i in 5..11 {
+            let position = player.star_position(i, 11);
+            assert_eq!(position, 18);
+        }
+
+        for i in 12..18 {
+            let position = player.star_position(i, 18);
+            assert_eq!(position, 24);
+        }
+
+        for i in 18..24 {
+            let position = player.star_position(i, 24);
+            assert_eq!(position, 31);
+        }
+
+        for i in 31..37 {
+            let position = player.star_position(i, 37);
+            assert_eq!(position, 44);
+        }
+
+        for i in 44..50 {
+            let position = player.star_position(i, 50);
+            assert_eq!(position, 50);
+        }
+
+        let mut player = Player::new(1, board);
+        for i in 44..50 {
+            let position = player.star_position(i, 50);
+            assert_eq!(position, 5);
+        }
+    }
 }

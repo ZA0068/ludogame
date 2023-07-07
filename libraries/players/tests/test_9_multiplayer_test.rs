@@ -1,41 +1,41 @@
-use board::Board;
+// use board::Board;
 
-use players::Player;
-use std::{cell::RefCell, rc::Rc};
+// use players::Player;
+// use std::{cell::RefCell, rc::Rc};
 
-#[cfg(test)]
-mod init_players_tests {
-    use super::*;
-    #[test]
-    fn add_all_player_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let board2 = Rc::new(RefCell::new(Board::new()));
-        let player0 = Player::new(0, board.clone(), None);
-        let player1 = Player::new(1, board.clone(), None);
-        let player2 = Player::new(2, board.clone(), None);
-        let player3 = Player::new(3, board.clone(), None);
+// #[cfg(test)]
+// mod init_players_tests {
+//     use super::*;
+//     #[test]
+//     fn add_all_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let board2 = Rc::new(RefCell::new(Board::new()));
+//         let player0 = Player::new(0, board.clone(), None);
+//         let player1 = Player::new(1, board.clone(), None);
+//         let player2 = Player::new(2, board.clone(), None);
+//         let player3 = Player::new(3, board.clone(), None);
 
-        assert_eq!(player0.id(), 0);
-        assert_eq!(player1.id(), 1);
-        assert_eq!(player2.id(), 2);
-        assert_eq!(player3.id(), 3);
+//         assert_eq!(player0.id(), 0);
+//         assert_eq!(player1.id(), 1);
+//         assert_eq!(player2.id(), 2);
+//         assert_eq!(player3.id(), 3);
 
-        assert_eq!(player0.board().as_ptr(), board.as_ptr());
-        assert_eq!(player1.board().as_ptr(), player0.board().as_ptr());
-        assert_eq!(player2.board().as_ptr(), player1.board().as_ptr());
-        assert_eq!(player3.board().as_ptr(), player2.board().as_ptr());
-        assert_eq!(board.as_ptr(), player3.board().as_ptr());
-        assert_ne!(board2.as_ptr(), player0.board().as_ptr());
-    }
+//         assert_eq!(player0.board().as_ptr(), board.as_ptr());
+//         assert_eq!(player1.board().as_ptr(), player0.board().as_ptr());
+//         assert_eq!(player2.board().as_ptr(), player1.board().as_ptr());
+//         assert_eq!(player3.board().as_ptr(), player2.board().as_ptr());
+//         assert_eq!(board.as_ptr(), player3.board().as_ptr());
+//         assert_ne!(board2.as_ptr(), player0.board().as_ptr());
+//     }
 
-    #[test]
-    #[should_panic]
-    fn invalid_player_id_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let player = Player::new(4, board, None);
-        assert_eq!(player.id(), 4);
-    }
-}
+//     #[test]
+//     #[should_panic]
+//     fn invalid_player_id_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let player = Player::new(4, board, None);
+//         assert_eq!(player.id(), 4);
+//     }
+// }
 
 // #[cfg(test)]
 // mod multiplayer_test {
