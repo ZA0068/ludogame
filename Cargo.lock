@@ -475,7 +475,7 @@ checksum = "b06a4cde4c0f271a446782e3eff8de789548ce57dbc8eca9292c27f4a42004b4"
 
 [[package]]
 name = "ludogame"
-version = "2.0.0"
+version = "1.0.0"
 dependencies = [
  "board",
  "csv",
@@ -584,7 +584,7 @@ dependencies = [
 
 [[package]]
 name = "players"
-version = "2.0.0"
+version = "1.0.0"
 dependencies = [
  "board",
  "dice",

@@ -523,8 +523,8 @@ mod board {
                     if self.inside(position).player_id.is_some() {
                         let pieces = self.inside(position).pieces.clone();
                         for piece in pieces {
-                            let id = piece.borrow_mut().color() as i8;
-                            self.home(id).pieces.push(piece);
+                            let player_id = piece.borrow_mut().color() as i8;
+                            self.home(player_id).pieces.push(piece);
                         }
                     }
                     self.inside(position).pieces.clear();

@@ -235,3 +235,339 @@
 //         println!("aggressive_player winrate: {}", winrate[3] / 100.0);
 //     }
 // }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn second_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player = Player::new(1, board);
+
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+
+//         while !player.is_finished() {
+//             player.my_turn();
+//             player.random_play(actions.clone());
+//             player.print_status();
+//         }
+//         assert!(player.is_finished());
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn third_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player = Player::new(2, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+
+//         while !player.is_finished() {
+//             player.my_turn();
+//             player.random_play(actions.clone());
+//             player.print_status();
+//         }
+//         assert!(player.is_finished());
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn fourth_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player = Player::new(3, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+//         while !player.is_finished() {
+//             player.my_turn();
+//             player.random_play(actions.clone());
+//             player.print_status();
+//         }
+//         assert!(player.is_finished());
+//     }
+//     #[test]
+//     fn all_single_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+
+//         for i in 0..4 {
+//             let mut player = Player::new(i, board.clone());
+
+//             while !player.is_finished() {
+//                 player.my_turn();
+//                 player.random_play(actions.clone());
+//                 player.print_status();
+//             }
+//             assert!(player.is_finished());
+//         }
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn replay_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+
+//         for i in 0..4 {
+//             let mut player = Player::new(i, board.clone());
+//             for _ in 0..10 {
+//                 while !player.is_finished() {
+//                     player.my_turn();
+//                     player.random_play(actions.clone());
+//                 }
+//                 assert!(player.is_finished());
+//                 player.reset();
+//             }
+//         }
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn two_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player0 = Player::new(0, board.clone());
+//         let mut player1 = Player::new(1, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+//         loop {
+//             player0.my_turn();
+//             player0.random_play(actions.clone());
+//             if player0.is_finished() {
+//                 println!("Player 0 wins");
+//                 break;
+//             }
+//             player1.my_turn();
+//             player1.random_play(actions.clone());
+//             if player1.is_finished() {
+//                 println!("Player 1 wins");
+//                 break;
+//             }
+//         }
+//         assert!(player0.is_finished() || player1.is_finished());
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn two_players_repeated_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player0 = Player::new(0, board.clone());
+//         let mut player1 = Player::new(1, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+//         for _ in 0..20 {
+//             loop {
+//                 player0.my_turn();
+//                 player0.random_play(actions.clone());
+//                 if player0.is_finished() {
+//                     println!("Player 0 wins");
+//                     break;
+//                 }
+//                 player1.my_turn();
+//                 player1.random_play(actions.clone());
+//                 if player1.is_finished() {
+//                     println!("Player 1 wins");
+//                     break;
+//                 }
+//             }
+//             assert!(player0.is_finished() || player1.is_finished());
+//             player0.reset();
+//             player1.reset();
+//         }
+//     }
+
+//     #[test]
+//     #[ignore = "long test"]
+//     fn other_two_players_repeated_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player0 = Player::new(2, board.clone());
+//         let mut player1 = Player::new(3, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+//         for _ in 0..20 {
+//             loop {
+//                 player0.my_turn();
+//                 player0.random_play(actions.clone());
+//                 player0.print_status();
+//                 if player0.is_finished() {
+//                     println!("Player 0 wins");
+//                     break;
+//                 }
+//                 player1.my_turn();
+//                 player1.random_play(actions.clone());
+//                 player1.print_status();
+//                 if player1.is_finished() {
+//                     println!("Player 1 wins");
+//                     break;
+//                 }
+//             }
+//             assert!(player0.is_finished() || player1.is_finished());
+//             player0.reset();
+//             player1.reset();
+//         }
+//     }
+
+//     #[test]
+//     #[ignore = "super long test"]
+//     fn all_player_test() {
+//         let board = Rc::new(RefCell::new(Board::new()));
+//         let dice = Rc::new(RefCell::new(Dice::new()));
+//         let mut player0 = Player::new(0, board.clone());
+//         let mut player1 = Player::new(1, board.clone());
+//         let mut player2 = Player::new(2, board.clone());
+//         let mut player3 = Player::new(3, board);
+//         let actions = vec![
+//             Act::Move,
+//             Act::Free,
+//             Act::Kill,
+//             Act::Join,
+//             Act::Leave,
+//             Act::Die,
+//             Act::Goal,
+//             Act::Safe,
+//             Act::Skip,
+//             Act::Nothing,
+//         ];
+//         let mut winrate: Vec<f32> = vec![0.0; 4];
+//         for _ in 0..30 {
+//             loop {
+//                 player0.my_turn();
+//                 player0.random_play(actions.clone());
+//                 // player0.print_status();
+//                 if player0.is_finished() {
+//                     println!("Player 0 wins");
+//                     winrate[0] += 1.0;
+//                     break;
+//                 }
+//                 player1.my_turn();
+//                 player1.random_play(actions.clone());
+//                 // player1.print_status();
+//                 if player1.is_finished() {
+//                     println!("Player 1 wins");
+//                     winrate[1] += 1.0;
+//                     break;
+//                 }
+
+//                 player2.my_turn();
+//                 player2.random_play(actions.clone());
+//                 // player2.print_status();
+//                 if player2.is_finished() {
+//                     println!("Player 2 wins");
+//                     winrate[2] += 1.0;
+//                     break;
+//                 }
+
+//                 player3.my_turn();
+//                 player3.random_play(actions.clone());
+//                 // player3.print_status();
+//                 if player3.is_finished() {
+//                     println!("Player 3 wins");
+//                     winrate[3] += 1.0;
+//                     break;
+//                 }
+//             }
+//             assert!(
+//                 player0.is_finished()
+//                     || player1.is_finished()
+//                     || player2.is_finished()
+//                     || player3.is_finished()
+//             );
+//             player0.reset();
+//             player1.reset();
+//             player2.reset();
+//             player3.reset();
+//         }
+//         println!("Player 0 winrate: {}", winrate[0] / 30.0);
+//         println!("Player 1 winrate: {}", winrate[1] / 30.0);
+//         println!("Player 2 winrate: {}", winrate[2] / 30.0);
+//         println!("Player 3 winrate: {}", winrate[3] / 30.0);
+//     }

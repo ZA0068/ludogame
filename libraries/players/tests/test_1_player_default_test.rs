@@ -96,4 +96,33 @@ mod default_player_tests {
             assert_eq!(position, 5);
         }
     }
+
+    #[test]
+    fn circumvent_player_0_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(0, board.clone());
+        
+        let position = player.circumvent_player_0(51, 57);
+        assert_eq!(position, 57);
+        
+        let mut player = Player::new(1, board);
+        let position = player.circumvent_player_0(51, 57);
+        assert_eq!(position, 5);
+    }
+
+    #[test]
+    fn send_pieces_home_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(0, board);
+
+        player.free_piece(0);
+
+        player.update_outside(0, 0, 6);
+
+        player.send_other_piece_home(6);
+
+        assert!(player.board().borrow_mut().home(0).piece(0).borrow().is_home());
+        assert_eq!(player.board().borrow_mut().home(0).piece(0).borrow().position(), -1);
+    }
+
 }
