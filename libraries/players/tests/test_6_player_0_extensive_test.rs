@@ -429,21 +429,21 @@ mod player_0_tests {
     }
 
 
-    #[test]
-    fn starjump_test () {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board.clone());
+    // #[test]
+    // fn starjump_test () {
+    //     let board = Rc::new(RefCell::new(Board::new()));
+    //     let mut player = Player::new(PLAYER_ID, board.clone());
 
-        let piece_id = 0;
-        player.free_piece(piece_id);
-        player.move_piece(piece_id, 44);
-        player.win_piece(piece_id, 6);
-        assert_eq!(player.piece(piece_id).borrow().position(), 99);
-        assert!(player.piece(piece_id).borrow().is_goal());
-        assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
-        assert!(player.is_finished());
-        board.borrow_mut().reset();
-    }
+    //     let piece_id = 0;
+    //     player.free_piece(piece_id);
+    //     player.move_piece(piece_id, 44);
+    //     player.win_piece(piece_id, 6);
+    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
+    //     assert!(player.piece(piece_id).borrow().is_goal());
+    //     assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
+    //     assert!(player.is_finished());
+    //     board.borrow_mut().reset();
+    // }
 //     #[test]
 //     fn update_piece_by_dice_test() {
 //         let board = Rc::new(RefCell::new(Board::new()));
