@@ -53,6 +53,10 @@ mod pieces {
             self.state == State::Goal
         }
 
+        pub fn is_vulnerable(&self) -> bool {
+            self.state == State::Vulnerable
+        }
+
         pub fn is_safe(&self) -> bool {
             self.state == State::Safe
         }
