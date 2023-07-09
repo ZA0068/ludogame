@@ -50,7 +50,7 @@ mod pieces_test {
     fn unsafe_piece_test() {
         let mut piece = Piece::new(1, Color::Green);
         assert_eq!(piece.id(), 1);
-        piece.not_safe();
+        piece.vulnerable();
         assert!(!piece.is_home());
         assert!(!piece.is_goal());
         assert!(!piece.is_safe());

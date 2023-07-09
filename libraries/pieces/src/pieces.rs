@@ -1,12 +1,11 @@
 mod pieces {
 
     #[derive(PartialEq, Debug, Clone)]
-    pub struct State {
-        position: i8,
-        home: bool,
-        safe: bool,
-        dangerous: bool,
-        goal: bool,
+    pub enum State {
+        home,
+        safe,
+        dangerous,
+        goal,
     }
 
     #[derive(PartialEq, Debug, Clone)]
@@ -23,6 +22,7 @@ mod pieces {
         id: i8,
         color: Color,
         state: State,
+        position: i8,
     }
 
     impl Piece {
@@ -84,7 +84,11 @@ mod pieces {
             self.state.goal = false;
         }
 
-        pub fn not_safe(&mut self) {
+        pub fn not_safe(&self) -> bool {
+            self.state
+        }
+
+        pub fn vulnerable(&mut self) {
             self.state.dangerous = false;
             self.state.safe = false;
             self.state.home = false;

@@ -722,7 +722,7 @@ mod board_update_test {
             .outside(player_id)
             .piece(piece_id)
             .borrow_mut()
-            .not_safe();
+            .vulnerable();
         board.update_outside(player_id, piece_id, old_position, new_position);
         assert_eq!(board.outside(old_position).pieces.len(), 0);
         assert_eq!(board.outside(new_position).pieces.len(), 1);

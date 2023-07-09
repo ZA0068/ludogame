@@ -197,25 +197,34 @@ mod players {
             }
         }
 
-        pub fn leave_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            self.update_outside(piece_id, old_position, new_position);
-            
-            let pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
+        pub fn leave_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.update_position(piece_id, dice_number);
+            self.leave(piece_id, self.old_position, self.new_position);
+        }
 
+        pub fn leave(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            self.update_outside(piece_id, old_position, new_position);
+            let pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
             if pieces.len() == 1 {
                 for piece in pieces {
-                    piece.borrow_mut().not_safe();
+                    piece.borrow_mut().vulnerable();
                 }
             }
         }
 
-        pub fn join_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+        pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.update_position(piece_id, dice_number);
+            self.join(piece_id, self.old_position, self.new_position);
+        }
+
+        pub fn join(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.star_position(old_position, new_position);
             self.update_outside(piece_id, old_position, new_position);
-
             let pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
-            for piece in pieces {
-                piece.borrow_mut().dangerous();
+            if self.is_occupied_by_selves(new_position).1 {
+                for piece in pieces {
+                    piece.borrow_mut().dangerous();
+                }
             }
         }
 
@@ -284,7 +293,7 @@ mod players {
             }
         }
 
-        pub fn starjump_piece (&mut self, piece_id: i8, dice_number: i8) {
+        pub fn starjump_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
             match self.goal_positions(self.old_position, self.new_position) {
                 99 => self.enter_goal(piece_id, self.old_position),
@@ -294,8 +303,8 @@ mod players {
         }
 
         pub fn starjump(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            let new_position = self.star_position(old_position, new_position);
-            self.update_outside(piece_id, old_position, new_position)
+            self.new_position = self.star_position(old_position, new_position);
+            self.update_outside(piece_id, old_position, self.new_position)
         }
 
         pub fn enter_globe(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
@@ -319,7 +328,7 @@ mod players {
         pub fn update_outside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.circumvent_player_0(old_position, new_position);
             self.piece(piece_id).borrow_mut().set_position(new_position);
-            self.piece(piece_id).borrow_mut().not_safe();
+            self.piece(piece_id).borrow_mut().vulnerable();
             self.board().borrow_mut().update_outside(
                 self.id(),
                 piece_id,
@@ -529,20 +538,20 @@ mod players {
         //         .reverse()
         // }
 
-        // pub fn generate_action_and_piece_id_vector(
-        //     &mut self,
-        //     dice_number: i8,
-        //     action: Act,
-        // ) -> Vec<(Act, i8)> {
-        //     let mut action_vector: Vec<(Act, i8)> = Vec::new();
-        //     for idx in 0..4 {
-        //         let reaction = self.valid_choices(idx, dice_number, action);
-        //         if reaction != Act::Nothing {
-        //             action_vector.push((reaction, idx));
-        //         }
-        //     }
-        //     action_vector
-        // }
+        pub fn generate_action_vector(
+            &mut self,
+            dice_number: i8,
+            act: Act,
+        ) -> Vec<(Act, i8, i8)> {
+            let mut action_vector: Vec<(Act, i8, i8)> = Vec::new();
+            for idx in 0..4 {
+                let action = self.valid_choices(idx, dice_number, act);
+                if action != Act::Nothing {
+                    action_vector.push((action, idx, self.new_position));
+                }
+            }
+            action_vector
+        }
 
         pub fn valid_choices(&mut self, piece_id: i8, dice_number: i8, action: Act) -> Act {
             match action {
@@ -572,7 +581,7 @@ mod players {
         pub fn try_to_starjump(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_star = self.board().borrow_mut().is_star(self.new_position);
-            let is_occupied = self.is_occupied_or_more(self.new_position, self.new_position).0;
+            let is_occupied = self.is_occupied_or_more(self.new_position).0;
             let is_star_occupied = self.is_star_occupied_by_selves().0;
             if is_star && !(is_occupied || is_star_occupied) {
                 return Act::Starjump;
@@ -608,14 +617,13 @@ mod players {
 
         fn is_occupied_or_more(
             &mut self,
-            occupying_position: i8,
-            multi_occupying_position: i8,
+            position: i8,
         ) -> (bool, bool) {
             let is_occupied_more = self
                 .board()
                 .borrow_mut()
-                .is_occupied_more(multi_occupying_position);
-            let is_occupied = self.board().borrow_mut().is_occupied(occupying_position);
+                .is_occupied_more(position);
+            let is_occupied = self.board().borrow_mut().is_occupied(position);
             (is_occupied, is_occupied_more)
         }
 
@@ -739,6 +747,23 @@ mod players {
                     (occupied_by_other_star, occupied_by_other_more_star)
                 }
                 _ => (false, false),
+            }
+        }
+
+        pub fn get_heuristics(&mut self, piece_id: i8) -> i8{
+            if self.piece(piece_id).borrow_mut().is_home() {
+                return 57
+            }
+            if self.piece(piece_id).borrow_mut().is_goal() {
+                return 0
+            }
+            let position = self.piece(piece_id).borrow_mut().position();
+            match (self.id, position) {
+                (0, 51..=55) => 57 - position,
+                (1, _)  => 69 - position,
+                (2, _) =>  82 - position,
+                (3, _) =>  95 - position,
+                _ => 56 - position,
             }
         }
 
