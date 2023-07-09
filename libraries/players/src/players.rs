@@ -234,7 +234,12 @@ mod players {
                 // (1, 6..=11, 12..=17) => self.enter_inside(piece_id, self.old_position, self.new_position),
                 // (2, 62..=66, 62..=72) => self.enter_inside(piece_id, self.old_position, self.new_position),
                 // (3, 67..=71, 67..=77) => self.enter_inside(piece_id, self.old_position, self.new_position),
-                _ => self.enter_globe(piece_id, self.old_position, self.new_position),
+                _ => {
+                    if !self.board().borrow_mut().is_globe(self.new_position) {
+                        panic!("New position is not a Globe!");	
+                    };
+                    self.enter_globe(piece_id, self.old_position, self.new_position);
+                },
             };
         }
 
@@ -279,15 +284,21 @@ mod players {
             }
         }
 
+        pub fn starjump_piece (&mut self, piece_id: i8, dice_number: i8) {
+            self.update_position(piece_id, dice_number);
+            match self.goal_positions(self.old_position, self.new_position) {
+                99 => self.enter_goal(piece_id, self.old_position),
+                _ => self.starjump(piece_id, self.old_position, self.new_position),
+            };
+            
+        }
+
         pub fn starjump(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.star_position(old_position, new_position);
             self.update_outside(piece_id, old_position, new_position)
         }
 
         pub fn enter_globe(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            if !self.board().borrow_mut().is_globe(new_position) {
-                panic!("New position is not a Globe!");	
-            }
             self.piece(piece_id).borrow_mut().set_position(new_position);
             self.piece(piece_id).borrow_mut().dangerous();
             self.board().borrow_mut().update_outside(
@@ -297,13 +308,6 @@ mod players {
                 new_position,
             );
         }
-
-        // pub fn try_update_outside(
-        //     &mut self,
-        //     piece_id: i8,
-        // ) {
-        //     // self.update_outside(piece_id);
-        // }
 
         pub fn circumvent_player_0(&mut self, old_position: i8, new_position: i8) -> i8 {
             match (self.id(), old_position, new_position) {
@@ -456,9 +460,11 @@ mod players {
             self.turn = true;
         }
 
-        // pub fn can_continue(&mut self) {
-        //     self.turn = self.dice.clone().unwrap().borrow_mut().get_value() == 6;
-        // }
+        pub fn can_continue(&mut self) {
+            if let Some(dice) = &mut self.dice {
+                self.turn = dice.get_value() == 6;
+            }
+        }
 
         pub fn valid_moves(&mut self, piece_id: i8, dice: i8) -> bool {
             if piece_id > 3 {

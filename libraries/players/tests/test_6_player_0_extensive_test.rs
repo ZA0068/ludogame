@@ -114,7 +114,7 @@ mod player_0_tests {
         let vec = (52..=57).chain((52..57).rev()).collect::<Vec<_>>();
         for i in 52..62 {
             let oldpos = player.piece(piece_id).borrow().position();
-            if (i + 1) % 57 == 0 {
+            if (i + 1) == 57 {
                 continue;
             }
 
@@ -171,7 +171,7 @@ mod player_0_tests {
         player.enter_goal(piece_id, 56);
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
     }
-    
+
     #[test]
     fn move_all_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -428,22 +428,72 @@ mod player_0_tests {
         }
     }
 
+    #[test]
+    fn starjump_test () {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+        let piece_id = 0;
 
-    // #[test]
-    // fn starjump_test () {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
+        player.free_piece(piece_id);
+        player.starjump_piece(piece_id, 5);
+        assert_eq!(player.piece(piece_id).borrow().position(), 11);
+        assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 1);
 
-    //     let piece_id = 0;
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 44);
-    //     player.win_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //     assert!(player.piece(piece_id).borrow().is_goal());
-    //     assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
-    //     assert!(player.is_finished());
-    //     board.borrow_mut().reset();
-    // }
+        player.update_piece(piece_id, 11, 10);
+        player.starjump_piece(piece_id, 1);
+        assert_eq!(player.piece(piece_id).borrow().position(), 18);
+        assert_eq!(player.board().borrow_mut().outside(18).pieces.len(), 1);
+    }
+
+    #[test]
+    fn starjump_test_2 () {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+        let starvec = vec![5, 11, 18, 24, 31, 37, 44, 50];
+        let piece_id = 0;
+
+        player.free_piece(piece_id);
+        player.starjump_piece(piece_id, 5);
+        assert_eq!(player.piece(piece_id).borrow().position(), 11);
+        assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 1);
+
+        (1..7).for_each(|i| {
+            
+            player.update_piece(piece_id, starvec[i], starvec[i] - 1);
+            player.starjump_piece(piece_id, 1);
+            
+            assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
+            assert_eq!(player.board().borrow_mut().outside(starvec[i + 1]).pieces.len(), 1);
+        });
+    }
+
+    #[test]
+    fn starjump_test_3 () {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+        let starvec = vec![5, 11, 18, 24, 31, 37, 44, 50];
+
+        for piece_id in 0..4 {
+            player.free_piece(piece_id);
+            player.starjump_piece(piece_id, 5);
+            assert_eq!(player.piece(piece_id).borrow().position(), 11);
+
+            (1..7).for_each(|i| {
+                player.update_piece(piece_id, starvec[i], starvec[i] - 1);
+                player.starjump_piece(piece_id, 1);
+            
+                assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
+            });
+
+            player.update_piece(piece_id, starvec[7], starvec[7] - 1);
+            player.starjump_piece(piece_id, 1);
+            assert_eq!(player.piece(piece_id).borrow().position(), 99);
+            assert!(player.piece(piece_id).borrow().is_goal());
+        }
+        assert!(player.is_finished());
+    }
+
+    
 //     #[test]
 //     fn update_piece_by_dice_test() {
 //         let board = Rc::new(RefCell::new(Board::new()));
