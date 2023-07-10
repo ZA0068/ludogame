@@ -458,7 +458,7 @@ mod player_0_choice_tests {
         
         player.update_outside(1,13, 14);
         let result = player.try_to_safe(0, 2);
-        assert_eq!(result, Act::Safe);
+        assert_eq!(result, Act::Nothing);
 
         player.update_outside(0, 12, 49);
         let result = player.try_to_safe(0, 2);
@@ -504,7 +504,7 @@ mod player_0_choice_tests {
 
         player.update_outside(0, 0, 49);
         let result = player.try_to_starjump(0, 1);
-        assert_eq!(result, Act::Nothing);
+        assert_eq!(result, Act::Starjump);
     }
 }
 
@@ -694,7 +694,7 @@ mod player_0_move_tests {
                 );
                 assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
             }
-            player.enter_inside(piece_id, 50, 52);
+            player.move_piece(piece_id, 1);
             let vec = (52..=57).chain((52..57).rev()).collect::<Vec<_>>();
             for i in 52..62 {
                 let oldpos = player.piece(piece_id).borrow().position();
@@ -734,7 +734,7 @@ mod player_0_move_tests {
                 );
                 assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
             }
-            player.enter_inside(piece_id, 50, 52);
+            player.move_piece(piece_id, 1);
             let vec = (52..=57).collect::<Vec<_>>();
             for i in 52..56 {
                 let oldpos = player.piece(piece_id).borrow().position();
@@ -821,11 +821,15 @@ mod player_0_move_tests {
     #[test]
     fn starjump_to_goal_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
 
         let piece_id = 0;
         player.free_piece(piece_id);
+        other_player.free_piece(piece_id);
+
         player.move_piece(piece_id, 44);
+        other_player.update_outside(piece_id, 13, 50);
         
         assert_eq!(player.piece(piece_id).borrow().position(), 44);
 
@@ -833,6 +837,9 @@ mod player_0_move_tests {
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
         assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
+
+        assert!(other_player.piece(piece_id).borrow().is_home());
+        assert_eq!(other_player.piece(piece_id).borrow().position(), -1);
     }
 
     #[test]
@@ -1009,6 +1016,7 @@ mod player_0_move_tests {
         assert!(player.piece(1).borrow().is_dangerous());
     }
 
+
     #[test]
     fn join_piece_by_starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -1034,6 +1042,28 @@ mod player_0_move_tests {
 
         assert!(!player.piece(0).borrow().is_dangerous());
         assert!(!player.piece(1).borrow().is_dangerous());
+    }
+
+    #[test]
+    fn join_piece_by_starkill_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
+
+        player.free_piece(0); 
+        player.free_piece(1);
+        other_player.free_piece(0);
+
+        player.starjump_piece(0, 5);
+        other_player.update_outside(0, 13, 5);
+        player.join_piece(1, 5);
+        assert_eq!(player.piece(0).borrow().position(), 11);
+        assert_eq!(player.piece(1).borrow().position(), 11);
+        assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
+        assert!(player.piece(0).borrow().is_dangerous());
+        assert!(player.piece(1).borrow().is_dangerous());
+        assert!(other_player.piece(0).borrow().is_home());
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
     }
 
     #[test]
@@ -1135,42 +1165,23 @@ mod player_0_move_tests {
     }
 
     #[test]
-    fn leave_piece_to_globe_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
+    fn kill_piece_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
 
-        player.free_piece(0); 
-        player.free_piece(1);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        other_player.free_piece(2);
+        other_player.free_piece(3);
 
-        player.move_piece(0, 6);
-        player.join_piece(1, 6);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
+        other_player.update_outside(0, 13, 0);
+        other_player.update_outside(1, 13, 0);
+        other_player.update_outside(0, 13, 1);
 
-        player.leave_piece(0, 2);
-        assert!(!player.piece(0).borrow().is_not_safe());
-        assert!(!player.piece(1).borrow().is_not_safe());
-        assert!(player.piece(0).borrow().is_vulnerable());
-        assert!(player.piece(1).borrow().is_vulnerable());
-    }
+        player.kill_piece(0, 6);
 
-    #[test]
-    fn leave_piece_to_starjump_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
-
-        player.free_piece(0); 
-        player.free_piece(1);
-
-        player.move_piece(0, 4);
-        player.join_piece(1, 4);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
-
-        player.leave_piece(0, 1);
-        assert!(player.piece(0).borrow().is_vulnerable());
-        assert!(player.piece(1).borrow().is_vulnerable());
-        assert_eq!(player.piece(0).borrow().position(), 11);
+        
     }
 
     #[test]

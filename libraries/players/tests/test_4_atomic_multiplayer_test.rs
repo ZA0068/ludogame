@@ -255,7 +255,7 @@ mod atomic_multiplayers_tests {
         opponent.free_piece(0);
         assert_eq!(opponent.piece(0).borrow().position(), 13);
 
-        opponent.kill_piece(0, 13, 17);
+        opponent.kill(0, 13, 17);
 
         assert_eq!(player.piece(0).borrow().position(), -1);
         assert!(player.piece(0).borrow().is_home());
@@ -362,7 +362,7 @@ mod atomic_multiplayers_tests {
         assert_eq!(player0.piece(piece_1).borrow().position(), 24);
 
         player1.free_piece(piece_0);
-        player1.kill_piece(0, 13, 18);
+        player1.kill_piece(0, 5);
         
 
         assert_eq!(player0.piece(piece_0).borrow().position(), -1);

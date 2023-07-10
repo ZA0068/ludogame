@@ -163,6 +163,7 @@ mod players {
 
         pub fn win_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
+            self.send_other_piece_home(self.new_position);
             match self.goal_positions(self.old_position, self.new_position) {
                 99 => self.enter_goal(piece_id, self.old_position),
                 _ => panic!("New position is not a goal!"),
@@ -171,7 +172,7 @@ mod players {
 
         pub fn send_other_piece_home(&mut self, new_position: i8) {
             let pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
-            if let Some(piece) = pieces.first() {
+            for piece in pieces {
                 let position = piece.borrow().position();
                 piece.borrow_mut().dead();
                 let (other_player_id, other_piece_id) = get_piece_and_player_id(piece);
@@ -179,7 +180,17 @@ mod players {
             }
         }
 
-        pub fn kill_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+        pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
+            if self.piece(piece_id).borrow().is_home() {
+                let invincible_position = self.invincible_positions();
+                self.send_other_piece_home(invincible_position);
+            } else {
+                self.update_position(piece_id, dice_number);
+                self.kill(piece_id, self.old_position, self.new_position);
+            }
+        }
+
+        pub fn kill(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             self.send_other_piece_home(new_position);
             let occupied_starspaces = self.is_star_occupied_by_others(old_position, new_position);
             match occupied_starspaces {
@@ -216,17 +227,6 @@ mod players {
                     }
                 }
             }
-            let new_pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
-            let is_globe = self.board().borrow_mut().is_globe(new_position);
-            if new_pieces.len() == 1 {
-                if let Some(piece) = new_pieces.get(0) {
-                    if is_globe {
-                        piece.borrow_mut().dangerous();
-                    } else {
-                        piece.borrow_mut().vulnerable();
-                    }
-                }
-            }
         }
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -248,10 +248,6 @@ mod players {
                         piece.borrow_mut().dangerous();
                     }
                 }
-            }
-            let pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
-            if pieces.len() > 1 {
-                 self.leave(piece_id, old_position, new_position);
             }
         }
 
@@ -473,7 +469,7 @@ mod players {
                     self.die(piece_id);
                 },
                 ((true, false), (_, true), false, false) => {
-                    self.kill_piece(piece_id, old_position, new_position);
+                    self.kill(piece_id, old_position, new_position);
                 },
                 _ => ()
             }
@@ -611,9 +607,8 @@ mod players {
             let is_star = self.board().borrow_mut().is_star(self.new_position);
             let is_occupied = self.is_occupied_or_more(self.new_position);
             let is_star_occupied = self.is_star_occupied(self.old_position, self.new_position);
-            let is_goalpos = self.goal_positions(self.old_position, self.new_position) == 99;
-            match (is_star, is_occupied.0, is_star_occupied.0, is_goalpos) {
-                (true, false, false, false) => Act::Starjump,
+            match (is_star, is_occupied.0, is_star_occupied.0) {
+                (true, false, false) => Act::Starjump,
                 _ => Act::Nothing,
             }
         }
@@ -622,10 +617,8 @@ mod players {
             self.update_position(piece_id, dice_number);
             let is_globe = self.board().borrow_mut().is_globe(self.new_position);
             let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
-            let is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
-            let is_occupied_by_selves = self.is_occupied_by_selves(self.new_position);
             self.correct_position();
-            if (is_globe & !is_occupied_by_others.0) | (!is_invincible & is_occupied_by_selves.0) | (self.new_position >= 52) {
+            if (is_globe & !is_occupied_by_others.0) | (self.new_position >= 52) {
                 return Act::Safe;
             }
             Act::Nothing
@@ -680,10 +673,10 @@ mod players {
         pub fn try_to_join(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_starpos = self.board().borrow_mut().is_star(self.new_position);
-            let is_self_occupied = self.is_occupied_by_selves(self.new_position).0;
-            let is_star_self_occupied = self.is_star_occupied_by_selves().0;
-            let is_other_occupied = self.is_occupied_by_others(self.new_position).1;
-            match (is_self_occupied, is_starpos, is_star_self_occupied, is_other_occupied) {
+            let is_self_occupied = self.is_occupied_by_selves(self.new_position);
+            let is_star_self_occupied = self.is_star_occupied_by_selves();
+            let is_other_occupied = self.is_occupied_by_others(self.new_position);
+            match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.1) {
                 (true, false, _, _) | (_, _, true, false) => Act::Join,
                 _ => Act::Nothing,
             }
@@ -950,7 +943,7 @@ mod players {
         // }
     }
 
-    fn get_piece_and_player_id(piece: &Rc<RefCell<Piece>>) -> (i8, i8) {
+    fn get_piece_and_player_id(piece: Rc<RefCell<Piece>>) -> (i8, i8) {
         let (other_player_id, other_piece_id) = {
             let piece_borrow = piece.borrow_mut();
             (piece_borrow.color() as i8, piece_borrow.id())
