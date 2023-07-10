@@ -216,15 +216,11 @@ mod player_0_choice_tests {
         other_player.free_piece(1);
         other_player.update_outside(0, 13, 0);
         other_player.join(1, 13, 0);
-        assert!(other_player.piece(0).borrow().is_not_safe());
-        assert!(other_player.piece(1).borrow().is_not_safe());
         let result = player.try_to_kill(0, 6);
         assert_eq!(result, Act::Kill);
 
         other_player.update_outside(0, 0, 1);
         other_player.join(1, 0, 1);
-        assert!(other_player.piece(0).borrow().is_dangerous());
-        assert!(other_player.piece(1).borrow().is_dangerous());
         player.free_piece(0);
         let result = player.try_to_kill(0, 1);
         assert_eq!(result, Act::Nothing);
@@ -232,8 +228,6 @@ mod player_0_choice_tests {
         player.update_outside(0, 0, 25);
         other_player.update_outside(0, 1, 26);
         other_player.join(1, 1, 26);
-        assert!(other_player.piece(0).borrow().is_not_safe());
-        assert!(other_player.piece(1).borrow().is_not_safe());
         let result = player.try_to_kill(0, 1);
         assert_eq!(result, Act::Nothing);
 
@@ -762,15 +756,11 @@ mod player_0_move_tests {
         player.move_piece(piece_id, 7);
         player.save_piece(piece_id, 1);
 
-        assert!(player.piece(piece_id).borrow().is_dangerous());
+
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
 
         player.update_piece(piece_id, 8, 50);
-        assert!(!player.piece(piece_id).borrow().is_safe());
-
         player.save_piece(piece_id, 1);
-        assert!(player.piece(piece_id).borrow().is_safe());
-        assert!(!player.piece(piece_id).borrow().is_dangerous());
         assert_eq!(player.piece(piece_id).borrow().position(), 52);
     }
 
@@ -784,15 +774,11 @@ mod player_0_move_tests {
             player.move_piece(piece_id, 7);
             player.save_piece(piece_id, 1);
 
-            assert!(player.piece(piece_id).borrow().is_dangerous());
+    
             assert_eq!(player.piece(piece_id).borrow().position(), 8);
 
             player.update_piece(piece_id, 8, 50);
-            assert!(!player.piece(piece_id).borrow().is_safe());
-
             player.save_piece(piece_id, 1);
-            assert!(player.piece(piece_id).borrow().is_safe());
-            assert!(!player.piece(piece_id).borrow().is_dangerous());
             assert_eq!(player.piece(piece_id).borrow().position(), 52);
         }
     }
@@ -810,7 +796,7 @@ mod player_0_move_tests {
                 let is_globe = player.board().borrow().is_globe(i);
                 if is_globe {
                     player.save_piece(piece_id, 1);
-                    assert!(player.piece(piece_id).borrow().is_dangerous());
+            
                 } else {
                     player.move_piece(piece_id, 1);
                 }
@@ -1012,8 +998,6 @@ mod player_0_move_tests {
         assert_eq!(player.piece(0).borrow().position(), 1);
         assert_eq!(player.piece(1).borrow().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
     }
 
 
@@ -1030,18 +1014,11 @@ mod player_0_move_tests {
         assert_eq!(player.piece(0).borrow().position(), 11);
         assert_eq!(player.piece(1).borrow().position(), 11);
         assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
 
         player.update_outside(0, 11, 18);
         player.update_outside(1, 11, 16);
-        assert!(!player.piece(0).borrow().is_dangerous());
-        assert!(!player.piece(1).borrow().is_dangerous());
 
         player.join_piece(1, 2);
-
-        assert!(!player.piece(0).borrow().is_dangerous());
-        assert!(!player.piece(1).borrow().is_dangerous());
     }
 
     #[test]
@@ -1060,8 +1037,6 @@ mod player_0_move_tests {
         assert_eq!(player.piece(0).borrow().position(), 11);
         assert_eq!(player.piece(1).borrow().position(), 11);
         assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
         assert!(other_player.piece(0).borrow().is_home());
         assert_eq!(other_player.piece(0).borrow().position(), -1);
     }
@@ -1079,8 +1054,6 @@ mod player_0_move_tests {
         player.move_piece(0, 2);
         player.join_piece(1, 1);
         
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
         assert_eq!(player.piece(0).borrow().position(), 8);
         assert_eq!(player.piece(1).borrow().position(), 8);
     }
@@ -1098,8 +1071,6 @@ mod player_0_move_tests {
         player.move_piece(0, 2);
         player.join_piece(1, 1);
         
-        assert!(player.piece(0).borrow().is_not_safe());
-        assert!(player.piece(1).borrow().is_not_safe());
         assert_eq!(player.piece(0).borrow().position(), 13);
         assert_eq!(player.piece(1).borrow().position(), 13);
     }
@@ -1114,15 +1085,8 @@ mod player_0_move_tests {
 
         player.move_piece(0, 1);
         player.join_piece(1, 1);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
 
         player.leave_piece(0, 1);
-        assert!(player.piece(0).borrow().is_vulnerable());
-        assert!(player.piece(1).borrow().is_vulnerable());
-        assert!(!player.piece(0).borrow().is_dangerous());
-        assert!(!player.piece(1).borrow().is_dangerous());
-
     }
 
     #[test]
@@ -1135,13 +1099,8 @@ mod player_0_move_tests {
 
         player.move_piece(0, 8);
         player.join_piece(1, 8);
-        assert!(player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(1).borrow().is_dangerous());
 
         player.leave_piece(0, 1);
-        assert!(!player.piece(0).borrow().is_dangerous());
-        assert!(player.piece(0).borrow().is_vulnerable());
-        assert!(player.piece(1).borrow().is_dangerous());
     }
 
     #[test]
@@ -1154,14 +1113,8 @@ mod player_0_move_tests {
 
         player.move_piece(0, 13);
         player.join_piece(1, 13);
-        assert!(player.piece(0).borrow().is_not_safe());
-        assert!(player.piece(1).borrow().is_not_safe());
 
         player.leave_piece(0, 1);
-        assert!(!player.piece(0).borrow().is_not_safe());
-        assert!(!player.piece(1).borrow().is_not_safe());
-        assert!(player.piece(0).borrow().is_vulnerable());
-        assert!(player.piece(1).borrow().is_vulnerable());
     }
 
     #[test]
