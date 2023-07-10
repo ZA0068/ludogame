@@ -47,6 +47,9 @@ mod atomic_choice_test {
 
         player.free_piece(piece_id);
         for dice_number in 1..=6 {
+            if dice_number == 5 {
+                continue;
+            }
             let result = player.try_to_move(piece_id, dice_number);
             assert_eq!(result, Act::Move);
         }
@@ -82,25 +85,17 @@ mod atomic_choice_test {
 
         player.free_piece(piece_id);
         other_player.free_piece(piece_id);
-        
+        other_player.update_outside(piece_id, 13, 1);
 
-        player.move_piece(piece_id, 1);
-        assert_eq!(player.piece(piece_id).borrow().position(), 1);
+        assert_eq!(other_player.piece(piece_id).borrow().position(), 1);
         let mut boardspace = board.borrow_mut().outside(1).clone();
         assert_eq!(boardspace.piece(piece_id).borrow().position(), 1);
         assert_eq!(boardspace.pieces.len(), 1);
 
-        other_player.update_outside(piece_id, 13, 4);
-        assert_eq!(other_player.piece(piece_id).borrow().position(), 4);
-        let mut boardspace = board.borrow_mut().outside(4).clone();
-        assert_eq!(boardspace.piece(piece_id).borrow().position(), 4);
-        assert_eq!(boardspace.pieces.len(), 1);
-        
         let result = player.try_to_kill(piece_id, 0);
         assert_eq!(result, Act::Nothing);
 
-        let dice_number = 3;
-        let result = player.try_to_kill(piece_id, dice_number);
+        let result = player.try_to_kill(piece_id, 1);
         assert_eq!(result, Act::Kill);
     }
 

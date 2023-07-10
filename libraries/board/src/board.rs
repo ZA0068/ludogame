@@ -451,10 +451,16 @@ mod board {
             }
 
             pub fn is_occupied_more(&mut self, position: i8) -> bool {
+                if !(0..=51).contains(&position) {
+                    return false;
+                }
                 self.outside(position).pieces.len() > 1
             }
 
             pub fn is_occupied(&mut self, position: i8) -> bool {
+                if !(0..=51).contains(&position) {
+                    return false;
+                }
                 !self.outside(position).pieces.is_empty()
             }
 

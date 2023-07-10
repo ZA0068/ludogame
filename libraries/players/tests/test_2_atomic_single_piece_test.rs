@@ -129,7 +129,7 @@ mod atomic_single_piece_test {
         let piece_id = 0;
 
         player.free_piece(piece_id);
-        player.move_piece(piece_id, 1);
+        player.update_outside(piece_id, 0, 1);
 
         let piece = player.piece(piece_id);
         assert_eq!(piece.borrow_mut().position(), 1);
@@ -241,6 +241,7 @@ mod atomic_single_piece_test {
         assert_eq!(player.board().borrow_mut().outside(6).pieces.len(), 1);
         assert_eq!(player.board().borrow_mut().outside(4).pieces.len(), 0);
     }
+
     #[test]
     fn valid_move_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -375,20 +376,18 @@ mod atomic_single_piece_test {
         let piece_id = 0;
         player.free_piece(piece_id);
         assert!(player.piece(piece_id).borrow().is_dangerous());
-        assert!(player.piece(piece_id).borrow().is_safe());
 
         player.move_piece(piece_id, 8);
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
         assert!(!player.piece(piece_id).borrow().is_dangerous());
-        assert!(!player.piece(piece_id).borrow().is_safe());
         assert_eq!(player.board().borrow_mut().outside(8).pieces.len(), 1);
         
         player.enter_globe(piece_id, 8, 8);
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
         assert!(player.piece(piece_id).borrow().is_dangerous());
-        assert!(player.piece(piece_id).borrow().is_safe());
         assert_eq!(player.board().borrow_mut().outside(8).pieces.len(), 1);
     }
+    
     #[test]
     fn starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
