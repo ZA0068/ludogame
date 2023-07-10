@@ -3,7 +3,7 @@ mod pieces {
     #[derive(PartialEq, Debug, Clone)]
     pub enum State {
         Home,
-        Active,
+        Free,
         Goal,
     }
 
@@ -46,6 +46,10 @@ mod pieces {
             self.state == State::Home
         }
 
+        pub fn is_free(&self) -> bool {
+            self.state == State::Free
+        }
+
         pub fn is_goal(&self) -> bool {
             self.state == State::Goal
         }
@@ -59,15 +63,12 @@ mod pieces {
             self.position = position;
         }
 
-        pub fn free(&mut self) {
-            self.active();
-        }
 
         pub fn dead(&mut self) {
             self.home();
         }
-        pub fn active(&mut self) {
-            self.state = State::Active;
+        pub fn free(&mut self) {
+            self.state = State::Free;
         }
 
         pub fn home(&mut self) {
