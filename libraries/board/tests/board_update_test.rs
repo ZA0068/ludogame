@@ -687,6 +687,7 @@ mod board_update_test {
         let new_position: i8 = 0;
 
         board.home(player_id).piece(piece_id).borrow_mut().free();
+        board.home(player_id).piece(piece_id).borrow_mut().set_position(new_position);
         board.move_from_home(player_id, piece_id, new_position);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
         assert_eq!(
@@ -729,7 +730,7 @@ mod board_update_test {
                 .id(),
             piece_id
         );
-        assert!(!board
+        assert!(board
             .outside(new_position)
             .piece(piece_id)
             .borrow()
