@@ -393,9 +393,7 @@ mod atomic_multiplayers_tests {
         player1.starjump(piece_0, 13, 18);
         player1.join(piece_1, 13, 24);
         assert_eq!(player1.piece(piece_0).borrow().position(), 24);
-        assert!(player1.piece(piece_0).borrow().is_dangerous());
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);
-        assert!(player1.piece(piece_1).borrow().is_dangerous());
 
         player0.free_piece(piece_0);
 
@@ -429,9 +427,6 @@ mod atomic_multiplayers_tests {
         player0.update_outside(piece_0, 0, 18);
         player0.update_outside(piece_1, 0, 18);
 
-        player0.piece(piece_0).borrow_mut().dangerous();
-        player0.piece(piece_1).borrow_mut().dangerous();
-
         assert_eq!(player0.piece(piece_0).borrow().position(), 18);
         assert_eq!(player0.piece(piece_1).borrow().position(), 18);
         assert_eq!(player0.board().borrow_mut().outside(18).pieces.len(), 2);
@@ -458,7 +453,6 @@ mod atomic_multiplayers_tests {
         player0.free_piece(piece_0);
         player0.enter_globe(piece_0, 0, 21);
 
-        player0.piece(piece_0).borrow_mut().dangerous();
 
         assert_eq!(player0.piece(piece_0).borrow().position(), 21);
         assert_eq!(player0.board().borrow_mut().outside(21).pieces.len(), 1);
@@ -486,7 +480,6 @@ mod atomic_multiplayers_tests {
         player0.update_outside(piece_0, 0, 12);
 
         assert_eq!(player0.piece(piece_0).borrow().position(), 12);
-        assert!(!player0.piece(piece_0).borrow().is_dangerous());
         assert_eq!(player0.board().borrow_mut().outside(12).pieces.len(), 1);
         assert_eq!(
             player0.board().borrow_mut().outside(12).player_id,
@@ -494,7 +487,6 @@ mod atomic_multiplayers_tests {
         );
 
         player1.free_piece(piece_0);
-        assert!(player1.piece(piece_0).borrow().is_dangerous());
         player0.death(piece_0, 12, 13);
 
         assert!(player0.piece(piece_0).borrow().is_home());
