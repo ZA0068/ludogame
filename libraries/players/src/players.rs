@@ -609,19 +609,23 @@ mod players {
         pub fn try_to_starjump(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_star = self.board().borrow_mut().is_star(self.new_position);
-            let is_occupied = self.is_occupied_or_more(self.new_position).0;
-            let is_star_occupied = self.is_star_occupied_by_selves().0;
-            if is_star && !(is_occupied || is_star_occupied) {
-                return Act::Starjump;
+            let is_occupied = self.is_occupied_or_more(self.new_position);
+            let is_star_occupied = self.is_star_occupied(self.old_position, self.new_position);
+            let is_goalpos = self.goal_positions(self.old_position, self.new_position) == 99;
+            match (is_star, is_occupied.0, is_star_occupied.0, is_goalpos) {
+                (true, false, false, false) => Act::Starjump,
+                _ => Act::Nothing,
             }
-            Act::Nothing
         }
 
         pub fn try_to_safe(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_globe = self.board().borrow_mut().is_globe(self.new_position);
-            let is_occupied_by_others = self.is_occupied_by_others(self.new_position).0;
-            if is_globe && !is_occupied_by_others {
+            let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
+            let is_occupied_by_selves = self.is_occupied_by_selves(self.new_position);
+            self.correct_position();
+            if (is_globe & !is_occupied_by_others.0) | (!is_invincible & is_occupied_by_selves.0) | (self.new_position >= 52) {
                 return Act::Safe;
             }
             Act::Nothing
@@ -630,10 +634,14 @@ mod players {
         pub fn try_to_leave(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let occupied_by_selves = self.is_occupied_by_selves(self.old_position);
-            if occupied_by_selves.1 {
-                return Act::Leave;
+            let is_occupied = self.is_occupied_or_more(self.new_position);
+            let is_star = self.board().borrow_mut().is_star(self.new_position);
+            let is_globe = self.board().borrow_mut().is_globe(self.new_position);
+
+            match (occupied_by_selves.1, is_star, is_globe, is_occupied.0) {
+                (true, false, false, false) => Act::Leave,
+                _ => Act::Nothing,
             }
-            Act::Nothing
         }
 
         pub fn try_to_move(&mut self, piece_id: i8, dice_number: i8) -> Act {
@@ -753,33 +761,28 @@ mod players {
                                                               .pieces
                                                               .get(0)
                                                               .cloned();
-            let starpos = self.star_position(self.old_position, self.new_position);
-            let other_star_piece = self.board()
-                                                                   .borrow_mut()
-                                                                   .outside(starpos)
-                                                                   .pieces.get(0).cloned();
-            let is_other_piece_vulnerable = other_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
-            let is_other_star_piece_vulnerable = other_star_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
 
+            let is_other_piece_vulnerable = other_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
             let binding = self.piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
 
             let invincible_position = self.invincible_positions();
             let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
-            let is_occupied_by_others = self.is_occupied_by_others(self.new_position).0;
-            let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position).0;
+            let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
 
-            match (is_other_piece_vulnerable, 
-                   is_other_star_piece_vulnerable, 
+            match (is_other_piece_vulnerable,
                    is_home, 
                    is_invincible_occupied_by_others,
-                   is_occupied_by_others,
-                   is_star_occupied_by_others, 
+                   is_occupied_by_others.0,
+                   is_occupied_by_others.1,
+                   is_star_occupied_by_others.0, 
+                   is_star_occupied_by_others.1, 
                    dice_number) {
-                (true, _, false, _, true, false, _) => Act::Kill, 
-                (_, true, false, _, false, true, _) => Act::Kill, 
-                (_, _, true, true, _, _, 6)  => Act::Kill,
+                (true, false, _, true, false, _, false, _) => Act::Kill, 
+                (_, false, _, _, false, true, false, _) => Act::Kill, 
+                (_, true, true, _, _, _, _, 6)  => Act::Kill,
                 _ => Act::Nothing,
             }
         }
