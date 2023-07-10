@@ -184,6 +184,7 @@ mod players {
             if self.piece(piece_id).borrow().is_home() {
                 let invincible_position = self.invincible_positions();
                 self.send_other_piece_home(invincible_position);
+                self.free_piece(piece_id);
             } else {
                 self.update_position(piece_id, dice_number);
                 self.kill(piece_id, self.old_position, self.new_position);
@@ -203,7 +204,7 @@ mod players {
                     self.die(piece_id);
                 }
                 _ => {
-                    self.update_outside(piece_id, old_position, new_position);
+                    self.join(piece_id, old_position, new_position);
                 }
             }
         }
@@ -231,18 +232,18 @@ mod players {
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
-            self.new_position = self.star_position(self.old_position, self.new_position);
             self.join(piece_id, self.old_position, self.new_position);
         }
 
         pub fn join(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
+            let new_position = self.star_position(old_position, new_position);
             self.update_outside(piece_id, old_position, new_position);
-            let pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
-            let is_invincible = self.board().borrow_mut().is_invincible(new_position);
+            let pieces = self.board().borrow_mut().outside(self.new_position).pieces.clone();
+            let is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
             let invincible_position = self.invincible_positions();
             if pieces.len() > 1 {
                 for piece in pieces {
-                    if is_invincible && (new_position != invincible_position){
+                    if is_invincible && (self.new_position != invincible_position){
                         piece.borrow_mut().not_safe();
                     } else {
                         piece.borrow_mut().dangerous();
@@ -773,9 +774,10 @@ mod players {
                    is_star_occupied_by_others.0, 
                    is_star_occupied_by_others.1, 
                    dice_number) {
-                (true, false, _, true, false, _, false, _) => Act::Kill, 
-                (_, false, _, _, false, true, false, _) => Act::Kill, 
-                (_, true, true, _, _, _, _, 6)  => Act::Kill,
+                (true, false, _, true, false, _, false, _) | 
+                (_, false, _, _, false, true, false, _) |
+                (_, false, _, true, false, true, _, _) | 
+                (_, true, true, _, _, _, _, 6) => Act::Kill,
                 _ => Act::Nothing,
             }
         }

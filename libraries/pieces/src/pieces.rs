@@ -3,10 +3,7 @@ mod pieces {
     #[derive(PartialEq, Debug, Clone)]
     pub enum State {
         Home,
-        Safe,
-        Vulnerable,
-        NotSafe,
-        Dangerous,
+        Active,
         Goal,
     }
 
@@ -53,22 +50,6 @@ mod pieces {
             self.state == State::Goal
         }
 
-        pub fn is_vulnerable(&self) -> bool {
-            self.state == State::Vulnerable
-        }
-
-        pub fn is_safe(&self) -> bool {
-            self.state == State::Safe
-        }
-
-        pub fn is_not_safe(&self) -> bool {
-            self.state == State::NotSafe
-        }
-
-        pub fn is_dangerous(&self) -> bool {
-            self.state == State::Dangerous
-        }
-
         pub fn position(&self) -> i8 {
             self.position
         }
@@ -79,31 +60,19 @@ mod pieces {
         }
 
         pub fn free(&mut self) {
-            self.dangerous();
+            self.active();
         }
 
         pub fn dead(&mut self) {
             self.home();
         }
-        pub fn dangerous(&mut self) {
-            self.state = State::Dangerous;
-        }
-
-        pub fn not_safe(&mut self) {
-            self.state = State::NotSafe;
-        }
-
-        pub fn vulnerable(&mut self) {
-            self.state = State::Vulnerable;
+        pub fn active(&mut self) {
+            self.state = State::Active;
         }
 
         pub fn home(&mut self) {
             self.position = -1;
             self.state = State::Home;
-        }
-
-        pub fn safe(&mut self) {
-            self.state = State::Safe;
         }
 
         pub fn goal(&mut self) {

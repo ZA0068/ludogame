@@ -255,7 +255,7 @@ mod player_0_choice_tests {
 
         other_player.join(1, 5, 11);
         let result = player.try_to_kill(0, 5);
-        assert_eq!(result, Act::Nothing);
+        assert_eq!(result, Act::Kill);
 
         other_player.leave(2, 11, 12);
         let result = player.try_to_kill(0, 5);
@@ -1177,11 +1177,65 @@ mod player_0_move_tests {
 
         other_player.update_outside(0, 13, 0);
         other_player.update_outside(1, 13, 0);
-        other_player.update_outside(0, 13, 1);
+        other_player.update_outside(2, 13, 0);
+        other_player.update_outside(3, 13, 1);
 
         player.kill_piece(0, 6);
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
+        assert_eq!(other_player.piece(1).borrow().position(), -1);
+        assert_eq!(other_player.piece(2).borrow().position(), -1);
+        assert!(other_player.piece(0).borrow().is_home());
+        assert!(other_player.piece(1).borrow().is_home());
+        assert!(other_player.piece(2).borrow().is_home());
 
-        
+        player.kill_piece(0, 1);
+        assert_eq!(other_player.piece(3).borrow().position(), -1);
+        assert!(other_player.piece(3).borrow().is_home());
+    }
+   
+    #[test]
+    fn kill_piece_by_starjump_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
+
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        player.free_piece(0);
+
+        other_player.update_outside(0, 13, 5);
+        other_player.update_outside(1, 13, 11);
+
+        player.kill_piece(0, 5);
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
+        assert!(other_player.piece(0).borrow().is_home());
+        assert_eq!(other_player.piece(1).borrow().position(), -1);
+        assert!(other_player.piece(1).borrow().is_home());
+        assert_eq!(player.piece(0).borrow().position(), 11);
+    }
+
+
+    #[test]
+    fn kill_piece_and_join() {
+            let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+            let mut player = Player::new(PLAYER_ID, board.clone());
+            let mut other_player = Player::new(1, board);
+    
+            other_player.free_piece(0);
+            player.free_piece(0);
+            player.free_piece(1);
+    
+            player.starjump_piece(1, 5);
+            other_player.update_outside(0, 13, 5);
+
+            player.kill_piece(0, 5);
+            assert_eq!(other_player.piece(0).borrow().position(), -1);
+            assert!(other_player.piece(0).borrow().is_home());
+
+            assert_eq!(player.piece(0).borrow().position(), 11);
+            assert_eq!(player.piece(1).borrow().position(), 11);
+            
+       
     }
 
     #[test]
