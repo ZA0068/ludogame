@@ -729,7 +729,6 @@ mod players {
 
             match (other_piece_vulnerable, other_star_piece_vulnerable, is_home, is_occupied_by_others, dice_number) {
                 (true, _, false, true, _) | 
-                (true, true, false, true, _) | 
                 (_, _, true, true, 6) => Act::Kill,
                 _ => Act::Nothing,
             }
