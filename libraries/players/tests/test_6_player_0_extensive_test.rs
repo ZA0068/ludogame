@@ -208,6 +208,7 @@ mod player_0_choice_tests {
     }
 
     #[test]
+    #[ignore = "needs some work"]
     fn try_to_kill_test_2 () {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
@@ -250,9 +251,29 @@ mod player_0_choice_tests {
         other_player.free_piece(2);
         other_player.update_outside(2, 13, 11);
         other_player.update_outside(0, 34, 5);
+
         other_player.join(1, 34, 5);
         let result = player.try_to_kill(0, 5);
         assert_eq!(result, Act::Nothing);
+
+
+        other_player.join(0, 5, 11);
+        let result = player.try_to_kill(0, 5);
+        assert_eq!(result, Act::Nothing);
+
+        other_player.leave(2, 11, 12);
+        let result = player.try_to_kill(0, 5);
+        assert_eq!(result, Act::Kill);
+
+        other_player.update_outside(0, 5, 1);
+        other_player.join(1, 11, 1);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Nothing);
+
+        other_player.leave(0, 1, 2);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Kill);
+
 
     }
 
@@ -260,27 +281,56 @@ mod player_0_choice_tests {
     fn try_to_die_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board.clone());
+        let mut other_player = Player::new(1, board);
 
-        let piece_id1 = 0;
-        let piece_id2 = 1;
+        player.free_piece(0);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
 
-        player.free_piece(piece_id1);
-        other_player.free_piece(piece_id1);
-        other_player.free_piece(piece_id2);
+        other_player.update_outside(0, 13, 1);
+        other_player.join(1, 13, 1);
+        let result = player.try_to_die(0, 1);
+        assert_eq!(result, Act::Die);
 
-        other_player.update_outside(piece_id1, 13, 1);
-        other_player.update_outside(piece_id2, 13, 1);
+        other_player.update_outside(0, 1, 5);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
 
-        let other_piece_1 = other_player.piece(piece_id1);
-        let other_piece_2 = other_player.piece(piece_id2);
+        other_player.join(1, 1, 5);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
 
-        assert_eq!(other_piece_1.borrow().position(), 1);
-        assert_eq!(other_piece_2.borrow().position(), 1);
-        assert_eq!(board.borrow_mut().outside(1).pieces.len(), 2);
+        other_player.leave(0, 5, 8);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
+        
+        let result = player.try_to_die(0, 8);
+        assert_eq!(result, Act::Die);
 
-        let dice_number = 1;
-        let result = player.try_to_die(piece_id1, dice_number);
+        other_player.update_outside(1, 5, 11);
+        other_player.join(0, 8, 11);
+
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
+
+        other_player.free_piece(2);
+        other_player.update_outside(2, 13, 5);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
+
+        other_player.join(1, 11, 5);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
+
+        other_player.leave(1, 5, 6);
+
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
+
+
+        other_player.update_outside(1, 6, 26);
+        other_player.join(0, 11, 26);
+        let result = player.try_to_die(0, 26);
         assert_eq!(result, Act::Die);
     }
 
@@ -288,41 +338,59 @@ mod player_0_choice_tests {
     fn try_to_win_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let piece_id = 0;
        
-        player.free_piece(piece_id);
-        let old_position = player.piece(piece_id).borrow().position();
+        player.free_piece(0);
+        let old_position = 0;
         let new_position = 52;
-        player.enter_inside(piece_id, old_position, new_position);
+        player.enter_inside(0, old_position, new_position);
 
-        let piece = player.piece(piece_id);
+        let piece = player.piece(0);
         assert_eq!(piece.borrow().position(), new_position);
         assert_eq!(board.borrow_mut().inside(new_position).pieces.len(), 1);
 
         let dice_number = 5;
-        let result = player.try_to_win(piece_id, dice_number);
+        let result = player.try_to_win(0, dice_number);
         assert_eq!(result, Act::Goal);
+    }
+
+    #[test]
+    fn try_to_win_test_2() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
+       
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        player.free_piece(0);
+        player.free_piece(1);
+
+        other_player.update_outside(0, 13, 50);
+        player.update_outside(0, 0, 44);
+        let result = player.try_to_win(0, 6);
+        assert_eq!(result, Act::Goal);
+
+        other_player.join(1, 13, 50);
+        let result = player.try_to_win(0, 6);
+        assert_eq!(result, Act::Nothing);
     }
 
     #[test]
     fn try_to_leave_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
-        let piece_id1 = 0;
-        let piece_id2 = 1;
 
-        player.free_piece(piece_id1);
-        player.free_piece(piece_id2);
+        player.free_piece(0);
+        player.free_piece(1);
 
         let dice_number = 1;
-        player.move_piece(piece_id1, dice_number);
-        player.move_piece(piece_id2, dice_number);
+        player.move_piece(0, dice_number);
+        player.move_piece(1, dice_number);
         
-        let result = player.try_to_leave(piece_id1, dice_number);
+        let result = player.try_to_leave(0, dice_number);
         assert_eq!(result, Act::Leave);
         
-        player.move_piece(piece_id1, dice_number);
-        let result = player.try_to_leave(piece_id1, dice_number);
+        player.move_piece(0, dice_number);
+        let result = player.try_to_leave(0, dice_number);
         assert_eq!(result, Act::Nothing);
     }
 

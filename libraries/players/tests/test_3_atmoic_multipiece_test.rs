@@ -198,7 +198,7 @@ mod atomic_multipiece_test {
         assert!(!player.piece(0).borrow_mut().is_dangerous());
         assert!(!player.piece(0).borrow_mut().is_safe());
 
-        player.join(1, 0, 5);
+        player.join_piece(1, 5);
         assert_eq!(player.piece(1).borrow_mut().position(), 11);
         assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
         assert_eq!(player.board().borrow_mut().outside(5).pieces.len(), 0);

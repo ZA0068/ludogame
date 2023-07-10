@@ -391,7 +391,7 @@ mod atomic_multiplayers_tests {
         player1.free_piece(piece_0);
         player1.free_piece(piece_1);
         player1.starjump(piece_0, 13, 18);
-        player1.join(piece_1, 13, 18);
+        player1.join(piece_1, 13, 24);
         assert_eq!(player1.piece(piece_0).borrow().position(), 24);
         assert!(player1.piece(piece_0).borrow().is_dangerous());
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);

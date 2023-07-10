@@ -113,7 +113,7 @@ mod atomic_choice_test {
         other_player.free_piece(piece_id2);
 
         other_player.update_outside(piece_id1, 13, 1);
-        other_player.update_outside(piece_id2, 13, 1);
+        other_player.join(piece_id2, 13, 1);
 
         let other_piece_1 = other_player.piece(piece_id1);
         let other_piece_2 = other_player.piece(piece_id2);

@@ -204,10 +204,22 @@ mod players {
 
         pub fn leave(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             self.update_outside(piece_id, old_position, new_position);
-            let pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
             let is_globe = self.board().borrow_mut().is_globe(old_position);
-            if pieces.len() == 1 {
-                if let Some(piece) = pieces.get(0) {
+            let old_pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
+
+            if old_pieces.len() == 1 {
+                if let Some(piece) = old_pieces.get(0) {
+                    if is_globe {
+                        piece.borrow_mut().dangerous();
+                    } else {
+                        piece.borrow_mut().vulnerable();
+                    }
+                }
+            }
+            let new_pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
+            let is_globe = self.board().borrow_mut().is_globe(new_position);
+            if new_pieces.len() == 1 {
+                if let Some(piece) = new_pieces.get(0) {
                     if is_globe {
                         piece.borrow_mut().dangerous();
                     } else {
@@ -219,22 +231,27 @@ mod players {
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
+            self.new_position = self.star_position(self.old_position, self.new_position);
             self.join(piece_id, self.old_position, self.new_position);
         }
 
         pub fn join(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            let new_position = self.star_position(old_position, new_position);
             self.update_outside(piece_id, old_position, new_position);
             let pieces = self.board().borrow_mut().outside(new_position).pieces.clone();
             let is_invincible = self.board().borrow_mut().is_invincible(new_position);
+            let invincible_position = self.invincible_positions();
             if pieces.len() > 1 {
                 for piece in pieces {
-                    if is_invincible {
+                    if is_invincible && (new_position != invincible_position){
                         piece.borrow_mut().not_safe();
                     } else {
                         piece.borrow_mut().dangerous();
                     }
                 }
+            }
+            let pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
+            if pieces.len() > 1 {
+                 self.leave(piece_id, old_position, new_position);
             }
         }
 
@@ -676,10 +693,31 @@ mod players {
             (occupied_by_self, occupied_by_self_more)
         }
 
+        // todo: refactor this function so it checks the piece logic instead of numbers of pieces.
         pub fn try_to_die(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let occupied_by_others = self.is_occupied_by_others(self.new_position);
-            if occupied_by_others.1 {
+            let other_piece = self.board()
+                .borrow_mut()
+                .outside(self.new_position)
+                .pieces
+                .get(0)
+                .cloned();
+            let starpos = self.star_position(self.old_position, self.new_position);
+            let other_star_piece = self.board()
+            .borrow_mut()
+            .outside(starpos)
+            .pieces.get(0).cloned();
+        let is_other_piece_dangerous = other_piece.as_ref().map(|p| p.borrow_mut().is_dangerous()).unwrap_or(false);
+        let is_other_star_piece_dangerous = other_star_piece.as_ref().map(|p| p.borrow_mut().is_dangerous()).unwrap_or(false);
+        
+            let invincible_position = self.invincible_positions();
+            let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
+            let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
+            let is_globepos = self.board().borrow_mut().is_globe(self.new_position);
+
+            if is_occupied_by_others.1 | is_occupied_by_others.0 & is_globepos | is_star_occupied_by_others.1 {
                 return Act::Die;
             }
             Act::Nothing
@@ -699,10 +737,12 @@ mod players {
 
         pub fn try_to_win(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
-            if self.goal_positions(self.old_position, self.new_position) == 99 {
-                return Act::Goal;
+            let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let goalpos =  self.goal_positions(self.old_position, self.new_position);
+            match (is_occupied_by_others.1, goalpos) {
+                (false, 99) => Act::Goal,
+                _ => Act::Nothing,
             }
-            Act::Nothing
         }
 
         pub fn try_to_kill(&mut self, piece_id: i8, dice_number: i8) -> Act {
@@ -718,18 +758,28 @@ mod players {
                                                                    .borrow_mut()
                                                                    .outside(starpos)
                                                                    .pieces.get(0).cloned();
-            let other_piece_vulnerable = other_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
-            let other_star_piece_vulnerable = other_star_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
+            let is_other_piece_vulnerable = other_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
+            let is_other_star_piece_vulnerable = other_star_piece.as_ref().map(|p| p.borrow_mut().is_vulnerable()).unwrap_or(false);
 
             let binding = self.piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
-            let invincible_position = self.invincible_positions();
-            let is_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
 
-            match (other_piece_vulnerable, other_star_piece_vulnerable, is_home, is_occupied_by_others, dice_number) {
-                (true, _, false, true, _) | 
-                (_, _, true, true, 6) => Act::Kill,
+            let invincible_position = self.invincible_positions();
+            let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
+            let is_occupied_by_others = self.is_occupied_by_others(self.new_position).0;
+            let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position).0;
+
+            match (is_other_piece_vulnerable, 
+                   is_other_star_piece_vulnerable, 
+                   is_home, 
+                   is_invincible_occupied_by_others,
+                   is_occupied_by_others,
+                   is_star_occupied_by_others, 
+                   dice_number) {
+                (true, _, false, _, true, false, _) => Act::Kill, 
+                (_, true, false, _, false, true, _) => Act::Kill, 
+                (_, _, true, true, _, _, 6)  => Act::Kill,
                 _ => Act::Nothing,
             }
         }
