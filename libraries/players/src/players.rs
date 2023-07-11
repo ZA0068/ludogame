@@ -1,7 +1,7 @@
 mod players {
     use board::Board;
     use dice::Dice;
-    use pieces::Piece;
+    use pieces::{Piece, Color};
     
     // use std::fmt;
     use std::{cell::RefCell, rc::Rc};
@@ -9,6 +9,7 @@ mod players {
     #[derive(PartialEq, Debug, Clone)]
     pub struct Player {
         id: i8,
+        color: Color,
         turn: bool,
         dice: Option<Dice>,
         board: Rc<RefCell<Board>>,
@@ -16,6 +17,7 @@ mod players {
         pub old_position: i8,
         pub new_position: i8,
     }
+
 
     #[derive(PartialEq, Debug, Copy, Clone)]
     pub enum Act {
@@ -76,10 +78,12 @@ mod players {
             player_id: i8,
             board: Rc<RefCell<Board>>
         ) -> Player {
-            let pieces = Self::init_pieces(board.clone(), player_id);
             let id = player_id;
+            let pieces = Self::init_pieces(board.clone(), player_id);
+            let color = get_color_from_player_id(player_id);
             Player {
                 id,
+                color,
                 turn: false,
                 board,
                 dice: None,
@@ -97,7 +101,7 @@ mod players {
             self.id
         }
 
-        pub fn piece(&self, piece_id: i8) -> Rc<RefCell<Piece>> {
+        pub fn get_piece(&self, piece_id: i8) -> Rc<RefCell<Piece>> {
             if piece_id > 3 {
                 panic!("The highest piece id cannot be higher than 3, else you have more than 4 pieces!");
             }
@@ -181,8 +185,8 @@ mod players {
         }
 
         pub fn kill_piece(&mut self, piece_id: i8, dice_number: i8) {
-            if self.piece(piece_id).borrow().is_home() {
-                let invincible_position = self.invincible_positions();
+            if self.get_piece(piece_id).borrow().is_home() {
+                let invincible_position = self.invincible_positions(self.color);
                 self.send_other_piece_home(invincible_position);
                 self.free_piece(piece_id);
             } else {
@@ -230,7 +234,7 @@ mod players {
             self.update_outside(piece_id, old_position, new_position);
             let pieces = self.board().borrow_mut().outside(self.new_position).pieces.clone();
             let is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
-            let invincible_position = self.invincible_positions();
+            let invincible_position = self.invincible_positions(self.color);
         }
 
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -258,7 +262,7 @@ mod players {
         }
 
         pub fn update_position(&mut self, piece_id: i8, dice_number: i8) {
-            self.old_position = self.piece(piece_id).borrow_mut().position();
+            self.old_position = self.get_piece(piece_id).borrow_mut().position();
             self.new_position = self.old_position + dice_number;
         }
 
@@ -275,7 +279,7 @@ mod players {
 
         pub fn update_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.move_back_if_overshoot(old_position, new_position);
-            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.get_piece(piece_id).borrow_mut().set_position(new_position);
             self.board().borrow_mut().update_inside(
                 self.id(),
                 piece_id,
@@ -313,7 +317,7 @@ mod players {
         }
 
         pub fn enter_globe(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.get_piece(piece_id).borrow_mut().set_position(new_position);
             self.board().borrow_mut().update_outside(
                 self.id(),
                 piece_id,
@@ -331,7 +335,7 @@ mod players {
 
         pub fn update_outside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.circumvent_player_0(old_position, new_position);
-            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.get_piece(piece_id).borrow_mut().set_position(new_position);
             self.board().borrow_mut().update_outside(
                 self.id(),
                 piece_id,
@@ -393,35 +397,35 @@ mod players {
         }
 
         pub fn enter_inside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            self.piece(piece_id).borrow_mut().set_position(new_position);
+            self.get_piece(piece_id).borrow_mut().set_position(new_position);
             self.board()
                 .borrow_mut()
                 .move_inside(self.id(), piece_id, old_position, new_position);
         }
 
         pub fn enter_goal(&mut self, piece_id: i8, old_position: i8) {
-            self.piece(piece_id).borrow_mut().goal();
+            self.get_piece(piece_id).borrow_mut().goal();
             self.board()
                 .borrow_mut()
                 .enter_goal(self.id(), piece_id, old_position);
         }
 
         pub fn free_piece(&mut self, piece_id: i8) {
-            self.new_position = self.invincible_positions();
-            self.piece(piece_id).borrow_mut().free();
-            self.piece(piece_id).borrow_mut().set_position(self.new_position);
+            self.new_position = self.invincible_positions(self.color);
+            self.get_piece(piece_id).borrow_mut().free();
+            self.get_piece(piece_id).borrow_mut().set_position(self.new_position);
             self.board()
                 .borrow_mut()
                 .move_from_home(self.id(), piece_id, self.new_position);
         }
 
-        fn invincible_positions(&mut self) -> i8 {
-            match self.id() {
-                0 => 0,
-                1 => 13,
-                2 => 26,
-                3 => 39,
-                _ => panic!("invalid move!"),
+        fn invincible_positions(&mut self, color: Color) -> i8 {
+            match color {
+                Color::Green => 0,
+                Color::Yellow => 13,
+                Color::Blue => 26,
+                Color::Red => 39,
+                _ => panic!("invalid color!"),
             }
         }
 
@@ -456,8 +460,8 @@ mod players {
         
 
         pub fn die(&mut self, piece_id: i8) {
-            let old_position = self.piece(piece_id).borrow_mut().position();
-            self.piece(piece_id).borrow_mut().dead();
+            let old_position = self.get_piece(piece_id).borrow_mut().position();
+            self.get_piece(piece_id).borrow_mut().dead();
             self.board()
                 .borrow_mut()
                 .move_into_home(self.id(), piece_id, old_position);
@@ -481,7 +485,7 @@ mod players {
             if piece_id > 3 {
                 return false;
             }
-            let binding = self.piece(piece_id);
+            let binding = self.get_piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
             let is_goal = binding.is_goal();
@@ -570,10 +574,10 @@ mod players {
         }
 
         pub fn try_to_free(&mut self, piece_id: i8, dice_number: i8) -> Act {
-            let binding = self.piece(piece_id);
+            let binding = self.get_piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
-            let invincible_position = self.invincible_positions();
+            let invincible_position = self.invincible_positions(self.color);
             let is_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
             match (is_home, is_occupied_by_others, dice_number) {
                 (true, false, 6) => Act::Free,
@@ -618,7 +622,7 @@ mod players {
 
         pub fn try_to_move(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
-            let binding = self.piece(piece_id);
+            let binding = self.get_piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
             let is_goalpos = self.is_goal_position();
@@ -688,7 +692,7 @@ mod players {
             .borrow_mut()
             .outside(starpos)
             .pieces.get(0).cloned();
-            let invincible_position = self.invincible_positions();
+            let invincible_position = self.invincible_positions(self.color);
             let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
             let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
             let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
@@ -724,35 +728,33 @@ mod players {
 
         pub fn try_to_kill(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
-            let other_piece = self.board()
-                                                              .borrow_mut()
-                                                              .outside(self.new_position)
-                                                              .pieces
-                                                              .get(0)
-                                                              .cloned();
+            let other_piece_player_id = self.get_other_player_color();
+            let is_home = self.get_piece(piece_id).borrow().is_home();
+            let invincible_position = self.invincible_positions(other_piece_player_id);
 
-            let binding = self.piece(piece_id);
-            let binding = binding.borrow_mut();
-            let is_home = binding.is_home();
+            let is_invincible_position_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
 
-            let invincible_position = self.invincible_positions();
-            let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
-            let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
-            let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
+            let is_new_position_occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let is_star_position_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
 
             match (is_home, 
-                   is_invincible_occupied_by_others,
-                   is_occupied_by_others.0,
-                   is_occupied_by_others.1,
-                   is_star_occupied_by_others.0, 
-                   is_star_occupied_by_others.1, 
+                   is_invincible_position_occupied_by_others,
+                   is_new_position_occupied_by_others.0,
+                   is_new_position_occupied_by_others.1,
+                   is_star_position_occupied_by_others.0, 
+                   is_star_position_occupied_by_others.1, 
                    dice_number) {
                 (false, _, true, false, _, false, _) | 
                 (false, _, _, false, true, false, _) |
                 (false, _, true, false, true, _, _) | 
                 (true, true, _, _, _, _, 6) => Act::Kill,
+                (false, true, true, _, _, _, _) => Act::Nothing,
                 _ => Act::Nothing,
             }
+        }
+
+        fn get_other_player_color(&mut self) -> Color {
+            self.board().borrow_mut().outside(self.new_position).pieces[0].borrow().color()
         }
 
         pub fn is_star_occupied_by_selves(
@@ -816,13 +818,13 @@ mod players {
         }
 
         pub fn get_heuristics(&mut self, piece_id: i8) -> i8{
-            if self.piece(piece_id).borrow_mut().is_home() {
+            if self.get_piece(piece_id).borrow_mut().is_home() {
                 return 57
             }
-            if self.piece(piece_id).borrow_mut().is_goal() {
+            if self.get_piece(piece_id).borrow_mut().is_goal() {
                 return 0
             }
-            let position = self.piece(piece_id).borrow_mut().position();
+            let position = self.get_piece(piece_id).borrow_mut().position();
             match (self.id, position) {
                 (0, 51..=55) => 57 - position,
                 (1, _)  => 69 - position,
@@ -916,6 +918,16 @@ mod players {
         //         .choose(&mut rand::thread_rng())
         //         .unwrap_or(&(Act::Nothing, 0))
         // }
+    }
+
+    fn get_color_from_player_id(player_id: i8) -> Color {
+        match player_id {
+            0 => Color::Green,
+            1 => Color::Yellow,
+            2 => Color::Blue,
+            3 => Color::Red,
+            _ => panic!("invalid player id!"),
+        }
     }
 
     fn get_piece_and_player_id(piece: Rc<RefCell<Piece>>) -> (i8, i8) {

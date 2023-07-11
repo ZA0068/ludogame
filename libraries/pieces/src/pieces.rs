@@ -7,8 +7,7 @@ mod pieces {
         Goal,
     }
 
-    #[derive(PartialEq, Debug, Clone)]
-
+    #[derive(PartialEq, Debug, Clone, Copy)]
     pub enum Color {
         Green,
         Yellow,

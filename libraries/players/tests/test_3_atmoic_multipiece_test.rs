@@ -16,9 +16,9 @@ mod atomic_multipiece_test {
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
-            assert!(!player.piece(piece_id).borrow_mut().is_home());
-            assert!(player.piece(piece_id).borrow_mut().is_free());
-            assert_eq!(player.piece(piece_id).borrow_mut().position(), 0);
+            assert!(!player.get_piece(piece_id).borrow_mut().is_home());
+            assert!(player.get_piece(piece_id).borrow_mut().is_free());
+            assert_eq!(player.get_piece(piece_id).borrow_mut().position(), 0);
         }
         assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 0);
         assert_eq!(player.board().borrow_mut().outside(0).pieces.len(), 4);
@@ -35,27 +35,27 @@ mod atomic_multipiece_test {
         player.update_outside(0, 0, 1);
         player.update_outside(1, 0, 1);
 
-        assert_eq!(player.piece(0).borrow_mut().position(), 1);
-        assert_eq!(player.piece(1).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(0).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
         
-        assert!(player.piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
         
-        assert_eq!(player.piece(0).borrow_mut().color(), pieces::Color::Green);
-        assert_eq!(player.piece(1).borrow_mut().color(), pieces::Color::Green);
+        assert_eq!(player.get_piece(0).borrow_mut().color(), pieces::Color::Green);
+        assert_eq!(player.get_piece(1).borrow_mut().color(), pieces::Color::Green);
 
         player.update_outside(1, 1, 0);
         player.join(1, 0, 1);
 
-        assert_eq!(player.piece(0).borrow_mut().position(), 1);
-        assert_eq!(player.piece(1).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(0).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
         
-        assert!(player.piece(0).borrow_mut().is_free());
-        assert!(player.piece(1).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(1).borrow_mut().is_free());
         
-        assert_eq!(player.piece(0).borrow_mut().color(), pieces::Color::Green);
-        assert_eq!(player.piece(1).borrow_mut().color(), pieces::Color::Green);
+        assert_eq!(player.get_piece(0).borrow_mut().color(), pieces::Color::Green);
+        assert_eq!(player.get_piece(1).borrow_mut().color(), pieces::Color::Green);
     }
 
     #[test]
@@ -69,19 +69,19 @@ mod atomic_multipiece_test {
         player.update_outside(0, 0, 1);
         player.join(1, 0, 1);
 
-        assert_eq!(player.piece(0).borrow_mut().position(), 1);
-        assert_eq!(player.piece(1).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(0).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
-        assert!(player.piece(0).borrow_mut().is_free());
-        assert!(player.piece(1).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(1).borrow_mut().is_free());
 
         player.leave(0, 1, 2);
-        assert_eq!(player.piece(0).borrow_mut().position(), 2);
-        assert_eq!(player.piece(1).borrow_mut().position(), 1);
+        assert_eq!(player.get_piece(0).borrow_mut().position(), 2);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(2).pieces.len(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 1);
-        assert!(player.piece(0).borrow_mut().is_free());
-        assert!(player.piece(1).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(1).borrow_mut().is_free());
     }
 
     #[test]
@@ -99,27 +99,27 @@ mod atomic_multipiece_test {
         player.join(2, 0, 6);
         player.join(3, 0, 6);
 
-        assert_eq!(player.piece(0).borrow().position(), 6);
-        assert_eq!(player.piece(1).borrow_mut().position(), 6);
-        assert_eq!(player.piece(2).borrow_mut().position(), 6);
-        assert_eq!(player.piece(3).borrow_mut().position(), 6);
+        assert_eq!(player.get_piece(0).borrow().position(), 6);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 6);
+        assert_eq!(player.get_piece(2).borrow_mut().position(), 6);
+        assert_eq!(player.get_piece(3).borrow_mut().position(), 6);
 
-        assert!(player.piece(0).borrow_mut().is_free());
-        assert!(player.piece(1).borrow_mut().is_free());
-        assert!(player.piece(2).borrow_mut().is_free());
-        assert!(player.piece(3).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(1).borrow_mut().is_free());
+        assert!(player.get_piece(2).borrow_mut().is_free());
+        assert!(player.get_piece(3).borrow_mut().is_free());
 
         player.leave(0, 6, 7);
-        assert_eq!(player.piece(0).borrow().position(), 7);
-        assert!(player.piece(3).borrow_mut().is_free());
+        assert_eq!(player.get_piece(0).borrow().position(), 7);
+        assert!(player.get_piece(3).borrow_mut().is_free());
 
         player.leave(1, 6, 9);
-        assert_eq!(player.piece(1).borrow_mut().position(), 9);
-        assert!(player.piece(1).borrow_mut().is_free());
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 9);
+        assert!(player.get_piece(1).borrow_mut().is_free());
 
         player.leave(2, 6, 10);
-        assert_eq!(player.piece(2).borrow_mut().position(), 10);
-        assert!(player.piece(2).borrow_mut().is_free());
+        assert_eq!(player.get_piece(2).borrow_mut().position(), 10);
+        assert!(player.get_piece(2).borrow_mut().is_free());
     }
 
     #[test]
@@ -137,10 +137,10 @@ mod atomic_multipiece_test {
         player.enter_goal(2, 0);
         player.enter_goal(3, 0);
 
-        assert!(player.piece(0).borrow_mut().is_goal());
-        assert!(player.piece(1).borrow_mut().is_goal());
-        assert!(player.piece(2).borrow_mut().is_goal());
-        assert!(player.piece(3).borrow_mut().is_goal());
+        assert!(player.get_piece(0).borrow_mut().is_goal());
+        assert!(player.get_piece(1).borrow_mut().is_goal());
+        assert!(player.get_piece(2).borrow_mut().is_goal());
+        assert!(player.get_piece(3).borrow_mut().is_goal());
         assert!(player
             .board()
             .borrow_mut()
@@ -181,11 +181,11 @@ mod atomic_multipiece_test {
         player.free_piece(1);
 
         player.starjump(0, 0, 5);
-        assert_eq!(player.piece(0).borrow_mut().position(), 11);
-        assert!(player.piece(0).borrow_mut().is_free());
+        assert_eq!(player.get_piece(0).borrow_mut().position(), 11);
+        assert!(player.get_piece(0).borrow_mut().is_free());
 
         player.join_piece(1, 5);
-        assert_eq!(player.piece(1).borrow_mut().position(), 11);
+        assert_eq!(player.get_piece(1).borrow_mut().position(), 11);
         assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
         assert_eq!(player.board().borrow_mut().outside(5).pieces.len(), 0);
         assert_eq!(player.board().borrow_mut().outside(5).player_id, None);
@@ -223,7 +223,7 @@ mod atomic_multipiece_test {
             .piece(1)
             .borrow_mut()
             .is_free());
-        assert!(player.piece(0).borrow_mut().is_free());
-        assert!(player.piece(1).borrow_mut().is_free());
+        assert!(player.get_piece(0).borrow_mut().is_free());
+        assert!(player.get_piece(1).borrow_mut().is_free());
     }
 }
