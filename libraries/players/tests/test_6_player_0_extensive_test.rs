@@ -5,7 +5,7 @@ use players::{Player, Act};
 use std::{cell::RefCell, rc::Rc};
 
 static PLAYER_ID: i8 = 0;
-
+static OTHER_PLAYER_ID: i8 = 1;
 
 #[cfg(test)]
 mod player_0_choice_tests {
@@ -15,7 +15,7 @@ mod player_0_choice_tests {
     fn try_to_free_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         let result = player.try_to_free(0, 6);
         assert_eq!(result, Act::Free);
@@ -68,7 +68,7 @@ mod player_0_choice_tests {
     fn try_to_move_test_2() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -139,7 +139,7 @@ mod player_0_choice_tests {
     fn try_to_join_test_2() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         let result = player.try_to_join(0, 1);
         assert_eq!(result, Act::Nothing);
@@ -166,7 +166,7 @@ mod player_0_choice_tests {
     fn try_to_kill_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -203,7 +203,7 @@ mod player_0_choice_tests {
     fn try_to_kill_test_2 () {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -262,7 +262,7 @@ mod player_0_choice_tests {
     fn try_to_die_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         player.free_piece(0);
         other_player.free_piece(0);
@@ -346,7 +346,7 @@ mod player_0_choice_tests {
     fn try_to_win_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
        
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -413,7 +413,7 @@ mod player_0_choice_tests {
     fn try_to_leave_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -464,7 +464,7 @@ mod player_0_choice_tests {
     fn try_to_safe_test_2(){
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         player.free_piece(0);
         other_player.free_piece(0);
@@ -478,7 +478,7 @@ mod player_0_choice_tests {
     fn try_to_starjump_test(){
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
         
 
         player.free_piece(0);
@@ -808,7 +808,7 @@ mod player_0_move_tests {
     fn starjump_to_goal_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         let piece_id = 0;
         player.free_piece(piece_id);
@@ -1101,7 +1101,7 @@ mod player_0_move_tests {
     fn kill_piece_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -1130,7 +1130,7 @@ mod player_0_move_tests {
     fn kill_piece_by_starjump_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut other_player = Player::new(1, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -1152,7 +1152,7 @@ mod player_0_move_tests {
     fn kill_piece_and_join() {
             let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
             let mut player = Player::new(PLAYER_ID, board.clone());
-            let mut other_player = Player::new(1, board);
+            let mut other_player = Player::new(OTHER_PLAYER_ID, board);
     
             other_player.free_piece(0);
             player.free_piece(0);
@@ -1455,6 +1455,7 @@ mod player_0_valid_choices_tests {
 
         let mut result = player.valid_choices(0, 0, Act::Free);
         assert_eq!(result, Act::Nothing);
+
         assert!(player.piece(0).borrow().is_home());
         assert!(player.piece(1).borrow().is_home());
         assert!(player.piece(2).borrow().is_home());
@@ -1639,12 +1640,58 @@ mod player_0_valid_choices_tests {
         result = player.valid_choices(2, 4, Act::Join);
         assert_eq!(result, Act::Nothing);
 
-        result = player.valid_choices(2, 4, Act::Safe);
+        result = player.valid_choices(3, 4, Act::Safe);
         assert_eq!(result, Act::Safe);
 
         result = player.valid_choices(2, 4, Act::Move);
         assert_eq!(result, Act::Move);
+        player.save_piece(3, 4);
+        player.move_piece(2, 4);
 
+        result = player.valid_choices(2, 4, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 4, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 4, Act::Move);
+        assert_eq!(result, Act::Move);
+        player.move_piece(2, 4);
+
+        result = player.valid_choices(0, 6, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 6, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Move);
+        player.move_piece(0, 6);
+
+        result = player.valid_choices(3, 5, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(3, 5, Act::Goal);
+        assert_eq!(result, Act::Goal);
+        player.win_piece(3, 5);
+
+        result = player.valid_choices(0, 1, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Goal);
+        assert_eq!(result, Act::Goal);
+        player.win_piece(2, 1);
+        player.win_piece(0, 1);
+
+        assert!(player.is_finished());
     }
 
+    #[test]
+    fn valid_choice_test_3() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut player = Player::new(OTHER_PLAYER_ID, board);
+
+        let mut result: Act;
+    }
 }
