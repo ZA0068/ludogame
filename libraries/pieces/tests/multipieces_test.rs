@@ -22,7 +22,7 @@ mod pieces_test {
         let colors = vec![Color::Red, Color::Blue, Color::Yellow, Color::Green];
         for color in colors.iter() {
             for i in 0..4 {
-                let piece = Piece::new(i, color.clone());
+                let piece = Piece::new(i, *color);
                 assert_eq!(piece.id(), i);
                 assert!(piece.is_home());
                 assert!(!piece.is_goal());
