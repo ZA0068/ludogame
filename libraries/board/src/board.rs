@@ -556,7 +556,7 @@ mod board {
     fn create_vector_of_pieces(color: Color) -> Vec<Rc<RefCell<Piece>>> {
         let mut pieces = Vec::default();
         for i in 0..4 {
-            pieces.push(Rc::new(RefCell::new(Piece::new(i, color.clone()))));
+            pieces.push(Rc::new(RefCell::new(Piece::new(i, color))));
         }
         pieces
     }

@@ -923,14 +923,13 @@ mod players {
     }
 
     fn get_color_from_player_id(player_id: i8) -> Color {
-        let color = match player_id {
+       match player_id {
             0 => Color::Green,
             1 => Color::Yellow,
             2 => Color::Blue,
             3 => Color::Red,
             _ => panic!("invalid player id!"),
-        };
-        color
+        }
     }
 
     fn get_piece_and_player_id(piece: Rc<RefCell<Piece>>) -> (i8, i8) {
