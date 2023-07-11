@@ -1464,12 +1464,9 @@ mod player_0_valid_choices_tests {
         (0..4).for_each(|i| {
             result = player.valid_choices(i, 6, Act::Free);
             assert_eq!(result, Act::Free);
+            player.free_piece(i);
         });
         
-        player.free_piece(0);
-        player.free_piece(1);
-        player.free_piece(2);
-        player.free_piece(3);
         assert!(player.piece(0).borrow().is_free());
         assert!(player.piece(1).borrow().is_free());
         assert!(player.piece(2).borrow().is_free());
@@ -1690,8 +1687,211 @@ mod player_0_valid_choices_tests {
     fn valid_choice_test_3() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
-        let mut player = Player::new(OTHER_PLAYER_ID, board);
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
         let mut result: Act;
+
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        other_player.free_piece(2);
+        other_player.free_piece(3);
+
+        result = player.valid_choices(0, 6, Act::Free);
+        assert_eq!(result, Act::Free);
+
+        other_player.update_piece(0, 13, 0);
+        
+        result = player.valid_choices(0, 6, Act::Free);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 6, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        other_player.update_piece(1, 13, 0);
+        
+        result = player.valid_choices(0, 6, Act::Die);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 6, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        other_player.move_piece(0, 1);
+        other_player.move_piece(1, 1);
+        
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+
+        result = player.valid_choices(0, 1, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        other_player.move_piece(0, 1);
+
+        result = player.valid_choices(0, 1, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        result = player.valid_choices(0, 1, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Die);
+        assert_eq!(result, Act::Nothing);
+
+        other_player.move_piece(0, 3);
+
+        result = player.valid_choices(0, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        player.update_outside(1, 0, 11);
+        
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        other_player.update_piece(1, 1, 5);
+
+        result = player.valid_choices(0, 5, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        player.move_piece(1, 1);
+        other_player.update_outside(2, 13, 11);
+
+        result = player.valid_choices(0, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        other_player.update_outside(1, 5, 11);
+
+        result = player.valid_choices(0, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        player.leave_piece(0, 6);
+        other_player.enter_globe(0, 5, 8);
+
+        result = player.valid_choices(0, 2, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        other_player.move_piece(0, 1);
+
+        player.save_piece(0, 2);
+        player.enter_globe(2, 0, 8);
+        player.move_piece(1, 2);
+
+        other_player.update_outside(1, 11, 12);
+        other_player.update_outside(2, 11, 12);
+
+        result = player.valid_choices(0, 4, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        result = player.valid_choices(0, 5, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        other_player.update_outside(1, 12, 26);
+        other_player.update_outside(2, 12, 25);
+
+        player.update_outside(0, 8, 24);
+
+        result = player.valid_choices(0, 2, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        result = player.valid_choices(0, 2, Act::Die);
+        assert_eq!(result, Act::Nothing);
+
+        other_player.move_piece(2, 1);
+
+        result = player.valid_choices(0, 2, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Die);
+        assert_eq!(result, Act::Die);
+
+        other_player.update_outside(1, 26, 50);
+        player.update_outside(0, 24, 43);
+
+        result = player.valid_choices(0, 1, Act::Kill);
+        assert_eq!(result, Act::Kill);
+
+        result = player.valid_choices(0, 1, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        player.update_outside(1, 14, 45);
+
+        result = player.valid_choices(1, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 5, Act::Goal);
+        assert_eq!(result, Act::Goal);
+        
+        player.win_piece(1, 5);
+        assert_eq!(player.piece(1).borrow().position(), 99);
+        assert!(player.piece(1).borrow().is_goal());
+        assert_eq!(other_player.piece(1).borrow().position(), -1);
+        assert!(other_player.piece(1).borrow().is_home());
+
+        other_player.update_outside(2, 26, 50);
+        player.move_piece(0, 6);
+
+        result = player.valid_choices(0, 1, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Goal);
+        assert_eq!(result, Act::Goal);
+
+        result = player.valid_choices(0, 1, Act::Kill);
+        assert_eq!(result, Act::Kill);
+        player.kill_piece(0, 1);
+        
+        assert_eq!(player.piece(0).borrow().position(), 99);
+        assert!(player.piece(0).borrow().is_goal());
+        
+        assert_eq!(other_player.piece(1).borrow().position(), -1);
+        assert!(other_player.piece(1).borrow().is_home());
+
     }
+
 }

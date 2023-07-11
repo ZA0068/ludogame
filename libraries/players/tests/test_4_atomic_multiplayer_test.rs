@@ -399,7 +399,7 @@ mod atomic_multiplayers_tests {
 
         player0.update_outside(piece_0, 0, 17);
 
-        player0.death(piece_0, 17, 18);
+        player0.die(piece_0);
 
         assert_eq!(player1.piece(piece_0).borrow().position(), 24);
         assert_eq!(player1.piece(piece_1).borrow().position(), 24);
@@ -436,7 +436,7 @@ mod atomic_multiplayers_tests {
         );
 
         player1.free_piece(piece_0);
-        player1.death(piece_0, 13, 18);
+        player1.die(piece_0);
 
         assert!(player1.piece(piece_0).borrow().is_home());
         assert_eq!(player1.piece(piece_0).borrow().position(), -1);
@@ -462,7 +462,7 @@ mod atomic_multiplayers_tests {
         );
 
         player1.free_piece(piece_0);
-        player1.death(piece_0, 13, 21);
+        player1.die(piece_0);
 
         assert!(player1.piece(piece_0).borrow().is_home());
         assert_eq!(player1.piece(piece_0).borrow().position(), -1);
@@ -487,7 +487,7 @@ mod atomic_multiplayers_tests {
         );
 
         player1.free_piece(piece_0);
-        player0.death(piece_0, 12, 13);
+        player0.die(piece_0);
 
         assert!(player0.piece(piece_0).borrow().is_home());
         assert_eq!(player0.piece(piece_0).borrow().position(), -1);

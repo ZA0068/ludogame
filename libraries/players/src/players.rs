@@ -201,6 +201,9 @@ mod players {
             } else {
                 self.update_position(piece_id, dice_number);
                 self.kill(piece_id, self.old_position, self.new_position);
+                if self.is_goal_position() {
+                    self.enter_goal(piece_id, self.new_position);
+                }
             }
         }
 
@@ -440,28 +443,7 @@ mod players {
             } else {
                 0
             }
-        }
-
-        pub fn death(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            let (occupied_outside_spaces, occupied_starspaces) = 
-                (self.is_occupied_by_others(new_position), self.is_star_occupied_by_others(old_position, new_position));
-            let (is_globe, is_invincible) = 
-                (self.board.borrow().is_globe(new_position), self.board.borrow().is_invincible(new_position));
-
-            match (occupied_outside_spaces, occupied_starspaces, is_globe, is_invincible) {
-                ((_, true), _, _, _)
-                | ((false, false), (_, true), _, _)
-                | ((true, _), _, true, _)
-                | ((true, _), _, _, true) => {
-                    self.die(piece_id);
-                },
-                ((true, false), (_, true), false, false) => {
-                    self.kill(piece_id, old_position, new_position);
-                },
-                _ => ()
-            }
-        }
-        
+        }      
 
         pub fn die(&mut self, piece_id: i8) {
             let old_position = self.piece(piece_id).borrow_mut().position();
@@ -667,7 +649,7 @@ mod players {
             let is_self_occupied = self.is_occupied_by_selves(self.new_position);
             let is_star_self_occupied = self.is_star_occupied_by_selves();
             let is_other_occupied = self.is_occupied_by_others(self.new_position);
-            let is_goalpos = self.goal_positions(self.old_position, self.new_position) == 99;
+            let is_goalpos = self.is_goal_position();
             match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.0, is_goalpos) {
                 (true, false, _, _, false) | (_, _, true, false, false) => Act::Join,
                 (_, _, _, _, true) => Act::Nothing,
@@ -721,9 +703,9 @@ mod players {
         pub fn try_to_win(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
-            let goalpos =  self.goal_positions(self.old_position, self.new_position);
-            match (is_occupied_by_others.1, goalpos) {
-                (false, 99) => Act::Goal,
+            let is_goalpos =  self.is_goal_position();
+            match (is_occupied_by_others.1, is_goalpos) {
+                (false, true) => Act::Goal,
                 _ => Act::Nothing,
             }
         }
