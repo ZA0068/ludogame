@@ -51,15 +51,15 @@ mod atomic_multiplayers_tests {
         player1.free_piece(0);
         player2.free_piece(0);
 
-        assert_eq!(player1.get_piece(0).borrow().position(), 0);
-        assert_eq!(player1.get_piece(0).borrow().color(), pieces::Color::Green);
+        assert_eq!(player1.piece(0).borrow().position(), 0);
+        assert_eq!(player1.piece(0).borrow().color(), pieces::Color::Green);
         assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
         assert_eq!(player1.board().borrow().outside[0].player_id,
         Some(board::PlayerID::Player0)
     );
     
-    assert_eq!(player2.get_piece(0).borrow().position(), 13);
-    assert_eq!(player2.get_piece(0).borrow().color(), pieces::Color::Yellow);
+    assert_eq!(player2.piece(0).borrow().position(), 13);
+    assert_eq!(player2.piece(0).borrow().color(), pieces::Color::Yellow);
         assert_eq!(player2.board().borrow_mut().outside(13).pieces.len(), 1);
         assert_eq!(player2.board().borrow_mut().outside(13).player_id,
             Some(board::PlayerID::Player1)
@@ -93,17 +93,17 @@ mod atomic_multiplayers_tests {
         player3.free_piece(0);
         player4.free_piece(0);
 
-        assert_eq!(player1.get_piece(0).borrow().position(), 0);
-        assert_eq!(player1.get_piece(0).borrow().color(), pieces::Color::Green);
+        assert_eq!(player1.piece(0).borrow().position(), 0);
+        assert_eq!(player1.piece(0).borrow().color(), pieces::Color::Green);
 
-        assert_eq!(player2.get_piece(0).borrow().position(), 13);
-        assert_eq!(player2.get_piece(0).borrow().color(), pieces::Color::Yellow);
+        assert_eq!(player2.piece(0).borrow().position(), 13);
+        assert_eq!(player2.piece(0).borrow().color(), pieces::Color::Yellow);
 
-        assert_eq!(player3.get_piece(0).borrow().position(), 26);
-        assert_eq!(player3.get_piece(0).borrow().color(), pieces::Color::Blue);
+        assert_eq!(player3.piece(0).borrow().position(), 26);
+        assert_eq!(player3.piece(0).borrow().color(), pieces::Color::Blue);
 
-        assert_eq!(player4.get_piece(0).borrow().position(), 39);
-        assert_eq!(player4.get_piece(0).borrow().color(), pieces::Color::Red);
+        assert_eq!(player4.piece(0).borrow().position(), 39);
+        assert_eq!(player4.piece(0).borrow().color(), pieces::Color::Red);
 
         assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
         assert_eq!(
@@ -139,8 +139,8 @@ mod atomic_multiplayers_tests {
         player1.move_piece(0, 6);
         player2.move_piece(0, 6);
 
-        assert_eq!(player1.get_piece(0).borrow().position(), 6);
-        assert_eq!(player2.get_piece(0).borrow().position(), 19);
+        assert_eq!(player1.piece(0).borrow().position(), 6);
+        assert_eq!(player2.piece(0).borrow().position(), 19);
 
         assert_eq!(player1.board().borrow().outside[0].pieces.len(), 0);
         assert_eq!(player1.board().borrow().outside[6].pieces.len(), 1);
@@ -174,10 +174,10 @@ mod atomic_multiplayers_tests {
         player3.move_piece(0, 6);
         player4.move_piece(0, 6);
 
-        assert_eq!(player1.get_piece(0).borrow().position(), 6);
-        assert_eq!(player2.get_piece(0).borrow().position(), 19);
-        assert_eq!(player3.get_piece(0).borrow().position(), 32);
-        assert_eq!(player4.get_piece(0).borrow().position(), 45);
+        assert_eq!(player1.piece(0).borrow().position(), 6);
+        assert_eq!(player2.piece(0).borrow().position(), 19);
+        assert_eq!(player3.piece(0).borrow().position(), 32);
+        assert_eq!(player4.piece(0).borrow().position(), 45);
 
         assert_eq!(player1.board().borrow_mut().outside[0].pieces.len(), 0);
         assert_eq!(player1.board().borrow_mut().outside[6].pieces.len(), 1);
@@ -212,34 +212,34 @@ mod atomic_multiplayers_tests {
         player1.free_piece(0);
         player1.move_piece(0, 36);
         player1.move_piece(0, 2);
-        assert_eq!(player1.get_piece(0).borrow().position(), 51);
+        assert_eq!(player1.piece(0).borrow().position(), 51);
 
         player1.free_piece(1);
         player1.move_piece(1, 36);
         player1.move_piece(1, 6);
-        assert_eq!(player1.get_piece(1).borrow().position(), 3);
+        assert_eq!(player1.piece(1).borrow().position(), 3);
 
         let mut player2 = Player::new(PLAYER_2, board.clone());
         player2.free_piece(0);
         player2.move_piece(0, 23);
         player2.move_piece(0, 2);
-        assert_eq!(player2.get_piece(0).borrow().position(), 51);
+        assert_eq!(player2.piece(0).borrow().position(), 51);
 
         player2.free_piece(1);
         player2.move_piece(1, 23);
         player2.move_piece(1, 6);
-        assert_eq!(player2.get_piece(1).borrow().position(), 3);
+        assert_eq!(player2.piece(1).borrow().position(), 3);
 
         let mut player3 = Player::new(PLAYER_3, board);
         player3.free_piece(0);
         player3.move_piece(0, 10);
         player3.move_piece(0, 2);
-        assert_eq!(player3.get_piece(0).borrow().position(), 51);
+        assert_eq!(player3.piece(0).borrow().position(), 51);
 
         player3.free_piece(1);
         player3.move_piece(1, 10);
         player3.move_piece(1, 6);
-        assert_eq!(player3.get_piece(1).borrow().position(), 3);
+        assert_eq!(player3.piece(1).borrow().position(), 3);
     }
 
     #[test]
@@ -250,15 +250,15 @@ mod atomic_multiplayers_tests {
 
         player.free_piece(0);
         player.move_piece(0, 17);
-        assert_eq!(player.get_piece(0).borrow().position(), 17);
+        assert_eq!(player.piece(0).borrow().position(), 17);
 
         opponent.free_piece(0);
-        assert_eq!(opponent.get_piece(0).borrow().position(), 13);
+        assert_eq!(opponent.piece(0).borrow().position(), 13);
 
         opponent.kill(0, 13, 17);
 
-        assert_eq!(player.get_piece(0).borrow().position(), -1);
-        assert!(player.get_piece(0).borrow().is_home());
+        assert_eq!(player.piece(0).borrow().position(), -1);
+        assert!(player.piece(0).borrow().is_home());
         assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 4);
         assert_eq!(player.board().borrow_mut().home(0).piece(0).borrow_mut().color(), pieces::Color::Green);
         assert!(player
@@ -269,7 +269,7 @@ mod atomic_multiplayers_tests {
             .borrow()
             .is_home());
 
-        assert_eq!(opponent.get_piece(0).borrow().position(), 17);
+        assert_eq!(opponent.piece(0).borrow().position(), 17);
         assert_eq!(
             player.board().borrow_mut().outside(17).player_id,
             Some(board::PlayerID::Player1)
@@ -288,12 +288,12 @@ mod atomic_multiplayers_tests {
         player0.move_piece(1, 17);
 
         player1.free_piece(0);
-        assert_eq!(player1.get_piece(0).borrow().position(), 13);
+        assert_eq!(player1.piece(0).borrow().position(), 13);
 
         player1.die(0);
 
-        assert_eq!(player0.get_piece(0).borrow().position(), 17);
-        assert!(!player0.get_piece(0).borrow().is_home());
+        assert_eq!(player0.piece(0).borrow().position(), 17);
+        assert!(!player0.piece(0).borrow().is_home());
         assert_eq!(
             player0
                 .board()
@@ -316,8 +316,8 @@ mod atomic_multiplayers_tests {
             Some(board::PlayerID::Player0)
         );
 
-        assert_eq!(player1.get_piece(0).borrow().position(), -1);
-        assert!(player1.get_piece(0).borrow().is_home());
+        assert_eq!(player1.piece(0).borrow().position(), -1);
+        assert!(player1.piece(0).borrow().is_home());
         assert_eq!(player1.board().borrow_mut().home(PLAYER_1).piece(0).borrow_mut().color(), pieces::Color::Yellow);
 
         assert_eq!(
@@ -356,23 +356,23 @@ mod atomic_multiplayers_tests {
         player0.free_piece(piece_1);
 
         player0.move_piece(piece_0, 18);
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), 18);
+        assert_eq!(player0.piece(piece_0).borrow().position(), 18);
 
         player0.move_piece(piece_1, 24);
-        assert_eq!(player0.get_piece(piece_1).borrow().position(), 24);
+        assert_eq!(player0.piece(piece_1).borrow().position(), 24);
 
         player1.free_piece(piece_0);
         player1.kill_piece(0, 5);
         
 
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), -1);
-        assert_eq!(player0.get_piece(piece_1).borrow().position(), -1);
+        assert_eq!(player0.piece(piece_0).borrow().position(), -1);
+        assert_eq!(player0.piece(piece_1).borrow().position(), -1);
         assert_eq!(player0.board().borrow_mut().outside(18).pieces.len(), 0);
         assert_eq!(player1.board().borrow_mut().outside(18).player_id, None);
-        assert!(player0.get_piece(piece_0).borrow().is_home());
-        assert!(player0.get_piece(piece_1).borrow().is_home());
+        assert!(player0.piece(piece_0).borrow().is_home());
+        assert!(player0.piece(piece_1).borrow().is_home());
 
-        assert_eq!(player1.get_piece(0).borrow().position(), 24);
+        assert_eq!(player1.piece(0).borrow().position(), 24);
         assert_eq!(player1.board().borrow_mut().outside(24).pieces.len(), 1);
         assert_eq!(
             player1.board().borrow_mut().outside(24).player_id,
@@ -392,8 +392,8 @@ mod atomic_multiplayers_tests {
         player1.free_piece(piece_1);
         player1.starjump(piece_0, 13, 18);
         player1.join(piece_1, 13, 24);
-        assert_eq!(player1.get_piece(piece_0).borrow().position(), 24);
-        assert_eq!(player1.get_piece(piece_1).borrow().position(), 24);
+        assert_eq!(player1.piece(piece_0).borrow().position(), 24);
+        assert_eq!(player1.piece(piece_1).borrow().position(), 24);
 
         player0.free_piece(piece_0);
 
@@ -401,16 +401,16 @@ mod atomic_multiplayers_tests {
 
         player0.death(piece_0, 17, 18);
 
-        assert_eq!(player1.get_piece(piece_0).borrow().position(), 24);
-        assert_eq!(player1.get_piece(piece_1).borrow().position(), 24);
+        assert_eq!(player1.piece(piece_0).borrow().position(), 24);
+        assert_eq!(player1.piece(piece_1).borrow().position(), 24);
         assert_eq!(player1.board().borrow_mut().outside(24).pieces.len(), 2);
         assert_eq!(
             player1.board().borrow_mut().outside(24).player_id,
             Some(board::PlayerID::Player1)
         );
 
-        assert!(player0.get_piece(piece_0).borrow().is_home());
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), -1);
+        assert!(player0.piece(piece_0).borrow().is_home());
+        assert_eq!(player0.piece(piece_0).borrow().position(), -1);
         assert_eq!(player0.board().borrow_mut().home(PLAYER_0).pieces.len(), 4);
     }
 
@@ -427,8 +427,8 @@ mod atomic_multiplayers_tests {
         player0.update_outside(piece_0, 0, 18);
         player0.update_outside(piece_1, 0, 18);
 
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), 18);
-        assert_eq!(player0.get_piece(piece_1).borrow().position(), 18);
+        assert_eq!(player0.piece(piece_0).borrow().position(), 18);
+        assert_eq!(player0.piece(piece_1).borrow().position(), 18);
         assert_eq!(player0.board().borrow_mut().outside(18).pieces.len(), 2);
         assert_eq!(
             player0.board().borrow_mut().outside(18).player_id,
@@ -438,8 +438,8 @@ mod atomic_multiplayers_tests {
         player1.free_piece(piece_0);
         player1.death(piece_0, 13, 18);
 
-        assert!(player1.get_piece(piece_0).borrow().is_home());
-        assert_eq!(player1.get_piece(piece_0).borrow().position(), -1);
+        assert!(player1.piece(piece_0).borrow().is_home());
+        assert_eq!(player1.piece(piece_0).borrow().position(), -1);
         assert_eq!(player1.board().borrow_mut().home(PLAYER_1).pieces.len(), 4);
     }
 
@@ -454,7 +454,7 @@ mod atomic_multiplayers_tests {
         player0.enter_globe(piece_0, 0, 21);
 
 
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), 21);
+        assert_eq!(player0.piece(piece_0).borrow().position(), 21);
         assert_eq!(player0.board().borrow_mut().outside(21).pieces.len(), 1);
         assert_eq!(
             player0.board().borrow_mut().outside(21).player_id,
@@ -464,8 +464,8 @@ mod atomic_multiplayers_tests {
         player1.free_piece(piece_0);
         player1.death(piece_0, 13, 21);
 
-        assert!(player1.get_piece(piece_0).borrow().is_home());
-        assert_eq!(player1.get_piece(piece_0).borrow().position(), -1);
+        assert!(player1.piece(piece_0).borrow().is_home());
+        assert_eq!(player1.piece(piece_0).borrow().position(), -1);
         assert_eq!(player1.board().borrow_mut().home(PLAYER_1).pieces.len(), 4);
     }
 
@@ -479,7 +479,7 @@ mod atomic_multiplayers_tests {
         player0.free_piece(piece_0);
         player0.update_outside(piece_0, 0, 12);
 
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), 12);
+        assert_eq!(player0.piece(piece_0).borrow().position(), 12);
         assert_eq!(player0.board().borrow_mut().outside(12).pieces.len(), 1);
         assert_eq!(
             player0.board().borrow_mut().outside(12).player_id,
@@ -489,8 +489,8 @@ mod atomic_multiplayers_tests {
         player1.free_piece(piece_0);
         player0.death(piece_0, 12, 13);
 
-        assert!(player0.get_piece(piece_0).borrow().is_home());
-        assert_eq!(player0.get_piece(piece_0).borrow().position(), -1);
+        assert!(player0.piece(piece_0).borrow().is_home());
+        assert_eq!(player0.piece(piece_0).borrow().position(), -1);
         assert_eq!(player0.board().borrow_mut().home(PLAYER_0).pieces.len(), 4);
     }
 }

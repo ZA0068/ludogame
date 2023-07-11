@@ -87,7 +87,7 @@ mod atomic_choice_test {
         other_player.free_piece(piece_id);
         other_player.update_outside(piece_id, 13, 1);
 
-        assert_eq!(other_player.get_piece(piece_id).borrow().position(), 1);
+        assert_eq!(other_player.piece(piece_id).borrow().position(), 1);
         let mut boardspace = board.borrow_mut().outside(1).clone();
         assert_eq!(boardspace.piece(piece_id).borrow().position(), 1);
         assert_eq!(boardspace.pieces.len(), 1);
@@ -115,8 +115,8 @@ mod atomic_choice_test {
         other_player.update_outside(piece_id1, 13, 1);
         other_player.join(piece_id2, 13, 1);
 
-        let other_piece_1 = other_player.get_piece(piece_id1);
-        let other_piece_2 = other_player.get_piece(piece_id2);
+        let other_piece_1 = other_player.piece(piece_id1);
+        let other_piece_2 = other_player.piece(piece_id2);
 
         assert_eq!(other_piece_1.borrow().position(), 1);
         assert_eq!(other_piece_2.borrow().position(), 1);
@@ -134,11 +134,11 @@ mod atomic_choice_test {
         let piece_id = 0;
        
         player.free_piece(piece_id);
-        let old_position = player.get_piece(piece_id).borrow().position();
+        let old_position = player.piece(piece_id).borrow().position();
         let new_position = 52;
         player.enter_inside(piece_id, old_position, new_position);
 
-        let piece = player.get_piece(piece_id);
+        let piece = player.piece(piece_id);
         assert_eq!(piece.borrow().position(), new_position);
         assert_eq!(board.borrow_mut().inside(new_position).pieces.len(), 1);
 
