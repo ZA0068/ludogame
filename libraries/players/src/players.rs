@@ -547,10 +547,11 @@ mod players {
             act: Act,
         ) -> Vec<(Act, i8, i8)> {
             let mut action_vector: Vec<(Act, i8, i8)> = Vec::new();
-            for idx in 0..4 {
-                let action = self.valid_choices(idx, dice_number, act);
+            for piece_id in 0..4 {
+                let action = self.valid_choices(piece_id, dice_number, act);
                 if action != Act::Nothing {
-                    action_vector.push((action, idx, self.new_position));
+                    let heuristic = self.get_heuristics(piece_id);
+                    action_vector.push((action, piece_id, heuristic));
                 }
             }
             action_vector
@@ -661,8 +662,10 @@ mod players {
             let is_self_occupied = self.is_occupied_by_selves(self.new_position);
             let is_star_self_occupied = self.is_star_occupied_by_selves();
             let is_other_occupied = self.is_occupied_by_others(self.new_position);
-            match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.0) {
-                (true, false, _, _) | (_, _, true, false) => Act::Join,
+            let is_goalpos = self.goal_positions(self.old_position, self.new_position) == 99;
+            match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.0, is_goalpos) {
+                (true, false, _, _, false) | (_, _, true, false, false) => Act::Join,
+                (_, _, _, _, true) => Act::Nothing,
                 _ => Act::Nothing,
             }
         }

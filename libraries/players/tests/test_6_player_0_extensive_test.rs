@@ -12,19 +12,6 @@ mod player_0_choice_tests {
     use super::*;
 
     #[test]
-    fn generate_action_vector_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
-
-        let result_vec = player.generate_action_vector(0, Act::Free);
-
-        assert_eq!(result_vec.len(), 0);
-
-        let result_vec = player.generate_action_vector(6, Act::Free);
-        assert_eq!(result_vec.len(), 4);
-    }
-
-    #[test]
     fn try_to_free_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
@@ -132,8 +119,11 @@ mod player_0_choice_tests {
         assert_eq!(result, Act::Join);
 
         player.update_outside(0, 13, 50);
-        player.enter_inside(0, 50, 55);
         player.update_outside(1, 0, 49);
+        let result = player.try_to_join(1, 1);
+        assert_eq!(result, Act::Nothing);
+
+        player.enter_inside(0, 50, 55);
         let result = player.try_to_join(1, 5);
         assert_eq!(result, Act::Nothing);
         
@@ -509,6 +499,7 @@ mod player_0_choice_tests {
         assert_eq!(result, Act::Starjump);
     }
 }
+
 #[cfg(test)]
 mod player_0_move_tests {
     use super::*;
@@ -738,9 +729,8 @@ mod player_0_move_tests {
             player.move_piece(piece_id, 1);
             let vec = (52..=57).collect::<Vec<_>>();
             for i in 52..56 {
-                let oldpos = player.piece(piece_id).borrow().position();
 
-                player.update_piece(piece_id, oldpos, i + 1);
+                player.move_piece(piece_id, 1);
                 assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 51]);
                 assert_eq!(
                     player.board().borrow_mut().inside(vec[i as usize - 51]).player_id,
@@ -1316,3 +1306,111 @@ mod player_0_move_tests {
     }
 }
 
+#[cfg(test)]
+mod player_0_valid_choices_tests {
+    use super::*;
+
+    #[test]
+    fn valid_choice_nothing_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+        let mut result: Act;
+        
+        result = player.valid_choices(0, 1, Act::Nothing);
+        assert_eq!(result, Act::Nothing);
+        
+        player.free_piece(0);
+        result = player.valid_choices(0, 7, Act::Move);
+        assert_eq!(result, Act::Nothing);
+        
+        player.enter_goal(0, 0);
+        result = player.valid_choices(0, 7, Act::Move);
+        assert_eq!(result, Act::Nothing);
+    }
+
+    #[test]
+    fn valid_choice_test_1() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+
+        let mut result = player.valid_choices(0, 0, Act::Free);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 5, Act::Free);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 6, Act::Free);
+        assert_eq!(result, Act::Free);
+
+        player.free_piece(0);
+
+        result = player.valid_choices(0, 6, Act::Free);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Move);
+        assert_eq!(result, Act::Move);
+
+        player.update_outside(0, 0, 1);
+        result = player.valid_choices(0, 4, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 4, Act::Starjump);
+        assert_eq!(result, Act::Starjump);
+
+        player.starjump_piece(0, 4);
+
+        result = player.valid_choices(0, 2, Act::Move);
+        assert_eq!(result, Act::Move);
+
+        player.move_piece(0, 2);
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Move);
+
+        player.update_outside(0, 13, 19);
+        result = player.valid_choices(0, 2, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 2, Act::Move);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 2, Act::Safe);
+        assert_eq!(result, Act::Safe);
+        player.save_piece(0, 2);
+
+        result = player.valid_choices(0, 2, Act::Kill);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 2, Act::Die);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 2, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        player.starjump_piece(0, 3);
+        player.starjump_piece(0, 6);
+
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(0, 6, Act::Starjump);
+        assert_eq!(result, Act::Starjump);
+
+        result = player.valid_choices(0, 6, Act::Goal);
+        assert_eq!(result, Act::Goal);
+
+        result = player.valid_choices(0, 6, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Safe);
+        assert_eq!(result, Act::Safe);
+
+        
+    }
+
+}
