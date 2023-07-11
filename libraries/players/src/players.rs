@@ -220,8 +220,8 @@ mod players {
 
         pub fn leave(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             self.update_outside(piece_id, old_position, new_position);
-            let is_globe = self.board().borrow_mut().is_globe(old_position);
-            let old_pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
+            let _is_globe = self.board().borrow_mut().is_globe(old_position);
+            let _old_pieces = self.board().borrow_mut().outside(old_position).pieces.clone();
         }
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -232,9 +232,9 @@ mod players {
         pub fn join(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             let new_position = self.star_position(old_position, new_position);
             self.update_outside(piece_id, old_position, new_position);
-            let pieces = self.board().borrow_mut().outside(self.new_position).pieces.clone();
-            let is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
-            let invincible_position = self.invincible_positions(self.color);
+            let _pieces = self.board().borrow_mut().outside(self.new_position).pieces.clone();
+            let _is_invincible = self.board().borrow_mut().is_invincible(self.new_position);
+            let _invincible_position = self.invincible_positions(self.color);
         }
 
         pub fn move_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -680,20 +680,20 @@ mod players {
         // todo: refactor this function so it checks the piece logic instead of numbers of pieces.
         pub fn try_to_die(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
-            let occupied_by_others = self.is_occupied_by_others(self.new_position);
-            let other_piece = self.board()
+            let _occupied_by_others = self.is_occupied_by_others(self.new_position);
+            let _other_piece = self.board()
                 .borrow_mut()
                 .outside(self.new_position)
                 .pieces
                 .get(0)
                 .cloned();
             let starpos = self.star_position(self.old_position, self.new_position);
-            let other_star_piece = self.board()
+            let _other_star_piece = self.board()
             .borrow_mut()
             .outside(starpos)
             .pieces.get(0).cloned();
             let invincible_position = self.invincible_positions(self.color);
-            let is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
+            let _is_invincible_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
             let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
             let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
             let is_globepos = self.board().borrow_mut().is_globe(self.new_position);
