@@ -38,7 +38,7 @@ mod pieces {
         }
 
         pub fn color(&self) -> Color {
-            self.color.clone()
+            self.color
         }
 
         pub fn is_home(&self) -> bool {
