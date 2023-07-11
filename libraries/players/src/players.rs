@@ -174,7 +174,9 @@ mod players {
 
         pub fn win_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
-            self.send_other_piece_home(self.new_position);
+            if self.is_occupied_by_others(self.new_position).0 {
+                self.send_other_piece_home(self.new_position);
+            }
             match self.goal_positions(self.old_position, self.new_position) {
                 99 => self.enter_goal(piece_id, self.old_position),
                 _ => panic!("New position is not a goal!"),
@@ -591,7 +593,7 @@ mod players {
         pub fn try_to_starjump(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_star = self.board().borrow_mut().is_star(self.new_position);
-            let is_occupied = self.is_occupied_or_more(self.new_position);
+            let is_occupied = self.is_occupied_by_others(self.new_position);
             let is_star_occupied = self.is_star_occupied(self.old_position, self.new_position);
             match (is_star, is_occupied.0, is_star_occupied.0) {
                 (true, false, false) => Act::Starjump,
@@ -604,7 +606,7 @@ mod players {
             let is_globe = self.board().borrow_mut().is_globe(self.new_position);
             let is_occupied_by_others = self.is_occupied_by_others(self.new_position);
             self.correct_position();
-            if (is_globe & !is_occupied_by_others.0) | (self.new_position >= 52) {
+            if (is_globe & !is_occupied_by_others.0) | (self.new_position >= 52 && self.old_position < 52) {
                 return Act::Safe;
             }
             Act::Nothing
@@ -625,6 +627,7 @@ mod players {
 
         pub fn try_to_move(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
+            self.correct_position();
             let binding = self.piece(piece_id);
             let binding = binding.borrow_mut();
             let is_home = binding.is_home();
@@ -633,7 +636,9 @@ mod players {
             let is_globepos = self.board().borrow_mut().is_globe(self.new_position);
             let is_self_occupied = self.is_occupied_by_selves(self.old_position).1;
             let is_newpos_occupied = self.is_occupied_or_more(self.new_position).0;
-            if is_home | is_goalpos | is_starpos | is_self_occupied | is_newpos_occupied | is_globepos {
+            let is_outside = self.new_position < 52;
+
+            if is_home | is_goalpos | is_starpos | (is_self_occupied | is_newpos_occupied) & is_outside | is_globepos {
                 return Act::Nothing;
             }
             Act::Move

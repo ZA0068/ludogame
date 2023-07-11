@@ -57,6 +57,9 @@ mod player_0_choice_tests {
         let result = player.try_to_move(0, 1);
         assert_eq!(result, Act::Move);
 
+        let result = player.try_to_move(0, 6);
+        assert_eq!(result, Act::Move);
+
         let result = player.try_to_move(0, 5);
         assert_eq!(result, Act::Nothing);
     }
@@ -1335,6 +1338,7 @@ mod player_0_valid_choices_tests {
 
         let mut result = player.valid_choices(0, 0, Act::Free);
         assert_eq!(result, Act::Nothing);
+        assert!(player.piece(0).borrow().is_home());
 
         result = player.valid_choices(0, 5, Act::Free);
         assert_eq!(result, Act::Nothing);
@@ -1344,8 +1348,9 @@ mod player_0_valid_choices_tests {
 
         result = player.valid_choices(0, 6, Act::Free);
         assert_eq!(result, Act::Free);
-
+        
         player.free_piece(0);
+        assert!(player.piece(0).borrow().is_free());
 
         result = player.valid_choices(0, 6, Act::Free);
         assert_eq!(result, Act::Nothing);
@@ -1353,7 +1358,7 @@ mod player_0_valid_choices_tests {
         result = player.valid_choices(0, 1, Act::Move);
         assert_eq!(result, Act::Move);
 
-        player.update_outside(0, 0, 1);
+        player.move_piece(0, 1);
         result = player.valid_choices(0, 4, Act::Move);
         assert_eq!(result, Act::Nothing);
 
@@ -1369,7 +1374,7 @@ mod player_0_valid_choices_tests {
         result = player.valid_choices(0, 6, Act::Move);
         assert_eq!(result, Act::Move);
 
-        player.update_outside(0, 13, 19);
+        player.move_piece(0, 6);
         result = player.valid_choices(0, 2, Act::Move);
         assert_eq!(result, Act::Nothing);
 
@@ -1410,7 +1415,236 @@ mod player_0_valid_choices_tests {
         result = player.valid_choices(0, 3, Act::Safe);
         assert_eq!(result, Act::Safe);
 
+        player.save_piece(0, 3);
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Move);
+
+        result = player.valid_choices(0, 6, Act::Safe);
+        assert_eq!(result, Act::Safe);
+
+        player.move_piece(0, 6);
+
+        result = player.valid_choices(0, 1, Act::Move);
+        assert_eq!(result, Act::Move);
         
+        result = player.valid_choices(0, 1, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 6, Act::Move);
+        assert_eq!(result, Act::Move);
+
+        result = player.valid_choices(0, 3, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Goal);
+        assert_eq!(result, Act::Goal);
+        player.win_piece(0, 3);
+        assert!(player.piece(0).borrow().is_goal());
+    }
+
+    #[test]
+    fn valid_choice_test_2() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+
+        let mut result = player.valid_choices(0, 0, Act::Free);
+        assert_eq!(result, Act::Nothing);
+        assert!(player.piece(0).borrow().is_home());
+        assert!(player.piece(1).borrow().is_home());
+        assert!(player.piece(2).borrow().is_home());
+        assert!(player.piece(3).borrow().is_home());
+
+        (0..4).for_each(|i| {
+            result = player.valid_choices(i, 6, Act::Free);
+            assert_eq!(result, Act::Free);
+        });
+        
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+        assert!(player.piece(0).borrow().is_free());
+        assert!(player.piece(1).borrow().is_free());
+        assert!(player.piece(2).borrow().is_free());
+        assert!(player.piece(3).borrow().is_free());
+
+        result = player.valid_choices(4, 6, Act::Free);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 1, Act::Leave);
+        assert_eq!(result, Act::Leave);
+        player.leave_piece(0, 1);
+
+        result = player.valid_choices(1, 5, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 5, Act::Starjump);
+        assert_eq!(result, Act::Starjump);
+        player.starjump_piece(1, 5);
+
+        result = player.valid_choices(2, 5, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 5, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 5, Act::Join);
+        assert_eq!(result, Act::Join);
+        player.join_piece(2, 5);
+
+        result = player.valid_choices(3, 5, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(3, 6, Act::Move);
+        assert_eq!(result, Act::Move);
+        player.move_piece(3, 6);
+
+        result = player.valid_choices(0, 5, Act::Join);
+        assert_eq!(result, Act::Join);
+
+        player.join_piece(0, 5);
+        result = player.valid_choices(0, 2, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 2, Act::Safe);
+        assert_eq!(result, Act::Safe);
+
+        player.save_piece(0, 2);
+
+        result = player.valid_choices(3, 2, Act::Join);
+        assert_eq!(result, Act::Join);
+
+        result = player.valid_choices(3, 2, Act::Safe);
+        assert_eq!(result, Act::Safe);
+
+        player.join_piece(3, 2);
+
+        result = player.valid_choices(0, 3, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(0, 3, Act::Starjump);
+        assert_eq!(result, Act::Starjump);
+        player.starjump_piece(0, 3);
+        
+        result = player.valid_choices(3, 5, Act::Move);
+        assert_eq!(result, Act::Move);
+        player.move_piece(3, 5);
+
+        result = player.valid_choices(1, 2, Act::Move);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 2, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 2, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 2, Act::Join);
+        assert_eq!(result, Act::Join);
+        player.join_piece(1, 2);
+
+        player.update_outside(0, 18, 24);
+        player.update_outside(2, 11, 18);
+
+        result = player.valid_choices(1, 5, Act::Move);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(1, 5, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(1, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 5, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 5, Act::Join);
+        assert_eq!(result, Act::Join);
+        player.join_piece(1, 5);
+        
+        result = player.valid_choices(3, 5, Act::Join);
+        assert_eq!(result, Act::Join);
+        player.join_piece(3, 5);
+
+        result = player.valid_choices(2, 6, Act::Join);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(2, 6, Act::Starjump);
+        assert_eq!(result, Act::Starjump);
+        player.join_piece(2, 6);
+
+        player.update_outside(0, 24, 50);
+        player.update_outside(1, 24, 44);
+        player.update_outside(2, 31, 39);
+        player.update_outside(3, 24, 39);
+
+        result = player.valid_choices(3, 5, Act::Move);
+        assert_eq!(result, Act::Nothing);
+        
+        result = player.valid_choices(3, 5, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(3, 5, Act::Safe);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(3, 5, Act::Leave);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(3, 5, Act::Join);
+        assert_eq!(result, Act::Join);
+
+        result = player.valid_choices(1, 6, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 6, Act::Starjump);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(1, 6, Act::Goal);
+        assert_eq!(result, Act::Goal);
+        player.win_piece(1, 6);
+
+        player.move_piece(3, 6);
+        result = player.valid_choices(3, 2, Act::Safe);
+        assert_eq!(result, Act::Safe);
+        player.save_piece(3, 2);
+        player.move_piece(2, 6);
+
+        result = player.valid_choices(2, 2, Act::Join);
+        assert_eq!(result, Act::Join);
+
+        result = player.valid_choices(2, 2, Act::Safe);
+        assert_eq!(result, Act::Safe);
+        player.save_piece(2, 2);
+
+        player.move_piece(0, 1);
+        
+        result = player.valid_choices(2, 4, Act::Join);
+        assert_eq!(result, Act::Nothing);
+
+        result = player.valid_choices(2, 4, Act::Safe);
+        assert_eq!(result, Act::Safe);
+
+        result = player.valid_choices(2, 4, Act::Move);
+        assert_eq!(result, Act::Move);
+
     }
 
 }
