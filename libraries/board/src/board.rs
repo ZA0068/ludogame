@@ -128,7 +128,7 @@ mod board {
             for ((position, player_id), color) in home.iter_mut().zip(player_ids.iter()).zip(colors.iter()) {
                 position.set(
                     -1,
-                    create_vector_of_pieces(color.clone()).clone(),
+                    create_vector_of_pieces(*color),
                     Some(player_id.clone()),
                 );
             }
