@@ -13,4 +13,3 @@ dice = { path = "../dice" }
 board = { path = "../board", version = "1.0.0"}
 rand = "0.8.4"
 prettytable-rs = "0.10.0"
-tui-rs = "0.1.0"

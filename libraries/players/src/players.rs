@@ -4,12 +4,6 @@ mod players {
     use pieces::Piece;
     use rand::prelude::SliceRandom;
     use prettytable::{Table, row};
-    use tui::Terminal;
-use tui::backend::TermionBackend;
-use tui::widgets::{Table, Row, Cell};
-use tui::style::{Style, Color};
-use termion::raw::IntoRawMode;
-use std::io;
     // use std::fmt;
 
 

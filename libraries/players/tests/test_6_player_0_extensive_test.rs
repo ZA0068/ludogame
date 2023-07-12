@@ -2294,7 +2294,7 @@ mod player_0_play_test {
         player.my_turn();
         player.take_dice(dice);
         
-            for _ in 0..1 {
+            for _ in 0..100 {
             while !player.is_finished() {
                 player.play_random(actions.clone());
                 player.print_status();
@@ -2303,43 +2303,4 @@ mod player_0_play_test {
         }
     }
 
-    #[test]
-    fn random_play_test_2() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board.clone());
-        let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
-        player.my_turn();
-        player.take_dice(dice);
-    
-        // Set up the terminal
-        let stdout = io::stdout().into_raw_mode().unwrap();
-        let backend = TermionBackend::new(stdout);
-        let mut terminal = Terminal::new(backend).unwrap();
-    
-        for _ in 0..1 {
-            while !player.is_finished() {
-                player.play_random(actions.clone());
-    
-                // Create the table
-                let rows = vec![
-                    // ... create rows as in the previous example ...
-                ];
-                let table = Table::new(rows)
-                    .widths(&[5, 11, 13, 13, 9, 6, 8, 8, 8, 8])
-                    .style(Style::default().fg(Color::White))
-                    .header_style(Style::default().fg(Color::Yellow));
-    
-                // Draw the table
-                terminal.draw(|f| {
-                    let size = f.size();
-                    f.render_widget(table, size);
-                }).unwrap();
-    
-                // You might want to add a delay here so that you can see each table
-                std::thread::sleep(std::time::Duration::from_secs(1));
-            }
-            board.borrow_mut().reset();
-        }
-    }
 }
