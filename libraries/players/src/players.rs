@@ -496,12 +496,12 @@ mod players {
 
         pub fn play_random(&mut self, actions: Vec<Act>) {
                 let dice_number = self.roll_dice();
-                let movesets = self.generate_movesets(actions, dice_number);
+                let movesets = self.generate_vector_of_random_actions(actions, dice_number);
                 self.action = self.select_random_piece(movesets);
                 self.make_move( self.action.1, dice_number,  self.action.0);
         }
 
-        fn generate_movesets(&mut self, actions: Vec<Act>, dice_number: i8) ->  Vec<(Act, i8, i8)> {
+        pub fn generate_vector_of_random_actions(&mut self, actions: Vec<Act>, dice_number: i8) ->  Vec<(Act, i8, i8)> {
             let mut movesets: Vec<(Act, i8, i8)> = Vec::new();
             for action in actions {
                 let mut action_vector = self.generate_action_vector(dice_number, action);
@@ -516,14 +516,32 @@ mod players {
                 .unwrap_or(&(Act::Nothing, self.id, 57))
         }
 
+        pub fn play_ordered(&mut self, actions: Vec<Act>, take_nearest_piece: bool) {
+            let dice_number = self.roll_dice();
+            let movesets = self.generate_vector_of_ordered_actions(actions, dice_number, take_nearest_piece);
+            self.action = movesets.first().copied().unwrap_or((Act::Nothing, self.id, 57));
+            self.make_move(self.action.1, dice_number, self.action.0);
+        }
+
+        fn generate_vector_of_ordered_actions(&mut self, actions: Vec<Act>, dice_number: i8, take_nearest_piece: bool) -> Vec<(Act, i8, i8)> {
+            let mut movesets: Vec<(Act, i8, i8)> = Vec::new();
+            for action in actions {
+                let moveset = self.make_ordered_choice(dice_number, action, take_nearest_piece);
+                if moveset.0 != Act::Nothing {
+                movesets.push(moveset);
+                }
+            }
+            movesets
+        }
+
         pub fn make_ordered_choice(
             &mut self,
             dice_number: i8,
             action: Act,
-            take_closest: bool,
+            take_nearest_piece: bool,
         ) -> (Act, i8, i8) {
             let action_vector = self.generate_action_vector(dice_number, action);
-            self.select_ordered_piece(action_vector, take_closest)
+            self.select_ordered_piece(action_vector, take_nearest_piece)
         }
 
         pub fn select_ordered_piece(

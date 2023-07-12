@@ -2303,4 +2303,21 @@ mod player_0_play_test {
         }
     }
 
+    #[test]
+    fn ordered_play_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let dice = Dice::default();
+        let actions = ACTIONS.to_vec();
+        player.my_turn();
+        player.take_dice(dice);
+        
+            for _ in 0..100 {
+            while !player.is_finished() {
+                player.play_ordered(actions.clone(), true);
+                player.print_status();
+            }
+            board.borrow_mut().reset();
+        }
+    }
 }
