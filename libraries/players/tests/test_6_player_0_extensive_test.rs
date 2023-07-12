@@ -1801,8 +1801,28 @@ mod player_0_valid_choices_tests {
         result = player.valid_choices(0, 5, Act::Kill);
         assert_eq!(result, Act::Kill);
 
+        player.kill_piece(0, 5);
+        assert!(player.piece(0).borrow().is_home());
+        assert_eq!(player.piece(0).borrow().position(), -1);
+        assert!(other_player.piece(0).borrow().is_home());
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
+
+        player.free_piece(0);
+        other_player.free_piece(0);
+        other_player.update_outside(0, 13, 5);
+
         result = player.valid_choices(0, 5, Act::Die);
         assert_eq!(result, Act::Die);
+
+        player.die_piece(0, 5);
+        assert!(player.piece(0).borrow().is_home());
+        assert_eq!(player.piece(0).borrow().position(), -1);
+        assert!(other_player.piece(0).borrow().is_home());
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
+
+        player.free_piece(0);
+        other_player.free_piece(0);
+        other_player.update_outside(0, 13, 5);
 
         player.leave_piece(0, 6);
         other_player.enter_globe(0, 5, 8);
@@ -1894,4 +1914,113 @@ mod player_0_valid_choices_tests {
 
     }
 
+}
+
+#[cfg(test)]
+mod player_0_play_test {
+    use super::*;
+
+    #[test]
+    fn make_move_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(1, board);
+
+        other_player.free_piece(0);
+
+        let mut dice_number: i8;
+        let mut choice: Act;
+
+        dice_number = 6;
+        choice = player.valid_choices(0, dice_number, Act::Free);
+        player.make_move(0, dice_number, choice);
+        assert!(player.piece(0).borrow().is_free());
+    
+        dice_number = 5;
+        choice = player.valid_choices(1, dice_number, Act::Free);
+        player.make_move(1, dice_number, choice);
+        assert!(!player.piece(1).borrow().is_free());
+
+        dice_number = 1;
+        choice = player.valid_choices(0, dice_number, Act::Move);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 1);
+
+        dice_number = 4;
+        choice = player.valid_choices(0, dice_number, Act::Move);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 1);
+        choice = player.valid_choices(0, dice_number, Act::Starjump);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 11);
+
+        dice_number = 2;
+        choice = player.valid_choices(0, dice_number, Act::Move);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 11);
+        choice = player.valid_choices(0, dice_number, Act::Die);
+        player.make_move(0, dice_number, choice);
+        assert!(player.piece(0).borrow().is_home());
+        assert_eq!(player.piece(0).borrow().position(), -1);
+
+        dice_number = 6;
+        choice = player.valid_choices(0, dice_number, Act::Free);
+        player.make_move(0, dice_number, choice);
+        assert!(player.piece(0).borrow().is_free());
+
+        dice_number = 6;
+        choice = player.valid_choices(0, dice_number, Act::Move);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 6);
+
+        dice_number = 2;
+        choice = player.valid_choices(0, dice_number, Act::Safe);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 8);
+
+        other_player.move_piece(0, 1);
+
+        dice_number = 6;
+        choice = player.valid_choices(0, dice_number, Act::Kill);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 14);
+
+        choice = player.valid_choices(1, dice_number, Act::Free);
+        player.make_move(1, dice_number, choice);
+        assert!(player.piece(1).borrow().is_free());
+        choice = player.valid_choices(2, dice_number, Act::Free);
+        player.make_move(2, dice_number, choice);
+        assert!(player.piece(2).borrow().is_free());
+
+        choice = player.valid_choices(1, dice_number, Act::Move);
+        player.make_move(1, dice_number, choice);
+        assert_eq!(player.piece(1).borrow().position(), 0);
+
+        choice = player.valid_choices(1, dice_number, Act::Leave);
+        player.make_move(1, dice_number, choice);
+        assert_eq!(player.piece(1).borrow().position(), 6);
+
+        choice = player.valid_choices(2, dice_number, Act::Move);
+        player.make_move(2, dice_number, choice);
+        assert_eq!(player.piece(2).borrow().position(), 0);
+
+        choice = player.valid_choices(2, dice_number, Act::Join);
+        player.make_move(2, dice_number, choice);
+        assert_eq!(player.piece(2).borrow().position(), 6);
+
+        player.move_piece(0, 35);
+
+        choice = player.valid_choices(0, dice_number, Act::Goal);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 49);
+
+        dice_number = 1;
+        choice = player.valid_choices(0, dice_number, Act::Goal);
+        player.make_move(0, dice_number, choice);
+        assert_eq!(player.piece(0).borrow().position(), 99);
+        assert!(player.piece(0).borrow().is_goal());
+    }
+
+    
 }

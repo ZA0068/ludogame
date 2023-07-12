@@ -133,42 +133,40 @@ mod players {
                     self.move_piece(piece_id, dice_number);
                     // self.can_continue();
                 }
-                // Act::Safe => {
-                //     self.move_to_safety(piece_id, dice_number);
-                //     self.can_continue();
-                // }
-                // Act::Starjump => {
-                //     self.skip(piece_id, dice_number);
-                //     self.can_continue();
-                // }
+                Act::Safe => {
+                    self.save_piece(piece_id, dice_number);
+                    // self.can_continue();
+                }
+                Act::Starjump => {
+                    self.starjump_piece(piece_id, dice_number);
+                    // self.can_continue();
+                }
                 Act::Goal => {
-                    // self.win(piece_id);
+                    self.win_piece(piece_id, dice_number);
                     // self.my_turn();
                 }
                 Act::Free => {
                     self.free_piece(piece_id);
                     // self.my_turn();
                 }
-                // Act::Kill => {
-                //     self.kill_piece(piece_id, dice_number);
-                //     self.my_turn();
-                // }
-                // Act::Join => {
-                //     self.join_piece(piece_id, dice_number);
-                //     self.can_continue();
-                // }
-                // Act::Leave => {
-                //     self.leave_piece(piece_id, dice_number);
-                //     self.can_continue();
-                // }
-                // Act::Die => {
-                //     self.die(piece_id);
-                //     self.can_continue();
-                // }
-                Act::Nothing => {
-                    self.turn = false;
+                Act::Kill => {
+                    self.kill_piece(piece_id, dice_number);
+                    // self.my_turn();
                 }
-                _ => panic!("invalid move!"),
+                Act::Join => {
+                    self.join_piece(piece_id, dice_number);
+                    // self.can_continue();
+                }
+                Act::Leave => {
+                    self.leave_piece(piece_id, dice_number);
+                    // self.can_continue();
+                }
+                Act::Die => {
+                    self.die_piece(piece_id, dice_number);
+                    // self.can_continue();
+                }
+                Act::Nothing => {
+                }
             }
         }
 
@@ -444,6 +442,18 @@ mod players {
                 0
             }
         }      
+
+        pub fn die_piece(&mut self, piece_id: i8, dice_number: i8) {
+            self.update_position(piece_id, dice_number);
+            if self.is_occupied_by_others(self.new_position).0 & !self.is_other_piece_invincible() {
+                self.send_other_piece_home(self.new_position);
+            }
+            self.die(piece_id);
+        }
+
+        fn is_other_piece_invincible(&mut self) -> bool {
+            self.invincible_positions(self.get_other_player_id()) == self.new_position
+        }
 
         pub fn die(&mut self, piece_id: i8) {
             let old_position = self.piece(piece_id).borrow_mut().position();
@@ -740,7 +750,7 @@ mod players {
             }
         }
 
-        fn get_other_player_id(&self) -> i8 {
+        pub fn get_other_player_id(&self) -> i8 {
             let other_piece = self.board().borrow_mut().outside(self.new_position).pieces.get(0).cloned();
             if let Some(id ) = other_piece.map(|piece| piece.borrow().color() as i8) {
                 id
