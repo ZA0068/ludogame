@@ -2,8 +2,17 @@ mod players {
     use board::Board;
     use dice::Dice;
     use pieces::Piece;
-    
+    use rand::prelude::SliceRandom;
+    use prettytable::{Table, row};
+    use tui::Terminal;
+use tui::backend::TermionBackend;
+use tui::widgets::{Table, Row, Cell};
+use tui::style::{Style, Color};
+use termion::raw::IntoRawMode;
+use std::io;
     // use std::fmt;
+
+
     use std::{cell::RefCell, rc::Rc};
 
     #[derive(PartialEq, Debug, Clone)]
@@ -14,6 +23,7 @@ mod players {
         dice: Option<Dice>,
         board: Rc<RefCell<Board>>,
         pieces: Vec<Rc<RefCell<Piece>>>,
+        pub action: (Act, i8, i8),
         pub old_position: i8,
         pub new_position: i8,
     }
@@ -95,6 +105,7 @@ mod players {
                 board,
                 dice: None,
                 pieces,
+                action: (Act::Nothing, player_id, 57),
                 old_position: -1,
                 new_position: -1,
             }
@@ -131,41 +142,42 @@ mod players {
             match choice {
                 Act::Move => {
                     self.move_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Safe => {
                     self.save_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Starjump => {
                     self.starjump_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Goal => {
                     self.win_piece(piece_id, dice_number);
-                    // self.my_turn();
+                    self.my_turn();
                 }
                 Act::Free => {
                     self.free_piece(piece_id);
-                    // self.my_turn();
+                    self.my_turn();
                 }
                 Act::Kill => {
                     self.kill_piece(piece_id, dice_number);
-                    // self.my_turn();
+                    self.my_turn();
                 }
                 Act::Join => {
                     self.join_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Leave => {
                     self.leave_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Die => {
                     self.die_piece(piece_id, dice_number);
-                    // self.can_continue();
+                    self.can_continue();
                 }
                 Act::Nothing => {
+                    self.turn = false;
                 }
             }
         }
@@ -229,7 +241,7 @@ mod players {
         }
 
         pub fn leave(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            self.update_outside(piece_id, old_position, new_position);
+            self.update_piece(piece_id, old_position, new_position);
         }
 
         pub fn join_piece(&mut self, piece_id: i8, dice_number: i8) {
@@ -488,52 +500,63 @@ mod players {
             matches!((is_goal, is_home, dice), (_, true, 6) | (false, false, 1..=6))
         }
 
-        // pub fn make_random_choice(&mut self, dice_number: i8, action: Act) -> (Act, i8) {
-        //     let action_vector = self.generate_action_and_piece_id_vector(dice_number, action);
-        //     self.select_random_piece(action_vector)
-        // }
+        pub fn play_random(&mut self, actions: Vec<Act>) {
+                let dice_number = self.roll_dice();
+                let movesets = self.generate_movesets(actions, dice_number);
+                self.action = self.select_random_piece(movesets);
+                self.make_move( self.action.1, dice_number,  self.action.0);
+        }
 
-        // pub fn make_ordered_choice(
-        //     &mut self,
-        //     dice_number: i8,
-        //     action: Act,
-        //     take_closest: bool,
-        // ) -> (Act, i8) {
-        //     let action_vector = self.generate_action_and_piece_id_vector(dice_number, action);
-        //     self.select_ordered_piece(action_vector, take_closest)
-        // }
+        fn generate_movesets(&mut self, actions: Vec<Act>, dice_number: i8) ->  Vec<(Act, i8, i8)> {
+            let mut movesets: Vec<(Act, i8, i8)> = Vec::new();
+            for action in actions {
+                let mut action_vector = self.generate_action_vector(dice_number, action);
+                movesets.append(&mut action_vector);
+            }
+            movesets
+        }
 
-        // pub fn select_ordered_piece(
-        //     &mut self,
-        //     action_vector: Vec<(Act, i8)>,
-        //     take_closest: bool,
-        // ) -> (Act, i8) {
-        //     if action_vector.is_empty() {
-        //         return (Act::Nothing, 0);
-        //     }
-        //     let mut ordered_vector = action_vector;
-        //     if take_closest {
-        //         ordered_vector.sort_by(|a, b| self.cmp_positions_asc(a, b));
-        //     } else {
-        //         ordered_vector.sort_by(|a, b| self.cmp_positions_desc(a, b));
-        //     }
-        //     ordered_vector[0]
-        // }
+        pub fn select_random_piece(&mut self, action_vector: Vec<(Act, i8, i8)>) -> (Act, i8, i8) {
+            *action_vector
+                .choose(&mut rand::thread_rng())
+                .unwrap_or(&(Act::Nothing, self.id, 57))
+        }
 
-        // fn cmp_positions_asc(&mut self, a: &(Act, i8), b: &(Act, i8)) -> std::cmp::Ordering {
-        //     self.piece(a.1)
-        //         .borrow_mut()
-        //         .position()
-        //         .cmp(&self.piece(b.1).borrow_mut().position())
-        // }
+        pub fn make_ordered_choice(
+            &mut self,
+            dice_number: i8,
+            action: Act,
+            take_closest: bool,
+        ) -> (Act, i8, i8) {
+            let action_vector = self.generate_action_vector(dice_number, action);
+            self.select_ordered_piece(action_vector, take_closest)
+        }
 
-        // fn cmp_positions_desc(&mut self, a: &(Act, i8), b: &(Act, i8)) -> std::cmp::Ordering {
-        //     self.piece(a.1)
-        //         .borrow_mut()
-        //         .position()
-        //         .cmp(&self.piece(b.1).borrow_mut().position())
-        //         .reverse()
-        // }
+        pub fn select_ordered_piece(
+            &mut self,
+            mut action_vector: Vec<(Act, i8, i8)>,
+            take_closest: bool,
+        ) -> (Act, i8, i8) {
+            action_vector.sort_by(|a, b| self.compare_heuristics(a, b, take_closest));
+            match action_vector.first() {
+                Some(&first_element) => first_element,
+                None => (Act::Nothing, self.id, 57)
+            }
+        }
+        
+        fn compare_heuristics(
+            &self,
+            a: &(Act, i8, i8),
+            b: &(Act, i8, i8),
+            ascending: bool,
+        ) -> std::cmp::Ordering {
+            let order = a.2.cmp(&b.2);
+            if ascending {
+                order
+            } else {
+                order.reverse()
+            }
+        }
 
         pub fn generate_action_vector(
             &mut self,
@@ -585,10 +608,11 @@ mod players {
         pub fn try_to_starjump(&mut self, piece_id: i8, dice_number: i8) -> Act {
             self.update_position(piece_id, dice_number);
             let is_star = self.board().borrow_mut().is_star(self.new_position);
+            let is_home = self.piece(piece_id).borrow_mut().is_home();
             let is_occupied = self.is_occupied_by_others(self.new_position);
             let is_star_occupied = self.is_star_occupied(self.old_position, self.new_position);
-            match (is_star, is_occupied.0, is_star_occupied.0) {
-                (true, false, false) => Act::Starjump,
+            match (is_star, is_home, is_occupied.0, is_star_occupied.0) {
+                (true, false, false, false) => Act::Starjump,
                 _ => Act::Nothing,
             }
         }
@@ -836,90 +860,42 @@ mod players {
             }
         }
 
-        // pub fn random_play(&mut self, actions: Vec<Act>) {
-        //     while self.is_player_turn() && !self.is_finished() {
-        //         let dice_number = self.roll_dice();
-        //         let choices = self.create_choice_vector_random(actions.clone(), dice_number);
-        //         self.choose_random_move(choices, dice_number);
-        //     }
-        // }
-
-        // fn create_choice_vector_random(
-        //     &mut self,
-        //     actions: Vec<Act>,
-        //     dice_number: i8,
-        // ) -> Vec<(Act, i8)> {
-        //     let mut choices: Vec<(Act, i8)> = vec![];
-        //     for action in actions {
-        //         let valid_choice = self.make_random_choice(dice_number, action);
-        //         if valid_choice.0 != Act::Nothing {
-        //             choices.push(valid_choice);
-        //         }
-        //     }
-        //     choices
-        // }
-
-        // fn choose_random_move(&mut self, choices: Vec<(Act, i8)>, dice_number: i8) {
-        //     if let Some(choice) = choices.choose(&mut rand::thread_rng()) {
-        //         self.make_move(choice.1, dice_number, choice.0);
-        //     } else {
-        //         self.make_move(0, dice_number, Act::Nothing);
-        //     }
-        // }
-
-        // pub fn ordered_play(&mut self, actions: Vec<Act>, take_closest: bool) {
-        //     while self.is_player_turn() && !self.is_finished() {
-        //         let dice_number = self.roll_dice();
-        //         let choices =
-        //             self.create_choice_vector_ordered(actions.clone(), dice_number, take_closest);
-        //         self.choose_prefered_move(choices, dice_number);
-        //     }
-        // }
-
-        // fn choose_prefered_move(&mut self, choices: Vec<(Act, i8)>, dice_number: i8) {
-        //     if let Some(choice) = choices.first() {
-        //         self.make_move(choice.1, dice_number, choice.0);
-        //     } else {
-        //         self.make_move(0, dice_number, Act::Nothing);
-        //     }
-        // }
-
-        // fn create_choice_vector_ordered(
-        //     &mut self,
-        //     actions: Vec<Act>,
-        //     dice_number: i8,
-        //     take_closest: bool,
-        // ) -> Vec<(Act, i8)> {
-        //     let mut choices: Vec<(Act, i8)> = vec![];
-        //     for action in actions {
-        //         let valid_choice = self.make_ordered_choice(dice_number, action, take_closest);
-        //         if valid_choice.0 != Act::Nothing {
-        //             choices.push(valid_choice);
-        //         }
-        //     }
-        //     choices
-        // }
-
         pub fn is_finished(&self) -> bool {
             self.pieces.iter().all(|piece| piece.borrow_mut().is_goal())
         }
 
-        // pub fn print_status(&mut self) {
-        //     println!("Player {} pieces:", self.id());
-        //     println!(
-        //         "Piece 0: {:?}\nPiece 1: {:?}\nPiece 2: {:?}\nPiece 3: {:?}\n\n",
-        //         self.piece(0).borrow().position(),
-        //         self.piece(1).borrow_mut().position(),
-        //         self.piece(2).borrow_mut().position(),
-        //         self.piece(3).borrow_mut().position()
-        //     );
-        // }
+        pub fn print_status(&mut self) {
+            let mut table = Table::new();
+            table.add_row(row![
+                "Player",
+                "Dice number",
+                "Old position",
+                "New position",
+                "Piece id",
+                "Act",
+                "Piece 0",
+                "Piece 1",
+                "Piece 2",
+                "Piece 3"
+            ]);
+            table.add_row(row![
+                format!("{:<8}", self.id()),
+                format!("{:<12}", self.dice.as_ref().unwrap().get_value()),
+                format!("{:<13}", self.old_position),
+                format!("{:<13}", self.new_position),
+                format!("{:<9}", self.action.1),
+                format!("{:<10}", format!("{:?}", self.action.0)),
+                format!("{:<8}", self.piece(0).borrow().position()),
+                format!("{:<8}", self.piece(1).borrow_mut().position()),
+                format!("{:<8}", self.piece(2).borrow_mut().position()),
+                format!("{:<8}", self.piece(3).borrow_mut().position())
+            ]);
+            table.printstd();
+        }
+        
+        
 
-        // pub fn select_random_piece(&mut self, action_vector: Vec<(Act, i8)>) -> (Act, i8) {
-        //     *action_vector
-        //         .choose(&mut rand::thread_rng())
-        //         .unwrap_or(&(Act::Nothing, 0))
-        // }
+
     }
 
     fn get_color_from_player_id(player_id: i8) -> Color {

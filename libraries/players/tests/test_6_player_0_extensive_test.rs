@@ -37,6 +37,9 @@ mod player_0_choice_tests {
         let result = player.try_to_move(0, 1);
         assert_eq!(result, Act::Nothing);
 
+        let result = player.try_to_move(0, 6);
+        assert_eq!(result, Act::Nothing);
+
         player.free_piece(0);
         let result = player.try_to_move(0, 6);
         assert_eq!(result, Act::Move);
@@ -95,6 +98,9 @@ mod player_0_choice_tests {
         let mut player = Player::new(PLAYER_ID, board);
 
         let result = player.try_to_join(0, 1);
+        assert_eq!(result, Act::Nothing);
+
+        let result = player.try_to_join(0, 6);
         assert_eq!(result, Act::Nothing);
 
         player.free_piece(0);
@@ -167,6 +173,9 @@ mod player_0_choice_tests {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+
+        let result = player.try_to_kill(0, 6);
+        assert_eq!(result, Act::Nothing);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -264,6 +273,9 @@ mod player_0_choice_tests {
         let mut player = Player::new(PLAYER_ID, board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
+        let result = player.try_to_die(0, 6);
+        assert_eq!(result, Act::Nothing);
+        
         player.free_piece(0);
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -328,6 +340,9 @@ mod player_0_choice_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
        
+        let result = player.try_to_win(0, 6);
+        assert_eq!(result, Act::Nothing);
+
         player.free_piece(0);
         let old_position = 0;
         let new_position = 52;
@@ -367,6 +382,9 @@ mod player_0_choice_tests {
     fn try_to_leave_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
+
+        let result = player.try_to_leave(0, 6);
+        assert_eq!(result, Act::Nothing);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -434,6 +452,9 @@ mod player_0_choice_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
 
+        let result = player.try_to_safe(0, 6);
+        assert_eq!(result, Act::Nothing);
+
         player.free_piece(0);
         player.free_piece(1);
 
@@ -480,6 +501,8 @@ mod player_0_choice_tests {
         let mut player = Player::new(PLAYER_ID, board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID, board);
         
+        let result = player.try_to_starjump(0, 6);
+        assert_eq!(result, Act::Nothing);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1321,7 +1344,7 @@ mod player_0_valid_choices_tests {
         
         result = player.valid_choices(0, 1, Act::Nothing);
         assert_eq!(result, Act::Nothing);
-        
+
         player.free_piece(0);
         result = player.valid_choices(0, 7, Act::Move);
         assert_eq!(result, Act::Nothing);
@@ -1920,6 +1943,19 @@ mod player_0_valid_choices_tests {
 mod player_0_play_test {
     use super::*;
 
+        static ACTIONS: [Act; 10] = [
+        Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Goal,
+        Act::Safe,
+        Act::Starjump,
+        Act::Nothing,
+    ];
+
     #[test]
     fn make_move_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -2022,5 +2058,288 @@ mod player_0_play_test {
         assert!(player.piece(0).borrow().is_goal());
     }
 
+    #[test]
+    fn generate_action_vector_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+
+        let mut result: Vec<(Act, i8, i8)>;
+        let mut dice_number: i8;
+
+        dice_number = 6;
+        result = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(result.len(), 0);
+        result = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(result.len(), 4);
+        assert_eq!(result.first().unwrap().2, 57);
+
+
+        player.free_piece(0);
+
+        result = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(result.len(), 3);
+
+        result = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result.first().unwrap().2, 56);
+
+
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        result = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(result.len(), 0);
+
+        result = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(result.len(), 0);
+
+        result = player.generate_action_vector(dice_number, Act::Leave);
+        assert_eq!(result.len(), 4);
+        assert_eq!(result[0].2, 56);
+        assert_eq!(result[1].2, 56);
+        assert_eq!(result[2].2, 56);
+        assert_eq!(result[3].2, 56);
+
+
+        player.leave_piece(0, dice_number);
+
+        result = player.generate_action_vector(dice_number, Act::Leave);
+        assert_eq!(result.len(), 0);
+
+        result = player.generate_action_vector(dice_number, Act::Join);
+        assert_eq!(result.len(), 3);
+
+        player.join_piece(1, dice_number);
+
+        dice_number = 5;
+        result = player.generate_action_vector(dice_number, Act::Starjump);
+        assert_eq!(result.len(), 4);
+        assert_eq!(result[0].2, 50);
+        assert_eq!(result[1].2, 50);
+        assert_eq!(result[2].2, 56);
+        assert_eq!(result[3].2, 56);
+    }
+
+    #[test]
+    fn select_ordered_piece_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+
+        let mut action_vector: Vec<(Act, i8, i8)>;
+        let mut dice_number: i8;
+        let mut result: (Act, i8, i8);
+
+        dice_number = 6;
+        action_vector = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(action_vector.len(), 0);
+        
+        result = player.select_ordered_piece(action_vector, true);
+        assert_eq!(result.0, Act::Nothing);
+        assert_eq!(result.2, 57);
+
+
+        action_vector = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(action_vector.len(), 4);
+        result = player.select_ordered_piece(action_vector, true);
+        assert_eq!(result.0, Act::Free);
+        assert_eq!(result.2, 57);
+
+        player.free_piece(0);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(action_vector.len(), 3);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(action_vector.len(), 1);
+        assert_eq!(action_vector.first().unwrap().2, 56);
+        result = player.select_ordered_piece(action_vector, true);
+        assert_eq!(result.0, Act::Move);
+        assert_eq!(result.2, 56);
+
+
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Free);
+        assert_eq!(action_vector.len(), 0);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Move);
+        assert_eq!(action_vector.len(), 0);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Leave);
+        assert_eq!(action_vector.len(), 4);
+        assert_eq!(action_vector[0].2, 56);
+        assert_eq!(action_vector[1].2, 56);
+        assert_eq!(action_vector[2].2, 56);
+        assert_eq!(action_vector[3].2, 56);
+
+        result = player.select_ordered_piece(action_vector, true);
+        assert_eq!(result.0, Act::Leave);
+        assert_eq!(result.2, 56);
+        
+
+        player.leave_piece(0, dice_number);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Leave);
+        assert_eq!(action_vector.len(), 0);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Join);
+        assert_eq!(action_vector.len(), 3);
+
+        player.join_piece(1, dice_number);
+
+        dice_number = 5;
+        action_vector = player.generate_action_vector(dice_number, Act::Starjump);
+        assert_eq!(action_vector.len(), 4);
+        assert_eq!(action_vector[0].2, 50);
+        assert_eq!(action_vector[1].2, 50);
+        assert_eq!(action_vector[2].2, 56);
+        assert_eq!(action_vector[3].2, 56);
+
+        result = player.select_ordered_piece(action_vector.clone(), true);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.2, 50);
+
+        result = player.select_ordered_piece(action_vector, false);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.2, 56);
+
+        player.leave_piece(0, 5);
+        player.leave_piece(0, 2);
+
+        action_vector = player.generate_action_vector(dice_number, Act::Starjump);
+        assert_eq!(action_vector.len(), 4);
+        assert_eq!(action_vector[0].2, 43);
+        assert_eq!(action_vector[1].2, 50);
+        assert_eq!(action_vector[2].2, 56);
+        assert_eq!(action_vector[3].2, 56);
+
+        result = player.select_ordered_piece(action_vector, true);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.1, 0);
+        assert_eq!(result.2, 43);
+    }
+
+    #[test]
+    fn make_ordered_choice() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
+
+        let mut dice_number: i8;
+        let mut result: (Act, i8, i8);
+
+        dice_number = 6;
+
+        result = player.make_ordered_choice(dice_number, Act::Move, true);
+        
+        assert_eq!(result.0, Act::Nothing);
+        assert_eq!(result.2, 57);
+
+
+        result = player.make_ordered_choice(dice_number, Act::Free, true);
+        assert_eq!(result.0, Act::Free);
+        assert_eq!(result.2, 57);
+
+        player.free_piece(0);
+
+        result = player.make_ordered_choice(dice_number, Act::Move, true);
+        assert_eq!(result.0, Act::Move);
+        assert_eq!(result.2, 56);
+
+
+        player.free_piece(1);
+        player.free_piece(2);
+        player.free_piece(3);
+
+        result = player.make_ordered_choice(dice_number, Act::Leave, true);
+
+        assert_eq!(result.0, Act::Leave);
+        assert_eq!(result.2, 56);
+        
+
+        player.leave_piece(0, dice_number);
+        player.join_piece(1, dice_number);
+
+        dice_number = 5;
+        result = player.make_ordered_choice(dice_number, Act::Starjump, true);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.2, 50);
+
+        result = player.make_ordered_choice(dice_number,Act::Starjump, false);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.2, 56);
+
+        player.leave_piece(0, 5);
+        player.leave_piece(0, 2);
+
+        result = player.make_ordered_choice(dice_number,Act::Starjump, true);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.1, 0);
+        assert_eq!(result.2, 43);
+
+        result = player.make_ordered_choice(dice_number,Act::Starjump, false);
+        assert_eq!(result.0, Act::Starjump);
+        assert_eq!(result.1, 2);
+        assert_eq!(result.2, 56);
+    }
+
+    #[test]
+    fn random_play_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let dice = Dice::default();
+        let actions = ACTIONS.to_vec();
+        player.my_turn();
+        player.take_dice(dice);
+        
+            for _ in 0..1 {
+            while !player.is_finished() {
+                player.play_random(actions.clone());
+                player.print_status();
+            }
+            board.borrow_mut().reset();
+        }
+    }
+
+    #[test]
+    fn random_play_test_2() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let dice = Dice::default();
+        let actions = ACTIONS.to_vec();
+        player.my_turn();
+        player.take_dice(dice);
     
+        // Set up the terminal
+        let stdout = io::stdout().into_raw_mode().unwrap();
+        let backend = TermionBackend::new(stdout);
+        let mut terminal = Terminal::new(backend).unwrap();
+    
+        for _ in 0..1 {
+            while !player.is_finished() {
+                player.play_random(actions.clone());
+    
+                // Create the table
+                let rows = vec![
+                    // ... create rows as in the previous example ...
+                ];
+                let table = Table::new(rows)
+                    .widths(&[5, 11, 13, 13, 9, 6, 8, 8, 8, 8])
+                    .style(Style::default().fg(Color::White))
+                    .header_style(Style::default().fg(Color::Yellow));
+    
+                // Draw the table
+                terminal.draw(|f| {
+                    let size = f.size();
+                    f.render_widget(table, size);
+                }).unwrap();
+    
+                // You might want to add a delay here so that you can see each table
+                std::thread::sleep(std::time::Duration::from_secs(1));
+            }
+            board.borrow_mut().reset();
+        }
+    }
 }
