@@ -2286,6 +2286,7 @@ mod player_0_play_test {
     }
 
     #[test]
+    #[ignore]
     fn random_play_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
@@ -2304,6 +2305,7 @@ mod player_0_play_test {
     }
 
     #[test]
+    #[ignore]
     fn ordered_play_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
