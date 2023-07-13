@@ -283,8 +283,14 @@ mod players {
 
         pub fn update_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
             match (self.id(), old_position, new_position) {
-                (0, 52..=56, 52..=62) => self.update_inside(piece_id, old_position, new_position),
-                (0, 45..=50, 51..=56) => {
+                (0, 52..=56, 52..=62) |
+                (1, 57..=61, 57..=67) |
+                (2, 62..=66, 62..=72) |
+                (3, 67..=71, 67..=77) => self.update_inside(piece_id, old_position, new_position),
+                (0, 45..=50, 51..=56) |
+                (1,  6..=11, 12..=17) |
+                (2, 19..=24, 25..=30) |
+                (3, 32..=37, 38..=43) => {
                     self.correct_position();
                     self.enter_inside(piece_id, self.old_position, self.new_position);
                 },
