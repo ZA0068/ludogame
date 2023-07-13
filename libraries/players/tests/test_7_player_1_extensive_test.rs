@@ -267,73 +267,73 @@ mod player_1_choice_tests {
         assert_eq!(result, Act::Kill);
     }
 
-    // #[test]
-    // fn try_to_die_test() {
-    //     let board = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
-    //     let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+    #[test]
+    fn try_to_die_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
-    //     let result = player.try_to_die(0, 6);
-    //     assert_eq!(result, Act::Nothing);
+        let result = player.try_to_die(0, 6);
+        assert_eq!(result, Act::Nothing);
         
-    //     player.free_piece(0);
-    //     other_player.free_piece(0);
-    //     other_player.free_piece(1);
+        player.free_piece(0);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
 
-    //     other_player.update_outside(0, 13, 1);
-    //     other_player.join(1, 13, 1);
-    //     let result = player.try_to_die(0, 1);
-    //     assert_eq!(result, Act::Die);
+        other_player.update_outside(0, 26, 14);
+        other_player.join(1, 26, 14);
+        let result = player.try_to_die(0, 1);
+        assert_eq!(result, Act::Die);
 
-    //     other_player.update_outside(0, 1, 5);
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.update_outside(0, 14, 18);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
 
-    //     other_player.update_outside(1, 1, 5);
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Die);
+        other_player.update_outside(1, 14, 18);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
 
-    //     other_player.leave(0, 5, 8);
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Nothing);
-        
-    //     let result = player.try_to_die(0, 8);
-    //     assert_eq!(result, Act::Die);
+        other_player.leave(0, 18, 21);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
 
-    //     other_player.update_outside(1, 5, 11);
-    //     other_player.join(0, 8, 11);
+        let result = player.try_to_die(0, 8);
+        assert_eq!(result, Act::Die);
 
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Die);
+        other_player.update_outside(1, 18, 24);
+        other_player.join(0, 21, 24);
 
-    //     other_player.free_piece(2);
-    //     other_player.update_outside(2, 13, 5);
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Die);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
 
-    //     other_player.join(1, 11, 5);
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Die);
+        other_player.free_piece(2);
+        other_player.update_outside(2, 26, 18);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
 
-    //     other_player.leave(1, 5, 6);
+        other_player.join(1, 24, 18);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Die);
 
-    //     let result = player.try_to_die(0, 5);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.leave(1, 18, 19);
 
-
-    //     other_player.update_outside(1, 6, 26);
-    //     other_player.join(0, 11, 26);
-    //     let result = player.try_to_die(0, 26);
-    //     assert_eq!(result, Act::Die);
+        let result = player.try_to_die(0, 5);
+        assert_eq!(result, Act::Nothing);
 
 
-    //     other_player.leave(1, 26, 13);
-    //     let result = player.try_to_die(0, 26);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.update_outside(1, 19, 39);
+        other_player.join(0, 24, 39);
+        let result = player.try_to_die(0, 26);
+        assert_eq!(result, Act::Die);
 
-    //     let result = player.try_to_die(0, 13);
-    //     assert_eq!(result, Act::Die);
-    // }
+
+        other_player.leave(1, 39, 26);
+        let result = player.try_to_die(0, 26);
+        assert_eq!(result, Act::Nothing);
+
+        let result = player.try_to_die(0, 13);
+        assert_eq!(result, Act::Die);
+    }
 
     // #[test]
     // fn try_to_win_test() {
