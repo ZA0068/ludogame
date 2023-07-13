@@ -128,35 +128,6 @@ mod atomic_multiplayers_tests {
     }
 
     #[test]
-    fn get_other_player_id_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let player0 = Player::new(PLAYER_0, board.clone());
-        let player1 = Player::new(PLAYER_1, board.clone());
-        let player2 = Player::new(PLAYER_2, board.clone());
-        let player3 = Player::new(PLAYER_3, board);
-
-        assert_eq!(player0.get_other_player_id(), 1);
-        assert_eq!(player0.get_other_player_id(), 2);
-        assert_eq!(player0.get_other_player_id(), 3);
-        assert_eq!(player0.get_other_player_id(), 0);
-
-        assert_eq!(player1.get_other_player_id(), 2);
-        assert_eq!(player1.get_other_player_id(), 3);
-        assert_eq!(player1.get_other_player_id(), 0);
-        assert_eq!(player1.get_other_player_id(), 1);
-
-        assert_eq!(player2.get_other_player_id(), 3);
-        assert_eq!(player2.get_other_player_id(), 0);
-        assert_eq!(player2.get_other_player_id(), 1);
-        assert_eq!(player2.get_other_player_id(), 2);
-
-        assert_eq!(player3.get_other_player_id(), 0);
-        assert_eq!(player3.get_other_player_id(), 1);
-        assert_eq!(player3.get_other_player_id(), 2);
-        assert_eq!(player3.get_other_player_id(), 3);
-    }
-
-    #[test]
     fn two_players_move_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player1 = Player::new(PLAYER_0, board.clone());

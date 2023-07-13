@@ -256,13 +256,13 @@ mod players {
         pub fn save_piece(&mut self, piece_id: i8, dice_number: i8) {
             self.update_position(piece_id, dice_number);
             match (self.id, self.old_position, self.new_position) {
-                (0, 45..=50, 51..=56) => {
+                (0, 45..=50, 51..=56) |
+                (1,  6..=11, 12..=17) |
+                (2, 19..=24, 25..=30) |
+                (3, 32..=37, 38..=43) => {
                     self.correct_position();
                     self.enter_inside(piece_id, self.old_position, self.new_position);
                 },
-                // (1, 6..=11, 12..=17) => self.enter_inside(piece_id, self.old_position, self.new_position),
-                // (2, 62..=66, 62..=72) => self.enter_inside(piece_id, self.old_position, self.new_position),
-                // (3, 67..=71, 67..=77) => self.enter_inside(piece_id, self.old_position, self.new_position),
                 _ => {
                     if !self.board().borrow_mut().is_globe(self.new_position) {
                         panic!("New position is not a Globe!");	
@@ -887,13 +887,18 @@ mod players {
                 return 0
             }
             let position = self.piece(piece_id).borrow_mut().position();
-            match (self.id, position) {
+            let fixed_position = match (self.id, position) {
                 (0, 51..=55) => 57 - position,
+                (1, 57..=61)  => 62 - position,
                 (1, _)  => 69 - position,
                 (2, _) =>  82 - position,
                 (3, _) =>  95 - position,
                 _ => 56 - position,
+            };
+            if fixed_position >= 57 {
+                return fixed_position - 52;
             }
+            fixed_position
         }
 
         pub fn is_finished(&self) -> bool {

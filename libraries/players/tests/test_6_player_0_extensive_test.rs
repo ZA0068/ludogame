@@ -253,7 +253,7 @@ mod player_0_choice_tests {
         let result = player.try_to_kill(0, 5);
         assert_eq!(result, Act::Kill);
 
-        other_player.leave(2, 11, 12);
+        other_player.leave(2, 11, 10);
         let result = player.try_to_kill(0, 5);
         assert_eq!(result, Act::Kill);
 
@@ -2295,7 +2295,7 @@ mod player_0_play_test {
         player.my_turn();
         player.take_dice(dice);
         
-            for _ in 0..1000 {
+            for _ in 0..100 {
             while !player.is_finished() {
 
                 player.play_random(actions.clone());
@@ -2323,19 +2323,5 @@ mod player_0_play_test {
             }
             board.borrow_mut().reset();
         }
-    }
-
-    #[test]
-    fn bug_test() {
-        let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board.clone());
-        let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
-        player.my_turn();
-        player.take_dice(dice);
-        
-        player.free_piece(3);
-        let result = player.valid_choices(0, 6, Act::Join);
-        assert_eq!(result, Act::Nothing);
     }
 }

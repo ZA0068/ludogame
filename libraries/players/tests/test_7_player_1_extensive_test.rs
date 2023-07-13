@@ -250,7 +250,7 @@ mod player_1_choice_tests {
         let result = player.try_to_kill(0, 5);
         assert_eq!(result, Act::Kill);
 
-        other_player.leave(2, 24, 25);
+        other_player.leave(2, 24, 23);
         let result = player.try_to_kill(0, 5);
         assert_eq!(result, Act::Kill);
 
@@ -703,1247 +703,1249 @@ mod player_1_move_tests {
     assert_eq!(player.piece(piece_id).borrow().position(), 99);
     }
 
-    // #[test]
-    // fn move_all_pieces_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     for i in 0..50 {
-    //         player.move_piece(piece_id, 1);
-    //         assert_eq!(player.piece(piece_id).borrow().position(), i + 1);
-    //         assert_eq!(
-    //             player.board().borrow_mut().outside(i + 1).pieces.len(),
-    //             1
-    //         );
-    //         assert_eq!(
-    //             player.board().borrow_mut().outside(i + 1).player_id,
-    //             Some(board::PlayerID::Player0)
-    //         );
-    //         assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
-    //     }
-    //     player.move_piece(piece_id, 1);
-    //     let vec = (52..=57).chain((52..57).rev()).collect::<Vec<_>>();
-    //     for i in 52..62 {
-    //         let oldpos = player.piece(piece_id).borrow().position();
-    //         if (i + 1) % 57 == 0 {
-    //             continue;
-    //         }
-
-    //         player.update_piece(piece_id, oldpos, i + 1);
-    //         assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 51]);
-
-    //         assert_eq!(
-    //             player.board().borrow_mut().inside(vec[i as usize - 51]).player_id,
-    //             Some(board::PlayerID::Player0)
-    //         );
-    //     }
-    // }
-    // assert_eq!(player.board().borrow_mut().inside(52).pieces.len(), 4);
-    // }
-
-    // #[test]
-    // fn move_all_pieces_test_2() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     for i in 0..50 {
-    //         player.move_piece(piece_id, 1);
-    //         assert_eq!(player.piece(piece_id).borrow().position(), i + 1);
-    //         assert_eq!(
-    //             player.board().borrow_mut().outside(i + 1).pieces.len(),
-    //             1
-    //         );
-    //         assert_eq!(
-    //             player.board().borrow_mut().outside(i + 1).player_id,
-    //             Some(board::PlayerID::Player0)
-    //         );
-    //         assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
-    //     }
-    //     player.move_piece(piece_id, 1);
-    //     let vec = (52..=57).collect::<Vec<_>>();
-    //     for i in 52..56 {
-
-    //         player.move_piece(piece_id, 1);
-    //         assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 51]);
-    //         assert_eq!(
-    //             player.board().borrow_mut().inside(vec[i as usize - 51]).player_id,
-    //             Some(board::PlayerID::Player0)
-    //         );
-    //     }
-    //     player.enter_goal(piece_id, 56);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    // }
-    // assert!(player.is_finished());
-    // }
-
-    // #[test]
-    // fn safety_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-    // let piece_id = 0;
-
-    // player.free_piece(piece_id);
-    // player.move_piece(piece_id, 7);
-    // player.save_piece(piece_id, 1);
-
-    // assert_eq!(player.piece(piece_id).borrow().position(), 8);
-
-    // player.update_piece(piece_id, 8, 50);
-    // player.save_piece(piece_id, 1);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 52);
-    // }
-
-    // #[test]
-    // fn safety_test_2() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 7);
-    //     player.save_piece(piece_id, 1);
-
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 8);
-
-    //     player.update_piece(piece_id, 8, 50);
-    //     player.save_piece(piece_id, 1);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 52);
-    // }
-    // }
-
-    // #[test]
-    // fn safety_test_3() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     for i in 1..=56 {
-    //         if i == 50 {
-    //             continue;
-    //         }
-    //         let is_globe = player.board().borrow().is_globe(i);
-    //         if is_globe {
-    //             player.save_piece(piece_id, 1);
-
-    //         } else {
-    //             player.move_piece(piece_id, 1);
-    //         }
-    //     }
-    // }
-    // }
-
-    // #[test]
-    // fn starjump_to_goal_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board.clone());
-    // let mut other_player = Player::new(OTHER_PLAYER_ID, board);
-
-    // let piece_id = 0;
-    // player.free_piece(piece_id);
-    // other_player.free_piece(piece_id);
-
-    // player.move_piece(piece_id, 44);
-    // other_player.update_outside(piece_id, 13, 50);
-
-    // assert_eq!(player.piece(piece_id).borrow().position(), 44);
-
-    // player.win_piece(piece_id, 6);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    // assert!(player.piece(piece_id).borrow().is_goal());
-    // assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
-
-    // assert!(other_player.piece(piece_id).borrow().is_home());
-    // assert_eq!(other_player.piece(piece_id).borrow().position(), -1);
-    // }
-
-    // #[test]
-    // fn starjump_to_goal_test_2() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 44);
-
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 44);
-
-    //     player.win_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //     assert!(player.piece(piece_id).borrow().is_goal());
-    //     assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
-    // }
-    // assert!(player.is_finished());
-    // }
-
-    // #[test]
-    // fn starjump_to_goal_test_3() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     for position in 1..=50 {
-    //         if position < 50 {
-    //             player.move_piece(piece_id, 1);
-    //             assert_eq!(player.piece(piece_id).borrow().position(), position);
-    //         } else {
-    //             player.win_piece(piece_id, 1);
-    //             assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //             assert!(player.piece(piece_id).borrow().is_goal());
-    //         }
-    //     }
-    //     assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
-    // }
-    // assert!(player.is_finished());
-    // }
-
-    // #[test]
-    // fn enter_goal_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // let piece_id = 0;
-    // player.free_piece(piece_id);
-    // player.move_piece(piece_id, 50);
-    // player.win_piece(piece_id, 6);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    // assert!(player.piece(piece_id).borrow().is_goal());
-    // assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
-    // }
-
-    // #[test]
-    // fn enter_goal_test_2() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     player.move_piece(piece_id, 50);
-    //     player.win_piece(piece_id, 6);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //     assert!(player.piece(piece_id).borrow().is_goal());
-    //     assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
-    // }
-    // assert!(player.is_finished());
-    // }
-
-    // #[test]
-    // fn enter_goal_test_3() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board.clone());
-
-    // for dice_number in (1..=6).rev() {
-    //     for piece_id in 0..4 {
-    //         player.free_piece(piece_id);
-    //         player.move_piece(piece_id, 50);
-    //         player.move_piece(piece_id, 6 - dice_number);
-    //         player.win_piece(piece_id, dice_number);
-    //         assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //         assert!(player.piece(piece_id).borrow().is_goal());
-    //         assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
-    //     }
-    //     assert!(player.is_finished());
-    //     board.borrow_mut().reset();
-    // }
-    // }
-
-    // #[test]
-    // fn starjump_test () {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-    // let piece_id = 0;
-
-    // player.free_piece(piece_id);
-    // player.starjump_piece(piece_id, 5);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 11);
-    // assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 1);
-
-    // player.update_piece(piece_id, 11, 10);
-    // player.starjump_piece(piece_id, 1);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 18);
-    // assert_eq!(player.board().borrow_mut().outside(18).pieces.len(), 1);
-    // }
-
-    // #[test]
-    // fn starjump_test_2 () {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-    // let starvec = vec![5, 11, 18, 24, 31, 37, 44, 50];
-    // let piece_id = 0;
-
-    // player.free_piece(piece_id);
-    // player.starjump_piece(piece_id, 5);
-    // assert_eq!(player.piece(piece_id).borrow().position(), 11);
-    // assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 1);
-
-    // (1..7).for_each(|i| {
-
-    //     player.update_piece(piece_id, starvec[i], starvec[i] - 1);
-    //     player.starjump_piece(piece_id, 1);
-
-    //     assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
-    //     assert_eq!(player.board().borrow_mut().outside(starvec[i + 1]).pieces.len(), 1);
-    // });
-    // }
-
-    // #[test]
-    // fn starjump_test_3 () {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-    // let starvec = vec![5, 11, 18, 24, 31, 37, 44, 50];
-
-    // for piece_id in 0..4 {
-    //     player.free_piece(piece_id);
-    //     player.starjump_piece(piece_id, 5);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 11);
-
-    //     (1..7).for_each(|i| {
-    //         player.update_piece(piece_id, starvec[i], starvec[i] - 1);
-    //         player.starjump_piece(piece_id, 1);
-
-    //         assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
-    //     });
-
-    //     player.update_piece(piece_id, starvec[7], starvec[7] - 1);
-    //     player.starjump_piece(piece_id, 1);
-    //     assert_eq!(player.piece(piece_id).borrow().position(), 99);
-    //     assert!(player.piece(piece_id).borrow().is_goal());
-    // }
-    // assert!(player.is_finished());
-    // }
-
-    // #[test]
-    // fn join_piece_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-
-    // player.move_piece(0, 1);
-    // player.join_piece(1, 1);
-    // assert_eq!(player.piece(0).borrow().position(), 1);
-    // assert_eq!(player.piece(1).borrow().position(), 1);
-    // assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
-    // }
-
-    // #[test]
-    // fn join_piece_by_starjump_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-
-    // player.starjump_piece(0, 5);
-    // player.join_piece(1, 5);
-    // assert_eq!(player.piece(0).borrow().position(), 11);
-    // assert_eq!(player.piece(1).borrow().position(), 11);
-    // assert_eq!(player.board().borrow_mut().outside(11).pieces.len(), 2);
-
-    // player.update_outside(0, 11, 18);
-    // player.update_outside(1, 11, 16);
-
-    // player.join_piece(1, 2);
-    // }
-
-    // #[test]
-    // fn join_piece_by_globe_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-    // player.update_outside(0, 0, 6);
-    // player.update_outside(1, 0, 7);
-
-    // player.move_piece(0, 2);
-    // player.join_piece(1, 1);
-
-    // assert_eq!(player.piece(0).borrow().position(), 8);
-    // assert_eq!(player.piece(1).borrow().position(), 8);
-    // }
-
-    // #[test]
-    // fn join_piece_by_invincible_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-    // player.update_outside(0, 0, 11);
-    // player.update_outside(1, 0, 12);
-
-    // player.move_piece(0, 2);
-    // player.join_piece(1, 1);
-
-    // assert_eq!(player.piece(0).borrow().position(), 13);
-    // assert_eq!(player.piece(1).borrow().position(), 13);
-    // }
-
-    // #[test]
-    // fn leave_piece_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-
-    // player.move_piece(0, 1);
-    // player.join_piece(1, 1);
-
-    // player.leave_piece(0, 1);
-    // }
-
-    // #[test]
-    // fn leave_piece_from_globe_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-
-    // player.move_piece(0, 8);
-    // player.join_piece(1, 8);
-
-    // player.leave_piece(0, 1);
-    // }
-
-    // #[test]
-    // fn leave_piece_from_invincible_test() {
-    // let board = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    // player.free_piece(0);
-    // player.free_piece(1);
-
-    // player.move_piece(0, 13);
-    // player.join_piece(1, 13);
-
-    // player.leave_piece(0, 1);
-    // }
-
-    // #[test]
-    // fn kill_piece_test() {
-    // let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board.clone());
-    // let mut other_player = Player::new(OTHER_PLAYER_ID, board);
-
-    // other_player.free_piece(0);
-    // other_player.free_piece(1);
-    // other_player.free_piece(2);
-    // other_player.free_piece(3);
-
-    // other_player.update_outside(0, 13, 0);
-    // other_player.update_outside(1, 13, 0);
-    // other_player.update_outside(2, 13, 0);
-    // other_player.update_outside(3, 13, 1);
-
-    // player.kill_piece(0, 6);
-    // assert_eq!(other_player.piece(0).borrow().position(), -1);
-    // assert_eq!(other_player.piece(1).borrow().position(), -1);
-    // assert_eq!(other_player.piece(2).borrow().position(), -1);
-    // assert!(other_player.piece(0).borrow().is_home());
-    // assert!(other_player.piece(1).borrow().is_home());
-    // assert!(other_player.piece(2).borrow().is_home());
-
-    // player.kill_piece(0, 1);
-    // assert_eq!(other_player.piece(3).borrow().position(), -1);
-    // assert!(other_player.piece(3).borrow().is_home());
-    // }
-
-    // #[test]
-    // fn kill_piece_by_starjump_test() {
-    // let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board.clone());
-    // let mut other_player = Player::new(OTHER_PLAYER_ID, board);
-
-    // other_player.free_piece(0);
-    // other_player.free_piece(1);
-    // player.free_piece(0);
-
-    // other_player.update_outside(0, 13, 5);
-    // other_player.update_outside(1, 13, 11);
-
-    // player.kill_piece(0, 5);
-    // assert_eq!(other_player.piece(0).borrow().position(), -1);
-    // assert!(other_player.piece(0).borrow().is_home());
-    // assert_eq!(other_player.piece(1).borrow().position(), -1);
-    // assert!(other_player.piece(1).borrow().is_home());
-    // assert_eq!(player.piece(0).borrow().position(), 11);
-    // }
-
-    // #[test]
-    // fn kill_piece_and_join() {
-    //     let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
-    //     let mut other_player = Player::new(OTHER_PLAYER_ID, board);
-
-    //     other_player.free_piece(0);
-    //     player.free_piece(0);
-    //     player.free_piece(1);
-
-    //     player.starjump_piece(1, 5);
-    //     other_player.update_outside(0, 13, 5);
-
-    //     player.kill_piece(0, 5);
-    //     assert_eq!(other_player.piece(0).borrow().position(), -1);
-    //     assert!(other_player.piece(0).borrow().is_home());
-
-    //     assert_eq!(player.piece(0).borrow().position(), 11);
-    //     assert_eq!(player.piece(1).borrow().position(), 11);
-
-    // }
-
-    // #[test]
-    // fn get_playerpiece_heuristics() {
-    // let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    //     for piece_id in 0..4 {
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 57);
-
-    //         player.free_piece(piece_id);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 56);
-
-    //         player.move_piece(piece_id, 1);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 55);
-
-    //         player.starjump_piece(piece_id, 4);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 45);
-
-    //         player.move_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 39);
-
-    //         player.save_piece(piece_id, 4);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 35);
-
-    //         player.starjump_piece(piece_id, 3);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 25);
-
-    //         player.starjump_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 12);
-
-    //         player.win_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 0);
-    //     }
-    // }
-
-    // #[test]
-    // fn get_playerpiece_heuristics_2() {
-    // let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    //     for piece_id in 0..4 {
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 57);
-
-    //         player.free_piece(piece_id);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 56);
-
-    //         player.move_piece(piece_id, 1);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 55);
-
-    //         player.starjump_piece(piece_id, 4);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 45);
-
-    //         player.move_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 39);
-
-    //         player.save_piece(piece_id, 4);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 35);
-
-    //         player.move_piece(piece_id, 5);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 30);
-
-    //         player.starjump_piece(piece_id, 5);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 19);
-
-    //         player.move_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 13);
-
-    //         player.starjump_piece(piece_id, 1);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 6);
-
-    //         player.win_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 0);
-    //     }
-    // }
-
-    // #[test]
-    // fn get_playerpiece_heuristics_3() {
-    // let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    // let mut player = Player::new(PLAYER_ID, board);
-
-    //     for piece_id in 0..4 {
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 57);
-
-    //         player.free_piece(piece_id);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 56);
-
-    //         player.move_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 50);
-
-    //         player.starjump_piece(piece_id, 5);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 38);
-
-    //         player.starjump_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 25);
-
-    //         player.starjump_piece(piece_id, 6);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 12);
-
-    //         player.save_piece(piece_id, 3);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 9);
-
-    //         player.save_piece(piece_id, 4);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 5);
-
-    //         player.win_piece(piece_id, 5);
-    //         let result = player.get_heuristics(piece_id);
-    //         assert_eq!(result, 0);
-    //     }
-    // }
+    #[test]
+    fn move_all_pieces_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        for i in 13..63 {
+            player.move_piece(piece_id, 1);
+            assert_eq!(player.piece(piece_id).borrow().position(), (i + 1) % 52);
+            assert_eq!(
+                player.board().borrow_mut().outside(i + 1).pieces.len(),
+                1
+            );
+            assert_eq!(
+                player.board().borrow_mut().outside(i + 1).player_id,
+                Some(board::PlayerID::Player1)
+            );
+            assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
+        }
+        player.move_piece(piece_id, 1);
+        let vec = (57..=62).chain((57..62).rev()).collect::<Vec<_>>();
+        for i in 57..67 {
+            let oldpos = player.piece(piece_id).borrow().position();
+            if (i + 1) % 62 == 0 {
+                continue;
+            }
+
+            player.update_piece(piece_id, oldpos, i + 1);
+            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 56]);
+
+            assert_eq!(
+                player.board().borrow_mut().inside(vec[i as usize - 56]).player_id,
+                Some(board::PlayerID::Player1)
+            );
+        }
+    }
+    assert_eq!(player.board().borrow_mut().inside(57).pieces.len(), 4);
+    }
+
+    #[test]
+    fn move_all_pieces_test_2() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        for i in 13..63 {
+            player.move_piece(piece_id, 1);
+            assert_eq!(player.piece(piece_id).borrow().position(), (i + 1) % 52);
+            assert_eq!(
+                player.board().borrow_mut().outside(i + 1).pieces.len(),
+                1
+            );
+            assert_eq!(
+                player.board().borrow_mut().outside(i + 1).player_id,
+                Some(board::PlayerID::Player1)
+            );
+            assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
+        }
+        player.move_piece(piece_id, 1);
+        let vec = (57..=62).collect::<Vec<_>>();
+        for i in 57..61 {
+
+            player.move_piece(piece_id, 1);
+            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 56]);
+            assert_eq!(
+                player.board().borrow_mut().inside(vec[i as usize - 56]).player_id,
+                Some(board::PlayerID::Player1)
+            );
+        }
+        player.enter_goal(piece_id, 61);
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+    }
+    assert!(player.is_finished());
+    }
+
+    #[test]
+    fn safety_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+    let piece_id = 0;
+
+    player.free_piece(piece_id);
+    player.move_piece(piece_id, 7);
+    player.save_piece(piece_id, 1);
+
+    assert_eq!(player.piece(piece_id).borrow().position(), 21);
+
+    player.update_piece(piece_id, 21, 11);
+    player.save_piece(piece_id, 1);
+    assert_eq!(player.piece(piece_id).borrow().position(), 57);
+    }
+
+    #[test]
+    fn safety_test_2() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 7);
+        player.save_piece(piece_id, 1);
+
+        assert_eq!(player.piece(piece_id).borrow().position(), 21);
+
+        player.update_piece(piece_id, 21, 11);
+        player.save_piece(piece_id, 1);
+        assert_eq!(player.piece(piece_id).borrow().position(), 57);
+    }
+    }
+
+    #[test]
+    fn safety_test_3() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        for i in 14..=69 {
+            if i == 63 {
+                continue;
+            }
+            let is_globe = player.board().borrow().is_globe(i);
+            if is_globe {
+                player.save_piece(piece_id, 1);
+
+            } else {
+                player.move_piece(piece_id, 1);
+            }
+        }
+    }
+    }
+
+    #[test]
+    fn starjump_to_goal_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board.clone());
+    let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+
+    let piece_id = 0;
+    player.free_piece(piece_id);
+    other_player.free_piece(piece_id);
+
+    player.move_piece(piece_id,44);
+    other_player.update_outside(piece_id, 26, 11);
+
+    assert_eq!(player.piece(piece_id).borrow().position(), 5);
+
+    player.win_piece(piece_id, 6);
+    assert_eq!(player.piece(piece_id).borrow().position(), 99);
+    assert!(player.piece(piece_id).borrow().is_goal());
+    assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
+
+    assert!(other_player.piece(piece_id).borrow().is_home());
+    assert_eq!(other_player.piece(piece_id).borrow().position(), -1);
+    }
+
+    #[test]
+    fn starjump_to_goal_test_2() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+
+        player.free_piece(piece_id);
+        player.move_piece(piece_id, 44);
+
+        assert_eq!(player.piece(piece_id).borrow().position(), 5);
+
+        player.win_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+        assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
+    }
+    assert!(player.is_finished());
+    }
+
+    #[test]
+    fn starjump_to_goal_test_3() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        for position in 14..=63 {
+            if position < 63 {
+                player.move_piece(piece_id, 1);
+                assert_eq!(player.piece(piece_id).borrow().position(), position % 52);
+            } else {
+                player.win_piece(piece_id, 1);
+                assert_eq!(player.piece(piece_id).borrow().position(), 99);
+                assert!(player.piece(piece_id).borrow().is_goal());
+            }
+        }
+        assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
+    }
+    assert!(player.is_finished());
+    }
+
+    #[test]
+    fn enter_goal_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    let piece_id = 0;
+    player.free_piece(piece_id);
+    player.update_piece(piece_id, 13, 11);
+    player.win_piece(piece_id, 6);
+    assert_eq!(player.piece(piece_id).borrow().position(), 99);
+    assert!(player.piece(piece_id).borrow().is_goal());
+    assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
+    }
+
+    #[test]
+    fn enter_goal_test_2() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        player.update_piece(piece_id, 13, 11);
+        player.win_piece(piece_id, 6);
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+        assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
+    }
+    assert!(player.is_finished());
+    }
+
+    #[test]
+    fn enter_goal_test_3() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board.clone());
+
+    for dice_number in (1..=6).rev() {
+        for piece_id in 0..4 {
+            player.free_piece(piece_id);
+            player.update_piece(piece_id, 13, 11);
+            player.move_piece(piece_id, 6 - dice_number);
+            player.win_piece(piece_id, dice_number);
+            assert_eq!(player.piece(piece_id).borrow().position(), 99);
+            assert!(player.piece(piece_id).borrow().is_goal());
+            assert_eq!(player.board().borrow_mut().goal(PLAYER_ID).pieces.len(), piece_id as usize + 1);
+        }
+        assert!(player.is_finished());
+        board.borrow_mut().reset();
+    }
+    }
+
+    #[test]
+    fn starjump_test () {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+    let piece_id = 0;
+
+    player.free_piece(piece_id);
+    player.starjump_piece(piece_id, 5);
+    assert_eq!(player.piece(piece_id).borrow().position(), 24);
+    assert_eq!(player.board().borrow_mut().outside(24).pieces.len(), 1);
+
+    player.update_piece(piece_id, 24, 23);
+    player.starjump_piece(piece_id, 1);
+    assert_eq!(player.piece(piece_id).borrow().position(), 31);
+    assert_eq!(player.board().borrow_mut().outside(31).pieces.len(), 1);
+    }
+
+    #[test]
+    fn starjump_test_2 () {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+    let starvec = vec![18, 24, 31, 37, 44, 50, 5, 11];
+    let piece_id = 0;
+
+    player.free_piece(piece_id);
+    player.starjump_piece(piece_id, 5);
+    assert_eq!(player.piece(piece_id).borrow().position(), 24);
+    assert_eq!(player.board().borrow_mut().outside(24).pieces.len(), 1);
+
+    (1..7).for_each(|i| {
+
+        player.update_piece(piece_id, starvec[i], starvec[i] - 1);
+        player.starjump_piece(piece_id, 1);
+
+        assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
+        assert_eq!(player.board().borrow_mut().outside(starvec[i + 1]).pieces.len(), 1);
+    });
+    }
+
+    #[test]
+    fn starjump_test_3 () {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+    let starvec = vec![18, 24, 31, 37, 44, 50, 5, 11];
+
+    for piece_id in 0..4 {
+        player.free_piece(piece_id);
+        player.starjump_piece(piece_id, 5);
+        assert_eq!(player.piece(piece_id).borrow().position(), 24);
+
+        (1..7).for_each(|i| {
+            player.update_piece(piece_id, starvec[i], starvec[i] - 1);
+            player.starjump_piece(piece_id, 1);
+
+            assert_eq!(player.piece(piece_id).borrow().position(), starvec[i + 1]);
+        });
+
+        player.update_piece(piece_id, starvec[7], starvec[7] - 1);
+        player.starjump_piece(piece_id, 1);
+        assert_eq!(player.piece(piece_id).borrow().position(), 99);
+        assert!(player.piece(piece_id).borrow().is_goal());
+    }
+    assert!(player.is_finished());
+    }
+
+    #[test]
+    fn join_piece_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+
+    player.move_piece(0, 1);
+    player.join_piece(1, 1);
+    assert_eq!(player.piece(0).borrow().position(), 14);
+    assert_eq!(player.piece(1).borrow().position(), 14);
+    assert_eq!(player.board().borrow_mut().outside(14).pieces.len(), 2);
+    }
+
+    #[test]
+    fn join_piece_by_starjump_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+
+    player.starjump_piece(0, 5);
+    player.join_piece(1, 5);
+    assert_eq!(player.piece(0).borrow().position(), 24);
+    assert_eq!(player.piece(1).borrow().position(), 24);
+    assert_eq!(player.board().borrow_mut().outside(24).pieces.len(), 2);
+
+    player.update_outside(0, 24, 31);
+    player.update_outside(1, 24, 29);
+
+    player.join_piece(1, 2);
+    }
+
+    #[test]
+    fn join_piece_by_globe_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+    player.update_outside(0, 13, 19);
+    player.update_outside(1, 13, 20);
+
+    player.move_piece(0, 2);
+    player.join_piece(1, 1);
+
+    assert_eq!(player.piece(0).borrow().position(), 21);
+    assert_eq!(player.piece(1).borrow().position(), 21);
+    }
+
+    #[test]
+    fn join_piece_by_invincible_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+    player.update_outside(0, 13, 24);
+    player.update_outside(1, 13, 25);
+
+    player.move_piece(0, 2);
+    player.join_piece(1, 1);
+
+    assert_eq!(player.piece(0).borrow().position(), 26);
+    assert_eq!(player.piece(1).borrow().position(), 26);
+    }
+
+    #[test]
+    fn leave_piece_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+
+    player.move_piece(0, 1);
+    player.join_piece(1, 1);
+
+    player.leave_piece(0, 1);
+    assert_eq!(player.piece(0).borrow().position(), 15);
+    }
+
+    #[test]
+    fn leave_piece_from_globe_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+
+    player.move_piece(0, 8);
+    player.join_piece(1, 8);
+
+    player.leave_piece(0, 1);
+    assert_eq!(player.piece(0).borrow().position(), 22);
+    }
+
+    #[test]
+    fn leave_piece_from_invincible_test() {
+    let board = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+    player.free_piece(0);
+    player.free_piece(1);
+
+    player.move_piece(0, 13);
+    player.join_piece(1, 13);
+
+    player.leave_piece(0, 1);
+    assert_eq!(player.piece(0).borrow().position(), 27);
+    }
+
+    #[test]
+    fn kill_piece_test() {
+    let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board.clone());
+    let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+
+    other_player.free_piece(0);
+    other_player.free_piece(1);
+    other_player.free_piece(2);
+    other_player.free_piece(3);
+
+    other_player.update_outside(0, 26, 13);
+    other_player.update_outside(1, 26, 13);
+    other_player.update_outside(2, 26, 13);
+    other_player.update_outside(3, 26, 14);
+
+    player.kill_piece(0, 6);
+    assert_eq!(other_player.piece(0).borrow().position(), -1);
+    assert_eq!(other_player.piece(1).borrow().position(), -1);
+    assert_eq!(other_player.piece(2).borrow().position(), -1);
+    assert!(other_player.piece(0).borrow().is_home());
+    assert!(other_player.piece(1).borrow().is_home());
+    assert!(other_player.piece(2).borrow().is_home());
+
+    player.kill_piece(0, 1);
+    assert_eq!(other_player.piece(3).borrow().position(), -1);
+    assert!(other_player.piece(3).borrow().is_home());
+    }
+
+    #[test]
+    fn kill_piece_by_starjump_test() {
+    let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board.clone());
+    let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+
+    other_player.free_piece(0);
+    other_player.free_piece(1);
+    player.free_piece(0);
+
+    other_player.update_outside(0, 26, 18);
+    other_player.update_outside(1, 26, 24);
+
+    player.kill_piece(0, 5);
+    assert_eq!(other_player.piece(0).borrow().position(), -1);
+    assert!(other_player.piece(0).borrow().is_home());
+    assert_eq!(other_player.piece(1).borrow().position(), -1);
+    assert!(other_player.piece(1).borrow().is_home());
+    assert_eq!(player.piece(0).borrow().position(), 24);
+    }
+
+    #[test]
+    fn kill_piece_and_join() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+
+        other_player.free_piece(0);
+        player.free_piece(0);
+        player.free_piece(1);
+
+        player.starjump_piece(1, 5);
+        other_player.update_outside(0, 26, 18);
+
+        player.kill_piece(0, 5);
+        assert_eq!(other_player.piece(0).borrow().position(), -1);
+        assert!(other_player.piece(0).borrow().is_home());
+
+        assert_eq!(player.piece(0).borrow().position(), 24);
+        assert_eq!(player.piece(1).borrow().position(), 24);
+    }
+
+    #[test]
+    fn get_playerpiece_heuristics() {
+    let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+        for piece_id in 0..4 {
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 57);
+
+            player.free_piece(piece_id);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 56);
+
+            player.move_piece(piece_id, 1);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 55);
+
+            player.starjump_piece(piece_id, 4);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 45);
+
+            player.move_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 39);
+
+            player.save_piece(piece_id, 4);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 35);
+
+            player.starjump_piece(piece_id, 3);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 25);
+
+            player.starjump_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 12);
+
+            player.win_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 0);
+        }
+    }
+
+    #[test]
+    fn get_playerpiece_heuristics_2() {
+    let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+        for piece_id in 0..4 {
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 57);
+
+            player.free_piece(piece_id);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 56);
+
+            player.move_piece(piece_id, 1);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 55);
+
+            player.starjump_piece(piece_id, 4);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 45);
+
+            player.move_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 39);
+
+            player.save_piece(piece_id, 4);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 35);
+
+            player.move_piece(piece_id, 5);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 30);
+
+            player.starjump_piece(piece_id, 5);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 19);
+
+            player.move_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 13);
+
+            player.starjump_piece(piece_id, 1);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 6);
+
+            player.win_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 0);
+        }
+    }
+
+    #[test]
+    fn get_playerpiece_heuristics_3() {
+    let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+    let mut player = Player::new(PLAYER_ID, board);
+
+        for piece_id in 0..4 {
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 57);
+
+            player.free_piece(piece_id);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 56);
+
+            player.move_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 50);
+
+            player.starjump_piece(piece_id, 5);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 38);
+
+            player.starjump_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 25);
+
+            player.starjump_piece(piece_id, 6);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 12);
+
+            player.save_piece(piece_id, 3);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 9);
+
+            player.save_piece(piece_id, 4);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 5);
+
+            // player.win_piece(piece_id, 5);
+            // let result = player.get_heuristics(piece_id);
+            // assert_eq!(result, 0);
+        }
+    }
 }
 
-// #[cfg(test)]
-// mod player_1_valid_choices_tests {
-// use super::*;
+#[cfg(test)]
+mod player_1_valid_choices_tests {
+use super::*;
 
-// #[test]
-// fn valid_choice_nothing_test() {
-// let board = Rc::new(RefCell::new(Board::new()));
-// let mut player = Player::new(PLAYER_ID, board);
-// let mut result: Act;
+#[test]
+fn valid_choice_nothing_test() {
+let board = Rc::new(RefCell::new(Board::new()));
+let mut player = Player::new(PLAYER_ID, board);
+let mut result: Act;
 
-// result = player.valid_choices(0, 1, Act::Nothing);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Nothing);
+assert_eq!(result, Act::Nothing);
 
-// player.free_piece(0);
-// result = player.valid_choices(0, 7, Act::Move);
-// assert_eq!(result, Act::Nothing);
+player.free_piece(0);
+result = player.valid_choices(0, 7, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// player.enter_goal(0, 0);
-// result = player.valid_choices(0, 7, Act::Move);
-// assert_eq!(result, Act::Nothing);
-// }
+player.enter_goal(0, 13);
+result = player.valid_choices(0, 7, Act::Move);
+assert_eq!(result, Act::Nothing);
+}
 
-// #[test]
-// fn valid_choice_test_1() {
-// let board = Rc::new(RefCell::new(Board::new()));
-// let mut player = Player::new(PLAYER_ID, board);
+#[test]
+fn valid_choice_test_1() {
+let board = Rc::new(RefCell::new(Board::new()));
+let mut player = Player::new(PLAYER_ID, board);
 
-// let mut result = player.valid_choices(0, 0, Act::Free);
-// assert_eq!(result, Act::Nothing);
-// assert!(player.piece(0).borrow().is_home());
+let mut result = player.valid_choices(0, 0, Act::Free);
+assert_eq!(result, Act::Nothing);
+assert!(player.piece(0).borrow().is_home());
 
-// result = player.valid_choices(0, 5, Act::Free);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Free);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Free);
-// assert_eq!(result, Act::Free);
+result = player.valid_choices(0, 6, Act::Free);
+assert_eq!(result, Act::Free);
 
-// player.free_piece(0);
-// assert!(player.piece(0).borrow().is_free());
+player.free_piece(0);
+assert!(player.piece(0).borrow().is_free());
 
-// result = player.valid_choices(0, 6, Act::Free);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Free);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Move);
-// assert_eq!(result, Act::Move);
+result = player.valid_choices(0, 1, Act::Move);
+assert_eq!(result, Act::Move);
 
-// player.move_piece(0, 1);
-// result = player.valid_choices(0, 4, Act::Move);
-// assert_eq!(result, Act::Nothing);
+player.move_piece(0, 1);
+result = player.valid_choices(0, 4, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 4, Act::Starjump);
-// assert_eq!(result, Act::Starjump);
+result = player.valid_choices(0, 4, Act::Starjump);
+assert_eq!(result, Act::Starjump);
 
-// player.starjump_piece(0, 4);
+player.starjump_piece(0, 4);
 
-// result = player.valid_choices(0, 2, Act::Move);
-// assert_eq!(result, Act::Move);
+result = player.valid_choices(0, 2, Act::Move);
+assert_eq!(result, Act::Move);
 
-// player.move_piece(0, 2);
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Move);
+player.move_piece(0, 2);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Move);
 
-// player.move_piece(0, 6);
-// result = player.valid_choices(0, 2, Act::Move);
-// assert_eq!(result, Act::Nothing);
+player.move_piece(0, 6);
+result = player.valid_choices(0, 2, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Safe);
-// assert_eq!(result, Act::Safe);
-// player.save_piece(0, 2);
+result = player.valid_choices(0, 2, Act::Safe);
+assert_eq!(result, Act::Safe);
+player.save_piece(0, 2);
 
-// result = player.valid_choices(0, 2, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// player.starjump_piece(0, 3);
-// player.starjump_piece(0, 6);
+player.starjump_piece(0, 3);
+player.starjump_piece(0, 6);
 
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Starjump);
-// assert_eq!(result, Act::Starjump);
+result = player.valid_choices(0, 6, Act::Starjump);
+assert_eq!(result, Act::Starjump);
 
-// result = player.valid_choices(0, 6, Act::Goal);
-// assert_eq!(result, Act::Goal);
+result = player.valid_choices(0, 6, Act::Goal);
+assert_eq!(result, Act::Goal);
 
-// result = player.valid_choices(0, 6, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Safe);
-// assert_eq!(result, Act::Safe);
+result = player.valid_choices(0, 3, Act::Safe);
+assert_eq!(result, Act::Safe);
 
-// player.save_piece(0, 3);
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Move);
+player.save_piece(0, 3);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Move);
 
-// result = player.valid_choices(0, 6, Act::Safe);
-// assert_eq!(result, Act::Safe);
+result = player.valid_choices(0, 6, Act::Safe);
+assert_eq!(result, Act::Safe);
 
-// player.move_piece(0, 6);
+player.move_piece(0, 6);
 
-// result = player.valid_choices(0, 1, Act::Move);
-// assert_eq!(result, Act::Move);
+result = player.valid_choices(0, 1, Act::Move);
+assert_eq!(result, Act::Move);
 
-// result = player.valid_choices(0, 1, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Move);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Move);
 
-// result = player.valid_choices(0, 3, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 3, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 3, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 3, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Goal);
-// assert_eq!(result, Act::Goal);
-// player.win_piece(0, 3);
-// assert!(player.piece(0).borrow().is_goal());
-// }
+result = player.valid_choices(0, 3, Act::Goal);
+assert_eq!(result, Act::Goal);
+player.win_piece(0, 3);
+assert!(player.piece(0).borrow().is_goal());
+}
 
-// #[test]
-// fn valid_choice_test_2() {
-// let board = Rc::new(RefCell::new(Board::new()));
-// let mut player = Player::new(PLAYER_ID, board);
+#[test]
+fn valid_choice_test_2() {
+let board = Rc::new(RefCell::new(Board::new()));
+let mut player = Player::new(PLAYER_ID, board);
 
-// let mut result = player.valid_choices(0, 0, Act::Free);
-// assert_eq!(result, Act::Nothing);
+let mut result = player.valid_choices(0, 0, Act::Free);
+assert_eq!(result, Act::Nothing);
 
-// assert!(player.piece(0).borrow().is_home());
-// assert!(player.piece(1).borrow().is_home());
-// assert!(player.piece(2).borrow().is_home());
-// assert!(player.piece(3).borrow().is_home());
+assert!(player.piece(0).borrow().is_home());
+assert!(player.piece(1).borrow().is_home());
+assert!(player.piece(2).borrow().is_home());
+assert!(player.piece(3).borrow().is_home());
 
-// (0..4).for_each(|i| {
-//     result = player.valid_choices(i, 6, Act::Free);
-//     assert_eq!(result, Act::Free);
-//     player.free_piece(i);
-// });
+(0..4).for_each(|i| {
+    result = player.valid_choices(i, 6, Act::Free);
+    assert_eq!(result, Act::Free);
+    player.free_piece(i);
+});
 
-// assert!(player.piece(0).borrow().is_free());
-// assert!(player.piece(1).borrow().is_free());
-// assert!(player.piece(2).borrow().is_free());
-// assert!(player.piece(3).borrow().is_free());
+assert!(player.piece(0).borrow().is_free());
+assert!(player.piece(1).borrow().is_free());
+assert!(player.piece(2).borrow().is_free());
+assert!(player.piece(3).borrow().is_free());
 
-// result = player.valid_choices(4, 6, Act::Free);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(4, 6, Act::Free);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Leave);
-// assert_eq!(result, Act::Leave);
-// player.leave_piece(0, 1);
+result = player.valid_choices(0, 1, Act::Leave);
+assert_eq!(result, Act::Leave);
+player.leave_piece(0, 1);
 
-// result = player.valid_choices(1, 5, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Starjump);
-// assert_eq!(result, Act::Starjump);
-// player.starjump_piece(1, 5);
+result = player.valid_choices(1, 5, Act::Starjump);
+assert_eq!(result, Act::Starjump);
+player.starjump_piece(1, 5);
 
-// result = player.valid_choices(2, 5, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 5, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 5, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 5, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 5, Act::Join);
-// assert_eq!(result, Act::Join);
-// player.join_piece(2, 5);
+result = player.valid_choices(2, 5, Act::Join);
+assert_eq!(result, Act::Join);
+player.join_piece(2, 5);
 
-// result = player.valid_choices(3, 5, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 6, Act::Move);
-// assert_eq!(result, Act::Move);
-// player.move_piece(3, 6);
+result = player.valid_choices(3, 6, Act::Move);
+assert_eq!(result, Act::Move);
+player.move_piece(3, 6);
 
-// result = player.valid_choices(0, 5, Act::Join);
-// assert_eq!(result, Act::Join);
+result = player.valid_choices(0, 5, Act::Join);
+assert_eq!(result, Act::Join);
 
-// player.join_piece(0, 5);
-// result = player.valid_choices(0, 2, Act::Move);
-// assert_eq!(result, Act::Nothing);
+player.join_piece(0, 5);
+result = player.valid_choices(0, 2, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Safe);
-// assert_eq!(result, Act::Safe);
+result = player.valid_choices(0, 2, Act::Safe);
+assert_eq!(result, Act::Safe);
 
-// player.save_piece(0, 2);
+player.save_piece(0, 2);
 
-// result = player.valid_choices(3, 2, Act::Join);
-// assert_eq!(result, Act::Join);
+result = player.valid_choices(3, 2, Act::Join);
+assert_eq!(result, Act::Join);
 
-// result = player.valid_choices(3, 2, Act::Safe);
-// assert_eq!(result, Act::Safe);
+result = player.valid_choices(3, 2, Act::Safe);
+assert_eq!(result, Act::Safe);
 
-// player.join_piece(3, 2);
+player.join_piece(3, 2);
 
-// result = player.valid_choices(0, 3, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 3, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 3, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 3, Act::Starjump);
-// assert_eq!(result, Act::Starjump);
-// player.starjump_piece(0, 3);
+result = player.valid_choices(0, 3, Act::Starjump);
+assert_eq!(result, Act::Starjump);
+player.starjump_piece(0, 3);
 
-// result = player.valid_choices(3, 5, Act::Move);
-// assert_eq!(result, Act::Move);
-// player.move_piece(3, 5);
+result = player.valid_choices(3, 5, Act::Move);
+assert_eq!(result, Act::Move);
+player.move_piece(3, 5);
 
-// result = player.valid_choices(1, 2, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 2, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 2, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 2, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 2, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 2, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 2, Act::Join);
-// assert_eq!(result, Act::Join);
-// player.join_piece(1, 2);
+result = player.valid_choices(1, 2, Act::Join);
+assert_eq!(result, Act::Join);
+player.join_piece(1, 2);
 
-// player.update_outside(0, 18, 24);
-// player.update_outside(2, 11, 18);
+player.update_outside(0, 31, 37);
+player.update_outside(2, 24, 31);
 
-// result = player.valid_choices(1, 5, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Join);
-// assert_eq!(result, Act::Join);
-// player.join_piece(1, 5);
+result = player.valid_choices(1, 5, Act::Join);
+assert_eq!(result, Act::Join);
+player.join_piece(1, 5);
 
-// result = player.valid_choices(3, 5, Act::Join);
-// assert_eq!(result, Act::Join);
-// player.join_piece(3, 5);
+result = player.valid_choices(3, 5, Act::Join);
+assert_eq!(result, Act::Join);
+player.join_piece(3, 5);
 
-// result = player.valid_choices(2, 6, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 6, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 6, Act::Starjump);
-// assert_eq!(result, Act::Starjump);
-// player.join_piece(2, 6);
+result = player.valid_choices(2, 6, Act::Starjump);
+assert_eq!(result, Act::Starjump);
+player.join_piece(2, 6);
 
-// player.update_outside(0, 24, 50);
-// player.update_outside(1, 24, 44);
-// player.update_outside(2, 31, 39);
-// player.update_outside(3, 24, 39);
+player.update_outside(0, 37, 11);
+player.update_outside(1, 37, 5);
+player.update_outside(2, 44, 0);
+player.update_outside(3, 37, 0);
 
-// result = player.valid_choices(3, 5, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 5, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 5, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 5, Act::Join);
-// assert_eq!(result, Act::Join);
+result = player.valid_choices(3, 5, Act::Join);
+assert_eq!(result, Act::Join);
 
-// result = player.valid_choices(1, 6, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 6, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 6, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 6, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 6, Act::Goal);
-// assert_eq!(result, Act::Goal);
-// player.win_piece(1, 6);
+result = player.valid_choices(1, 6, Act::Goal);
+assert_eq!(result, Act::Goal);
+player.win_piece(1, 6);
 
-// player.move_piece(3, 6);
-// result = player.valid_choices(3, 2, Act::Safe);
-// assert_eq!(result, Act::Safe);
-// player.save_piece(3, 2);
-// player.move_piece(2, 6);
+player.move_piece(3, 6);
+result = player.valid_choices(3, 2, Act::Safe);
+assert_eq!(result, Act::Safe);
+player.save_piece(3, 2);
+player.move_piece(2, 6);
 
-// result = player.valid_choices(2, 2, Act::Join);
-// assert_eq!(result, Act::Join);
+result = player.valid_choices(2, 2, Act::Join);
+assert_eq!(result, Act::Join);
 
-// result = player.valid_choices(2, 2, Act::Safe);
-// assert_eq!(result, Act::Safe);
-// player.save_piece(2, 2);
+result = player.valid_choices(2, 2, Act::Safe);
+assert_eq!(result, Act::Safe);
+player.save_piece(2, 2);
 
-// player.move_piece(0, 1);
+player.move_piece(0, 1);
 
-// result = player.valid_choices(2, 4, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 4, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 4, Act::Safe);
-// assert_eq!(result, Act::Safe);
+result = player.valid_choices(3, 4, Act::Safe);
+assert_eq!(result, Act::Safe);
 
-// result = player.valid_choices(2, 4, Act::Move);
-// assert_eq!(result, Act::Move);
-// player.save_piece(3, 4);
-// player.move_piece(2, 4);
+result = player.valid_choices(2, 4, Act::Move);
+assert_eq!(result, Act::Move);
+player.save_piece(3, 4);
+player.move_piece(2, 4);
 
-// result = player.valid_choices(2, 4, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 4, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 4, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(2, 4, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(2, 4, Act::Move);
-// assert_eq!(result, Act::Move);
-// player.move_piece(2, 4);
+result = player.valid_choices(2, 4, Act::Move);
+assert_eq!(result, Act::Move);
+player.move_piece(2, 4);
 
-// result = player.valid_choices(0, 6, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Move);
-// assert_eq!(result, Act::Move);
-// player.move_piece(0, 6);
+result = player.valid_choices(0, 6, Act::Move);
+assert_eq!(result, Act::Move);
+player.move_piece(0, 6);
 
-// result = player.valid_choices(3, 5, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(3, 5, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(3, 5, Act::Goal);
-// assert_eq!(result, Act::Goal);
-// player.win_piece(3, 5);
+result = player.valid_choices(3, 5, Act::Goal);
+assert_eq!(result, Act::Goal);
+player.win_piece(3, 5);
 
-// result = player.valid_choices(0, 1, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Goal);
-// assert_eq!(result, Act::Goal);
-// player.win_piece(2, 1);
-// player.win_piece(0, 1);
+result = player.valid_choices(0, 1, Act::Goal);
+assert_eq!(result, Act::Goal);
+player.win_piece(2, 1);
+player.win_piece(0, 1);
 
-// assert!(player.is_finished());
-// }
+assert!(player.is_finished());
+}
 
-// #[test]
-// fn valid_choice_test_3() {
-// let board = Rc::new(RefCell::new(Board::new()));
-// let mut player = Player::new(PLAYER_ID, board.clone());
-// let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+#[test]
+fn valid_choice_test_3() {
+let board = Rc::new(RefCell::new(Board::new()));
+let mut player = Player::new(PLAYER_ID, board.clone());
+let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
-// let mut result: Act;
+let mut result: Act;
 
-// other_player.free_piece(0);
-// other_player.free_piece(1);
-// other_player.free_piece(2);
-// other_player.free_piece(3);
+other_player.free_piece(0);
+other_player.free_piece(1);
+other_player.free_piece(2);
+other_player.free_piece(3);
 
-// result = player.valid_choices(0, 6, Act::Free);
-// assert_eq!(result, Act::Free);
+result = player.valid_choices(0, 6, Act::Free);
+assert_eq!(result, Act::Free);
 
-// other_player.update_piece(0, 13, 0);
+other_player.update_piece(0, 26, 13);
 
-// result = player.valid_choices(0, 6, Act::Free);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Free);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 6, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// other_player.update_piece(1, 13, 0);
+other_player.update_piece(1, 26, 13);
 
-// result = player.valid_choices(0, 6, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 6, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 6, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 6, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// other_player.move_piece(0, 1);
-// other_player.move_piece(1, 1);
+other_player.move_piece(0, 1);
+other_player.move_piece(1, 1);
 
-// player.free_piece(0);
-// player.free_piece(1);
-// player.free_piece(2);
+player.free_piece(0);
+player.free_piece(1);
+player.free_piece(2);
 
-// result = player.valid_choices(0, 1, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 1, Act::Die);
+assert_eq!(result, Act::Die);
 
-// other_player.move_piece(0, 1);
+other_player.move_piece(0, 1);
 
-// result = player.valid_choices(0, 1, Act::Move);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Move);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 1, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// result = player.valid_choices(0, 1, Act::Leave);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Leave);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// other_player.move_piece(0, 3);
+other_player.move_piece(0, 3);
 
-// result = player.valid_choices(0, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 5, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// player.update_outside(1, 0, 11);
+player.update_outside(1, 13, 24);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 5, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// other_player.update_piece(1, 1, 5);
+other_player.update_piece(1, 14, 18);
 
-// result = player.valid_choices(0, 5, Act::Join);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Join);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Die);
 
-// player.move_piece(1, 1);
-// other_player.update_outside(2, 13, 11);
+player.move_piece(1, 1);
+other_player.update_outside(2, 26, 24);
 
-// result = player.valid_choices(0, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Die);
 
-// other_player.update_outside(1, 5, 11);
+other_player.update_outside(1, 18, 24);
 
-// result = player.valid_choices(0, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 5, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 5, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// player.kill_piece(0, 5);
-// assert!(player.piece(0).borrow().is_home());
-// assert_eq!(player.piece(0).borrow().position(), -1);
-// assert!(other_player.piece(0).borrow().is_home());
-// assert_eq!(other_player.piece(0).borrow().position(), -1);
+player.kill_piece(0, 5);
+assert!(player.piece(0).borrow().is_home());
+assert_eq!(player.piece(0).borrow().position(), -1);
+assert!(other_player.piece(0).borrow().is_home());
+assert_eq!(other_player.piece(0).borrow().position(), -1);
 
-// player.free_piece(0);
-// other_player.free_piece(0);
-// other_player.update_outside(0, 13, 5);
+player.free_piece(0);
+other_player.free_piece(0);
+other_player.update_outside(0, 26, 18);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Die);
 
-// player.die_piece(0, 5);
-// assert!(player.piece(0).borrow().is_home());
-// assert_eq!(player.piece(0).borrow().position(), -1);
-// assert!(other_player.piece(0).borrow().is_home());
-// assert_eq!(other_player.piece(0).borrow().position(), -1);
+player.die_piece(0, 5);
+assert!(player.piece(0).borrow().is_home());
+assert_eq!(player.piece(0).borrow().position(), -1);
+assert!(other_player.piece(0).borrow().is_home());
+assert_eq!(other_player.piece(0).borrow().position(), -1);
 
-// player.free_piece(0);
-// other_player.free_piece(0);
-// other_player.update_outside(0, 13, 5);
+player.free_piece(0);
+other_player.free_piece(0);
+other_player.update_outside(0, 26, 18);
 
-// player.leave_piece(0, 6);
-// other_player.enter_globe(0, 5, 8);
+player.leave_piece(0, 6);
+other_player.enter_globe(0, 18, 21);
 
-// result = player.valid_choices(0, 2, Act::Safe);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Safe);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 2, Act::Die);
+assert_eq!(result, Act::Die);
 
-// other_player.move_piece(0, 1);
+other_player.move_piece(0, 1);
 
-// player.save_piece(0, 2);
-// player.enter_globe(2, 0, 8);
-// player.move_piece(1, 2);
+player.save_piece(0, 2);
+player.enter_globe(2, 13, 21);
+player.move_piece(1, 2);
 
-// other_player.update_outside(1, 11, 12);
-// other_player.update_outside(2, 11, 12);
+other_player.update_outside(1, 24, 25);
+other_player.update_outside(2, 24, 25);
 
-// result = player.valid_choices(0, 4, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 4, Act::Die);
+assert_eq!(result, Act::Die);
 
-// result = player.valid_choices(0, 5, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 5, Act::Die);
+assert_eq!(result, Act::Die);
 
-// other_player.update_outside(1, 12, 26);
-// other_player.update_outside(2, 12, 25);
+other_player.update_outside(1, 25, 39);
+other_player.update_outside(2, 25, 38);
 
-// player.update_outside(0, 8, 24);
+player.update_outside(0, 21, 37);
 
-// result = player.valid_choices(0, 2, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 2, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// result = player.valid_choices(0, 2, Act::Die);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Die);
+assert_eq!(result, Act::Nothing);
 
-// other_player.move_piece(2, 1);
+other_player.move_piece(2, 1);
 
-// result = player.valid_choices(0, 2, Act::Kill);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 2, Act::Kill);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 2, Act::Die);
-// assert_eq!(result, Act::Die);
+result = player.valid_choices(0, 2, Act::Die);
+assert_eq!(result, Act::Die);
 
-// other_player.update_outside(1, 26, 50);
-// player.update_outside(0, 24, 43);
+other_player.update_outside(1, 39, 11);
+player.update_outside(0, 37, 4);
 
-// result = player.valid_choices(0, 1, Act::Kill);
-// assert_eq!(result, Act::Kill);
+result = player.valid_choices(0, 1, Act::Kill);
+assert_eq!(result, Act::Kill);
 
-// result = player.valid_choices(0, 1, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// player.update_outside(1, 14, 45);
+player.update_outside(1, 27, 6);
 
-// result = player.valid_choices(1, 5, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(1, 5, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(1, 5, Act::Goal);
-// assert_eq!(result, Act::Goal);
+result = player.valid_choices(1, 5, Act::Goal);
+assert_eq!(result, Act::Goal);
 
-// player.win_piece(1, 5);
-// assert_eq!(player.piece(1).borrow().position(), 99);
-// assert!(player.piece(1).borrow().is_goal());
-// assert_eq!(other_player.piece(1).borrow().position(), -1);
-// assert!(other_player.piece(1).borrow().is_home());
+player.win_piece(1, 5);
+assert_eq!(player.piece(1).borrow().position(), 99);
+assert!(player.piece(1).borrow().is_goal());
+assert_eq!(other_player.piece(1).borrow().position(), -1);
+assert!(other_player.piece(1).borrow().is_home());
 
-// other_player.update_outside(2, 26, 50);
-// player.move_piece(0, 6);
+other_player.update_outside(2, 39, 11);
+player.move_piece(0, 6);
 
-// result = player.valid_choices(0, 1, Act::Starjump);
-// assert_eq!(result, Act::Nothing);
+result = player.valid_choices(0, 1, Act::Starjump);
+assert_eq!(result, Act::Nothing);
 
-// result = player.valid_choices(0, 1, Act::Goal);
-// assert_eq!(result, Act::Goal);
+result = player.valid_choices(0, 1, Act::Goal);
+assert_eq!(result, Act::Goal);
 
-// result = player.valid_choices(0, 1, Act::Kill);
-// assert_eq!(result, Act::Kill);
-// player.kill_piece(0, 1);
+result = player.valid_choices(0, 1, Act::Kill);
+assert_eq!(result, Act::Kill);
+player.kill_piece(0, 1);
 
-// assert_eq!(player.piece(0).borrow().position(), 99);
-// assert!(player.piece(0).borrow().is_goal());
+assert_eq!(player.piece(0).borrow().position(), 99);
+assert!(player.piece(0).borrow().is_goal());
 
-// assert_eq!(other_player.piece(1).borrow().position(), -1);
-// assert!(other_player.piece(1).borrow().is_home());
+assert_eq!(other_player.piece(1).borrow().position(), -1);
+assert!(other_player.piece(1).borrow().is_home());
 
-// }
+}
 
-// }
+}
 
 // #[cfg(test)]
 // mod player_1_play_test {
