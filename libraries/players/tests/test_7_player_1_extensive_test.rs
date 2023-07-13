@@ -92,81 +92,81 @@ mod player_1_choice_tests {
         assert_eq!(result, Act::Nothing);
     }
 
-    // #[test]
-    // fn try_to_join_test() {
-    //     let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board);
+    #[test]
+    fn try_to_join_test() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board);
 
-    //     let result = player.try_to_join(0, 1);
-    //     assert_eq!(result, Act::Nothing);
+        let result = player.try_to_join(0, 1);
+        assert_eq!(result, Act::Nothing);
 
-    //     let result = player.try_to_join(0, 6);
-    //     assert_eq!(result, Act::Nothing);
+        let result = player.try_to_join(0, 6);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.free_piece(0);
-    //     player.free_piece(1);
-    //     player.free_piece(2);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
 
-    //     player.update_outside(0, 0, 1);
-    //     let result = player.try_to_join(1, 1);
-    //     assert_eq!(result, Act::Join);
+        player.update_outside(0, 13, 14);
+        let result = player.try_to_join(1, 1);
+        assert_eq!(result, Act::Join);
         
-    //     player.update_outside(0, 1, 5);
-    //     let result = player.try_to_join(1, 5);
-    //     assert_eq!(result, Act::Nothing);
+        player.update_outside(0, 14, 18);
+        let result = player.try_to_join(1, 5);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.update_outside(0, 5, 8);
-    //     let result = player.try_to_join(1, 3);
-    //     assert_eq!(result, Act::Nothing);
+        player.update_outside(0, 18, 21);
+        let result = player.try_to_join(1, 3);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.update_outside(0, 8, 11);
-    //     let result = player.try_to_join(1, 5);
-    //     assert_eq!(result, Act::Join);
+        player.update_outside(0, 21, 24);
+        let result = player.try_to_join(1, 5);
+        assert_eq!(result, Act::Join);
 
-    //     player.update_outside(0, 11, 13);
-    //     let result = player.try_to_join(1, 13);
-    //     assert_eq!(result, Act::Join);
+        player.update_outside(0, 24, 26);
+        let result = player.try_to_join(1, 13);
+        assert_eq!(result, Act::Join);
 
-    //     player.update_outside(0, 13, 50);
-    //     player.update_outside(1, 0, 49);
-    //     let result = player.try_to_join(1, 1);
-    //     assert_eq!(result, Act::Nothing);
+        player.update_outside(0, 26, 11);
+        player.update_outside(1, 13, 10);
+        let result = player.try_to_join(1, 1);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.enter_inside(0, 50, 55);
-    //     let result = player.try_to_join(1, 5);
-    //     assert_eq!(result, Act::Nothing);
+    player.enter_inside(0, 11, 60);
+    let result = player.try_to_join(1, 5);
+    assert_eq!(result, Act::Nothing);
         
-    //     player.enter_inside(1, 49, 52);
-    //     let result = player.try_to_join(1, 3);
-    //     assert_eq!(result, Act::Nothing);
-    // }
+        player.enter_inside(1, 10, 52+5);
+        let result = player.try_to_join(1, 3);
+        assert_eq!(result, Act::Nothing);
+    }
     
-    // #[test]
-    // fn try_to_join_test_2() {
-    //     let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
-    //     let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+    #[test]
+    fn try_to_join_test_2() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
-    //     let result = player.try_to_join(0, 1);
-    //     assert_eq!(result, Act::Nothing);
+        let result = player.try_to_join(0, 1);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.free_piece(0);
-    //     player.free_piece(1);
-    //     player.free_piece(2);
-    //     other_player.free_piece(0);
-    //     other_player.free_piece(1);
+        player.free_piece(0);
+        player.free_piece(1);
+        player.free_piece(2);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
 
-    //     other_player.update_outside(0, 13, 5);
-    //     player.update_outside(0, 0, 11);
+        // other_player.update_outside(0, 13, 5);
+        // player.update_outside(0, 0, 11);
 
-    //     let result = player.try_to_join(1, 5);
-    //     assert_eq!(result, Act::Nothing);
+        // let result = player.try_to_join(1, 5);
+        // assert_eq!(result, Act::Nothing);
 
-    //     other_player.update_outside(1, 13, 5);
+        // other_player.update_outside(1, 13, 5);
 
-    //     let result = player.try_to_join(1, 5);
-    //     assert_eq!(result, Act::Nothing);
-    // }
+        // let result = player.try_to_join(1, 5);
+        // assert_eq!(result, Act::Nothing);
+    }
 
     // #[test]
     // fn try_to_kill_test() {
