@@ -205,67 +205,67 @@ mod player_1_choice_tests {
 
         other_player.update_outside(0, 24, 39);
         let result = player.try_to_kill(0, 26);
-        assert_eq!(result, Act::Kill);
+        assert_eq!(result, Act::Kill); 
     }
 
-    // #[test]
-    // fn try_to_kill_test_2 () {
-    //     let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
-    //     let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+    #[test]
+    fn try_to_kill_test_2 () {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
-    //     other_player.free_piece(0);
-    //     other_player.free_piece(1);
-    //     other_player.update_outside(0, 13, 0);
-    //     other_player.join(1, 13, 0);
-    //     let result = player.try_to_kill(0, 6);
-    //     assert_eq!(result, Act::Kill);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        other_player.update_outside(0, 26, 13);
+        other_player.join(1,26,13);
+        let result = player.try_to_kill(0, 6);
+        assert_eq!(result, Act::Kill);
 
-    //     other_player.update_outside(0, 0, 1);
-    //     other_player.join(1, 0, 1);
-    //     player.free_piece(0);
-    //     let result = player.try_to_kill(0, 1);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.update_outside(0, 13, 14);
+        other_player.join(1, 13, 14);
+        player.free_piece(0);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.update_outside(0, 0, 25);
-    //     other_player.update_outside(0, 1, 26);
-    //     other_player.join(1, 1, 26);
-    //     let result = player.try_to_kill(0, 1);
-    //     assert_eq!(result, Act::Nothing);
-
-
-    //     other_player.enter_globe(0, 26, 34);
-    //     other_player.enter_globe(1, 26, 34);
-    //     let result = player.try_to_kill(0, 10);
-    //     assert_eq!(result, Act::Nothing);
-
-    //     player.update_outside(0, 25, 0);
-    //     other_player.free_piece(2);
-    //     other_player.update_outside(2, 13, 11);
-    //     other_player.update_outside(0, 34, 5);
-
-    //     other_player.join(1, 34, 5);
-    //     let result = player.try_to_kill(0, 5);
-    //     assert_eq!(result, Act::Nothing);
+        player.update_outside(0, 13, 38);
+        other_player.update_outside(0, 14, 39);
+        other_player.join(1, 14, 39);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Nothing);
 
 
-    //     other_player.join(1, 5, 11);
-    //     let result = player.try_to_kill(0, 5);
-    //     assert_eq!(result, Act::Kill);
+        other_player.enter_globe(0, 39, 47);
+        other_player.enter_globe(1, 39, 47);
+        let result = player.try_to_kill(0, 10);
+        assert_eq!(result, Act::Nothing);
 
-    //     other_player.leave(2, 11, 12);
-    //     let result = player.try_to_kill(0, 5);
-    //     assert_eq!(result, Act::Kill);
+        player.update_outside(0, 38, 13);
+        other_player.free_piece(2);
+        other_player.update_outside(2, 26, 24);
+        other_player.update_outside(0, 47, 18);
 
-    //     other_player.update_outside(0, 5, 1);
-    //     other_player.join(1, 11, 1);
-    //     let result = player.try_to_kill(0, 1);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.join(1, 47, 18);
+        let result = player.try_to_kill(0, 5);
+        assert_eq!(result, Act::Nothing);
 
-    //     other_player.leave(0, 1, 2);
-    //     let result = player.try_to_kill(0, 1);
-    //     assert_eq!(result, Act::Kill);
-    // }
+
+        other_player.join(1, 18, 24);
+        let result = player.try_to_kill(0, 5);
+        assert_eq!(result, Act::Kill);
+
+        other_player.leave(2, 24, 25);
+        let result = player.try_to_kill(0, 5);
+        assert_eq!(result, Act::Kill);
+
+        other_player.update_outside(0, 18,14);
+        other_player.join(1,24,14);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Nothing);
+
+        other_player.leave(0,14,15);
+        let result = player.try_to_kill(0, 1);
+        assert_eq!(result, Act::Kill);
+    }
 
     // #[test]
     // fn try_to_die_test() {
@@ -526,9 +526,9 @@ mod player_1_choice_tests {
     // }
 }
 
-// #[cfg(test)]
-// mod player_1_move_tests {
-// use super::*;
+#[cfg(test)]
+mod player_1_move_tests {
+use super::*;
 
 // #[test]
 // fn add_player_test() {
@@ -1330,7 +1330,7 @@ mod player_1_choice_tests {
 //         assert_eq!(result, 0);
 //     }
 // }
-// }
+}
 
 // #[cfg(test)]
 // mod player_1_valid_choices_tests {

@@ -274,7 +274,11 @@ mod players {
 
         pub fn update_position(&mut self, piece_id: i8, dice_number: i8) {
             self.old_position = self.piece(piece_id).borrow_mut().position();
-            self.new_position = self.old_position + dice_number;
+            if self.piece(piece_id).borrow().is_home() {
+                self.new_position = self.invincible_positions(self.id());
+            } else {
+                self.new_position = self.old_position + dice_number;
+            }
         }
 
         pub fn update_piece(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
@@ -436,7 +440,7 @@ mod players {
                 1 => 13,
                 2 => 26,
                 3 => 39,
-                _ => panic!("invalid move!"),
+                _ => panic!("invalid player ID!"),
             }
         }
 
@@ -498,7 +502,14 @@ mod players {
                 let dice_number = self.roll_dice();
                 let movesets = self.generate_vector_of_random_actions(actions, dice_number);
                 self.action = self.select_random_piece(movesets);
+                println!("-------------------");
+                println!("prior play:");
+                self.print_status();
                 self.make_move( self.action.1, dice_number,  self.action.0);
+                println!("-------------------");
+                println!("posterior play:");
+                self.print_status();
+                println!("\n");
         }
 
         pub fn generate_vector_of_random_actions(&mut self, actions: Vec<Act>, dice_number: i8) ->  Vec<(Act, i8, i8)> {
@@ -520,7 +531,13 @@ mod players {
             let dice_number = self.roll_dice();
             let movesets = self.generate_vector_of_ordered_actions(actions, dice_number, take_nearest_piece);
             self.action = movesets.first().copied().unwrap_or((Act::Nothing, self.id, 57));
+            println!("-------------------");
+            println!("prior play");
+            self.print_status();
             self.make_move(self.action.1, dice_number, self.action.0);
+            println!("-------------------");
+            println!("posterior play");
+            self.print_status();
         }
 
         fn generate_vector_of_ordered_actions(&mut self, actions: Vec<Act>, dice_number: i8, take_nearest_piece: bool) -> Vec<(Act, i8, i8)> {
@@ -696,9 +713,10 @@ mod players {
             let is_star_self_occupied = self.is_star_occupied_by_selves();
             let is_other_occupied = self.is_occupied_by_others(self.new_position);
             let is_goalpos = self.is_goal_position();
-            match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.0, is_goalpos) {
-                (true, false, _, _, false) | (_, _, true, false, false) => Act::Join,
-                (_, _, _, _, true) => Act::Nothing,
+            let is_home = self.piece(piece_id).borrow_mut().is_home();
+            match (is_self_occupied.0, is_starpos, is_star_self_occupied.0, is_other_occupied.0, is_goalpos, is_home) {
+                (true, false, _, _, false, false) | (_, _, true, false, false, false) => Act::Join,
+                (_, _, _, _, true, true) => Act::Nothing,
                 _ => Act::Nothing,
             }
         }
@@ -720,16 +738,16 @@ mod players {
             let occupied_by_others = self.is_occupied_by_others(self.new_position);
             let is_star_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
             let is_globepos = self.board().borrow_mut().is_globe(self.new_position);
-
+            let is_home = self.piece(piece_id).borrow_mut().is_home();
             let other_player_id = self.get_other_player_id();
             let invincible_position = self.invincible_positions(other_player_id);
             let is_other_player_invincible = self.is_occupied_by_others(invincible_position).0 & (self.new_position == invincible_position);
 
-            match (occupied_by_others.0, occupied_by_others.1, is_globepos, is_star_occupied_by_others.1, is_other_player_invincible) {
-                (_, true, _, _, _) | 
-                (_, _, _, true, _) | 
-                (_, _, _, _, true) |
-                (true, _, true, _, _) => Act::Die,
+            match (is_home, occupied_by_others.0, occupied_by_others.1, is_globepos, is_star_occupied_by_others.1, is_other_player_invincible) {
+                (false, _, true, _, _, _) | 
+                (false, _, _, _, true, _) | 
+                (false, _, _, _, _, true) |
+                (false, true, _, true, _, _) => Act::Die,
                 _ => Act::Nothing,
             }
         }
@@ -763,9 +781,9 @@ mod players {
             let other_player_id = self.get_other_player_id();
             let invincible_position = self.invincible_positions(other_player_id);
             let is_invincible_position_occupied_by_others = self.is_occupied_by_others(invincible_position).0;
+            let is_new_position_same_as_invincible_position = self.new_position == invincible_position;
             let is_new_position_occupied_by_others = self.is_occupied_by_others(self.new_position);
             let is_star_position_occupied_by_others = self.is_star_occupied_by_others(self.old_position, self.new_position);
-            let is_new_position_same_as_invincible_position = self.new_position == invincible_position;
             let is_globe = self.board().borrow_mut().is_globe(self.new_position);
         
             match (is_home,
@@ -780,7 +798,7 @@ mod players {
                 (false, _, false, false, true, false, _, false, _) |
                 (false, _, false, false, _, false, true, false, _) |
                 (false, _, false, false, true, false, true, _, _) |
-                (true, true, _, _, _, _, _, _, 6) => Act::Kill,
+                (true, _, _, _, true, _, _, _, 6) => Act::Kill,
                 (false, true, false, _, true, _, _, _, _) => Act::Nothing,
                 _ => Act::Nothing,
             }

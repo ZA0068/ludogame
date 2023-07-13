@@ -2295,10 +2295,11 @@ mod player_0_play_test {
         player.my_turn();
         player.take_dice(dice);
         
-            for _ in 0..100 {
+            for _ in 0..1000 {
             while !player.is_finished() {
+
                 player.play_random(actions.clone());
-                player.print_status();
+
             }
             board.borrow_mut().reset();
         }
@@ -2316,10 +2317,25 @@ mod player_0_play_test {
         
             for _ in 0..100 {
             while !player.is_finished() {
+
                 player.play_ordered(actions.clone(), true);
-                player.print_status();
+
             }
             board.borrow_mut().reset();
         }
+    }
+
+    #[test]
+    fn bug_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let dice = Dice::default();
+        let actions = ACTIONS.to_vec();
+        player.my_turn();
+        player.take_dice(dice);
+        
+        player.free_piece(3);
+        let result = player.valid_choices(0, 6, Act::Join);
+        assert_eq!(result, Act::Nothing);
     }
 }
