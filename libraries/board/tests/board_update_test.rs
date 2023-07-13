@@ -687,6 +687,7 @@ mod board_update_test {
         let new_position: i8 = 0;
 
         board.home(player_id).piece(piece_id).borrow_mut().free();
+        board.home(player_id).piece(piece_id).borrow_mut().set_position(new_position);
         board.move_from_home(player_id, piece_id, new_position);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
         assert_eq!(
@@ -706,7 +707,7 @@ mod board_update_test {
             .outside(new_position)
             .piece(piece_id)
             .borrow_mut()
-            .is_dangerous());
+            .is_free());
         assert_eq!(
             board
                 .outside(new_position)
@@ -718,11 +719,6 @@ mod board_update_test {
 
         let old_position = new_position;
         let new_position = 4;
-        board
-            .outside(player_id)
-            .piece(piece_id)
-            .borrow_mut()
-            .not_safe();
         board.update_outside(player_id, piece_id, old_position, new_position);
         assert_eq!(board.outside(old_position).pieces.len(), 0);
         assert_eq!(board.outside(new_position).pieces.len(), 1);
@@ -734,16 +730,11 @@ mod board_update_test {
                 .id(),
             piece_id
         );
-        assert!(!board
+        assert!(board
             .outside(new_position)
             .piece(piece_id)
             .borrow()
-            .is_dangerous());
-        assert!(!board
-            .outside(new_position)
-            .piece(piece_id)
-            .borrow()
-            .is_safe());
+            .is_free());
     }
 
     #[test]
@@ -790,7 +781,7 @@ mod board_update_test {
                 assert_eq!(board.home(i).piece(j).borrow().id(), j);
                 assert_eq!(board.home(i).player_id, Some(player_ids[i as usize].clone()));
                 assert!(board.home(i).piece(j).borrow().is_home());
-                assert!(board.home(i).piece(j).borrow().is_safe());
+                assert!(!board.home(i).piece(j).borrow().is_free());
                 assert!(!board.home(i).piece(j).borrow().is_goal());
                 assert_eq!(board.home(i).piece(j).borrow().position(), -1);
             }

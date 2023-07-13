@@ -24,7 +24,6 @@ mod default_player_tests {
                 let piece = player.board().borrow_mut().home(player_id).piece(i);
                 assert_eq!(piece.borrow().id(), i);
                 assert!(piece.borrow().is_home());
-                assert!(piece.borrow().is_safe());
                 assert_eq!(
                     piece.as_ptr(),
                     board.borrow_mut().home(player_id).piece(i).as_ptr()

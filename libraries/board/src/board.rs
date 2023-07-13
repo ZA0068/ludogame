@@ -128,7 +128,7 @@ mod board {
             for ((position, player_id), color) in home.iter_mut().zip(player_ids.iter()).zip(colors.iter()) {
                 position.set(
                     -1,
-                    create_vector_of_pieces(color.clone()).clone(),
+                    create_vector_of_pieces(*color),
                     Some(player_id.clone()),
                 );
             }
@@ -451,10 +451,16 @@ mod board {
             }
 
             pub fn is_occupied_more(&mut self, position: i8) -> bool {
+                if !(0..=51).contains(&position) {
+                    return false;
+                }
                 self.outside(position).pieces.len() > 1
             }
 
             pub fn is_occupied(&mut self, position: i8) -> bool {
+                if !(0..=51).contains(&position) {
+                    return false;
+                }
                 !self.outside(position).pieces.is_empty()
             }
 
@@ -550,7 +556,7 @@ mod board {
     fn create_vector_of_pieces(color: Color) -> Vec<Rc<RefCell<Piece>>> {
         let mut pieces = Vec::default();
         for i in 0..4 {
-            pieces.push(Rc::new(RefCell::new(Piece::new(i, color.clone()))));
+            pieces.push(Rc::new(RefCell::new(Piece::new(i, color))));
         }
         pieces
     }
