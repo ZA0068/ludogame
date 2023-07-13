@@ -68,30 +68,29 @@ mod player_1_choice_tests {
         assert_eq!(result, Act::Nothing);
     }
 
-    // #[test]
-    // fn try_to_move_test_2() {
-    //     let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-    //     let mut player = Player::new(PLAYER_ID, board.clone());
-    //     let mut other_player = Player::new(OTHER_PLAYER_ID, board);
+    #[test]
+    fn try_to_move_test_2() {
+        let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
+        let mut player = Player::new(PLAYER_ID, board.clone());
+        let mut other_player = Player::new(OTHER_PLAYER_ID, board);
 
-    //     player.free_piece(0);
-    //     player.free_piece(1);
-    //     let result = player.try_to_move(0, 1);
-    //     assert_eq!(result, Act::Nothing);
+        player.free_piece(0);
+        player.free_piece(1);
+        let result = player.try_to_move(0, 1);
+        assert_eq!(result, Act::Nothing);
 
-    //     player.update_outside(0, 0, 7);
+        player.update_outside(0, 13, 20);
         
-    //     other_player.free_piece(0);
-    //     other_player.free_piece(1);
-    //     other_player.update_outside(0, 13, 9);
-    //     let result = player.try_to_move(0, 2);
-    //     assert_eq!(result, Act::Nothing);
+        other_player.free_piece(0);
+        other_player.free_piece(1);
+        other_player.update_outside(0, 26, 22);
+        let result = player.try_to_move(0, 2);
+        assert_eq!(result, Act::Nothing);
 
-    //     other_player.update_outside(1
-    //         , 13, 9);
-    //     let result = player.try_to_move(0, 2);
-    //     assert_eq!(result, Act::Nothing);
-    // }
+        other_player.update_outside(1, 26, 22);
+        let result = player.try_to_move(0, 2);
+        assert_eq!(result, Act::Nothing);
+    }
 
     // #[test]
     // fn try_to_join_test() {
