@@ -939,18 +939,20 @@ mod players {
                 return 0;
             }
             let position = self.piece(piece_id).borrow_mut().position();
-            let fixed_position = match (self.id, position) {
-                (0, 51..=55) => 57 - position,
+            match (self.id, position) {
+                (0, 0..=50) => 56 - position,
+                (0, 52..=56) => 57 - position,
+                (1, 13..=51) => 69 - position,
+                (1, 0..=11) => 17 - position,
                 (1, 57..=61) => 62 - position,
-                (1, _) => 69 - position,
-                (2, _) => 82 - position,
-                (3, _) => 95 - position,
-                _ => 56 - position,
-            };
-            if fixed_position >= 57 {
-                return fixed_position - 52;
+                (2, 25..=51) => 82 - position,
+                (2, 0..=24) => 30 - position,
+                (2, 62..=66) => 67 - position,
+                (3, 39..=51) => 95 - position,
+                (3, 67..=71) => 72 - position,
+                (3, 0..=37) => 43 - position,
+                _ => panic!("invalid Heuristics!"),
             }
-            fixed_position
         }
 
         pub fn is_finished(&self) -> bool {

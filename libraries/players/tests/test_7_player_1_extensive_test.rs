@@ -1333,9 +1333,9 @@ mod player_1_move_tests {
             let result = player.get_heuristics(piece_id);
             assert_eq!(result, 5);
 
-            // player.win_piece(piece_id, 5);
-            // let result = player.get_heuristics(piece_id);
-            // assert_eq!(result, 0);
+            player.win_piece(piece_id, 5);
+            let result = player.get_heuristics(piece_id);
+            assert_eq!(result, 0);
         }
     }
 }
