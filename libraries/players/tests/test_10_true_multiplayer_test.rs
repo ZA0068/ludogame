@@ -402,7 +402,7 @@ mod multiplayer_tests {
                 player3.my_turn();
                 player3.play_random(ACTIONS.to_vec());
             if player3.is_finished() {
-                println!("Player 1 wins");
+                println!("Player 2 wins");
                 winrates[0] += 1.0;
                 break;
             }
@@ -410,7 +410,7 @@ mod multiplayer_tests {
             player2.my_turn();
             player2.play_random(ACTIONS.to_vec());
             if player2.is_finished() {
-                println!("Player 2 wins");
+                println!("Player 3 wins");
                 winrates[1] += 1.0;
                 break;
             }
@@ -423,8 +423,67 @@ mod multiplayer_tests {
     println!("Player 3 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
     }
 
+    #[test]
+    #[ignore = "super long test"]
+    fn all_players_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
 
-    
+        let mut player0 = Player::new(0, board.clone());
+        let mut player1 = Player::new(1, board.clone());
+        let mut player2 = Player::new(2, board.clone());
+        let mut player3 = Player::new(3, board.clone());
+
+        let mut winrates = [0.0; 4];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player0.take_dice(dice.clone());
+            loop {
+                player0.my_turn();
+                player0.play_random(ACTIONS.to_vec());
+                if player0.is_finished() {
+                    println!("Player 0 wins");
+                    winrates[0] += 1.0;
+                    break;
+                }
+                player0.give_dice(&mut player1);
+                player1.my_turn();
+                player1.play_random(ACTIONS.to_vec());
+                if player1.is_finished() {
+                    println!("Player 1 wins");
+                    winrates[1] += 1.0;
+                    break;
+                }
+                player1.give_dice(&mut player2);
+                player2.my_turn();
+                player2.play_random(ACTIONS.to_vec());
+                if player2.is_finished() {
+                    println!("Player 2 wins");
+                    winrates[2] += 1.0;
+                    break;
+                }
+                player2.give_dice(&mut player3);
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+                if player3.is_finished() {
+                    println!("Player 3 wins");
+                    winrates[3] += 1.0;
+                    break;
+                }
+                player3.give_dice(&mut player0);
+        }
+        assert!(player0.is_finished() || player1.is_finished() || player2.is_finished() || player3.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 0 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 1 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    println!("Player 2 winrate: {}", winrates[2] / (1.0 * max_iter as f32));
+    println!("Player 3 winrate: {}", winrates[3] / (1.0 * max_iter as f32));
+    }
+
+
+
+
 }
 
 // #[cfg(test)]
