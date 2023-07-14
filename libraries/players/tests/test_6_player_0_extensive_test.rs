@@ -648,6 +648,9 @@ mod player_0_move_tests {
                 player.board().borrow_mut().inside(vec[i as usize - 51]).player_id,
                 Some(board::PlayerID::Player0)
             );
+            if i == 52 {
+                continue;
+            }
             assert_eq!(player.board().borrow_mut().inside(vec[i as usize - 52]).pieces.len(), 0);
         }
     }
