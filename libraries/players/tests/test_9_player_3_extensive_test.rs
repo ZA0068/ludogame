@@ -565,7 +565,7 @@ mod player_3_move_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let player = Player::new(PLAYER_ID, board);
         let piece = player.piece(0);
-        assert_eq!(piece.borrow().id(), 1);
+        assert_eq!(piece.borrow().id(), 0);
         assert_eq!(piece.borrow().color(), Color::Red);
     }
 
@@ -717,7 +717,7 @@ mod player_3_move_tests {
 
     for piece_id in 0..4 {
         player.free_piece(piece_id);
-        for i in 26..76 {
+        for i in 39..89 {
             player.move_piece(piece_id, 1);
             assert_eq!(player.piece(piece_id).borrow().position(), (i + 1) % 52);
             assert_eq!(
@@ -726,28 +726,27 @@ mod player_3_move_tests {
             );
             assert_eq!(
                 player.board().borrow_mut().outside(i + 1).player_id,
-                Some(board::PlayerID::Player2)
+                Some(board::PlayerID::Player3)
             );
             assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
         }
         player.move_piece(piece_id, 1);
-        let vec = (62..=67).chain((62..67).rev()).collect::<Vec<_>>();
-        for i in 62..72  {
+        let vec = (67..=72).chain((67..72).rev()).collect::<Vec<_>>();
+        for i in 67..77  {
             let oldpos = player.piece(piece_id).borrow().position();
-            if (i + 1) % 67 == 0 {
+            if (i + 1) % 72 == 0 {
                 continue;
             }
-
             player.update_piece(piece_id, oldpos, i + 1);
-            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize - 61]);
+            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize -66]);
 
             assert_eq!(
-                player.board().borrow_mut().inside(vec[i as usize - 61]).player_id,
-                Some(board::PlayerID::Player2)
+                player.board().borrow_mut().inside(vec[i as usize -66]).player_id,
+                Some(board::PlayerID::Player3)
             );
         }
     }
-    assert_eq!(player.board().borrow_mut().inside(62).pieces.len(), 4);
+    assert_eq!(player.board().borrow_mut().inside(67).pieces.len(), 4);
     }
 
     #[test]
@@ -757,7 +756,7 @@ mod player_3_move_tests {
 
     for piece_id in 0..4 {
         player.free_piece(piece_id);
-        for i in 26..76 {
+        for i in 39..89 {
             player.move_piece(piece_id, 1);
             assert_eq!(player.piece(piece_id).borrow().position(), (i + 1) % 52);
             assert_eq!(
@@ -766,22 +765,22 @@ mod player_3_move_tests {
             );
             assert_eq!(
                 player.board().borrow_mut().outside(i + 1).player_id,
-                Some(board::PlayerID::Player2)
+                Some(board::PlayerID::Player3)
             );
             assert_eq!(player.board().borrow_mut().outside(i).pieces.len(), 0);
         }
         player.move_piece(piece_id, 1);
-        let vec = (62..=67).collect::<Vec<_>>();
-        for i in 62..66 {
+        let vec = (67..=72).collect::<Vec<_>>();
+        for i in 67..71 {
 
             player.move_piece(piece_id, 1);
-            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize -61]);
+            assert_eq!(player.piece(piece_id).borrow().position(), vec[i as usize -66]);
             assert_eq!(
-                player.board().borrow_mut().inside(vec[i as usize -61]).player_id,
-                Some(board::PlayerID::Player2)
+                player.board().borrow_mut().inside(vec[i as usize -66]).player_id,
+                Some(board::PlayerID::Player3)
             );
         }
-        player.enter_goal(piece_id, 66);
+        player.enter_goal(piece_id, 71);
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
     }
     assert!(player.is_finished());
@@ -797,11 +796,11 @@ mod player_3_move_tests {
     player.move_piece(piece_id, 7);
     player.save_piece(piece_id, 1);
 
-    assert_eq!(player.piece(piece_id).borrow().position(), 34);
+    assert_eq!(player.piece(piece_id).borrow().position(), 47);
 
-    player.update_piece(piece_id, 34, 24);
+    player.update_piece(piece_id, 47, 37);
     player.save_piece(piece_id, 1);
-    assert_eq!(player.piece(piece_id).borrow().position(), 62);
+    assert_eq!(player.piece(piece_id).borrow().position(), 67);
     }
 
     #[test]
@@ -814,11 +813,11 @@ mod player_3_move_tests {
         player.move_piece(piece_id, 7);
         player.save_piece(piece_id, 1);
 
-        assert_eq!(player.piece(piece_id).borrow().position(), 34);
+        assert_eq!(player.piece(piece_id).borrow().position(), 47);
 
-        player.update_piece(piece_id, 34, 24);
+        player.update_piece(piece_id, 47, 37);
         player.save_piece(piece_id, 1);
-        assert_eq!(player.piece(piece_id).borrow().position(), 62);
+        assert_eq!(player.piece(piece_id).borrow().position(), 67);
     }
     }
 
@@ -828,8 +827,8 @@ mod player_3_move_tests {
     let mut player = Player::new(PLAYER_ID, board);
     for piece_id in 0..4 {
         player.free_piece(piece_id);
-        for i in 14..=69 {
-            if i == 63 {
+        for i in 27..=82 {
+            if i == 76 {
                 continue;
             }
             let is_globe = player.board().borrow().is_globe(i);
@@ -853,10 +852,10 @@ mod player_3_move_tests {
     player.free_piece(piece_id);
     other_player.free_piece(piece_id);
 
-    player.update_outside(piece_id, 26, 18);
-    other_player.update_outside(piece_id, 39, 24);
+    player.update_outside(piece_id, 39, 31);
+    other_player.update_outside(piece_id, 52, 37);
 
-    assert_eq!(player.piece(piece_id).borrow().position(), 18);
+    assert_eq!(player.piece(piece_id).borrow().position(), 31);
 
     player.win_piece(piece_id, 6);
     assert_eq!(player.piece(piece_id).borrow().position(), 99);
@@ -875,9 +874,9 @@ mod player_3_move_tests {
     for piece_id in 0..4 {
 
         player.free_piece(piece_id);
-        player.update_outside(piece_id, 26, 18);
+        player.update_outside(piece_id, 39, 31);
 
-        assert_eq!(player.piece(piece_id).borrow().position(), 18);
+        assert_eq!(player.piece(piece_id).borrow().position(), 31);
 
         player.win_piece(piece_id, 6);
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
@@ -894,8 +893,8 @@ mod player_3_move_tests {
 
     for piece_id in 0..4 {
         player.free_piece(piece_id);
-        for position in 27..=76 {
-            if position < 76 {
+        for position in 40..=89 {
+            if position < 89 {
                 player.move_piece(piece_id, 1);
                 assert_eq!(player.piece(piece_id).borrow().position(), position % 52);
             } else {
@@ -916,7 +915,7 @@ mod player_3_move_tests {
 
     let piece_id = 0;
     player.free_piece(piece_id);
-    player.update_piece(piece_id, 26, 24);
+    player.update_piece(piece_id, 39, 37);
     player.win_piece(piece_id, 6);
     assert_eq!(player.piece(piece_id).borrow().position(), 99);
     assert!(player.piece(piece_id).borrow().is_goal());
@@ -930,7 +929,7 @@ mod player_3_move_tests {
 
     for piece_id in 0..4 {
         player.free_piece(piece_id);
-        player.update_piece(piece_id, 26, 24);
+        player.update_piece(piece_id, 39, 37);
         player.win_piece(piece_id, 6);
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
@@ -947,7 +946,7 @@ mod player_3_move_tests {
     for dice_number in (1..=6).rev() {
         for piece_id in 0..4 {
             player.free_piece(piece_id);
-            player.update_piece(piece_id, 26, 24);
+            player.update_piece(piece_id, 39, 37);
             player.move_piece(piece_id, 6 - dice_number);
             player.win_piece(piece_id, dice_number);
             assert_eq!(player.piece(piece_id).borrow().position(), 99);
@@ -967,26 +966,26 @@ mod player_3_move_tests {
 
     player.free_piece(piece_id);
     player.starjump_piece(piece_id, 5);
-    assert_eq!(player.piece(piece_id).borrow().position(), 37);
-    assert_eq!(player.board().borrow_mut().outside(37).pieces.len(), 1);
+    assert_eq!(player.piece(piece_id).borrow().position(), 50);
+    assert_eq!(player.board().borrow_mut().outside(50).pieces.len(), 1);
 
-    player.update_piece(piece_id, 37, 36);
+    player.update_piece(piece_id, 50, 49);
     player.starjump_piece(piece_id, 1);
-    assert_eq!(player.piece(piece_id).borrow().position(), 44);
-    assert_eq!(player.board().borrow_mut().outside(44).pieces.len(), 1);
+    assert_eq!(player.piece(piece_id).borrow().position(), 5);
+    assert_eq!(player.board().borrow_mut().outside(5).pieces.len(), 1);
     }
 
     #[test]
     fn starjump_test_2 () {
     let board = Rc::new(RefCell::new(Board::new()));
     let mut player = Player::new(PLAYER_ID, board);
-    let starvec = vec![31, 37, 44, 50, 5, 11, 18, 24];
+    let starvec = vec![44, 50, 5, 11, 18, 24, 31, 37];
     let piece_id = 0;
 
     player.free_piece(piece_id);
     player.starjump_piece(piece_id, 5);
-    assert_eq!(player.piece(piece_id).borrow().position(), 37);
-    assert_eq!(player.board().borrow_mut().outside(37).pieces.len(), 1);
+    assert_eq!(player.piece(piece_id).borrow().position(), 50);
+    assert_eq!(player.board().borrow_mut().outside(50).pieces.len(), 1);
 
     (1..7).for_each(|i| {
 
@@ -1002,12 +1001,12 @@ mod player_3_move_tests {
     fn starjump_test_3 () {
     let board = Rc::new(RefCell::new(Board::new()));
     let mut player = Player::new(PLAYER_ID, board);
-    let starvec = vec![31, 37, 44, 50, 5, 11, 18, 24];
+    let starvec = vec![44, 50, 5, 11, 18, 24, 31, 37];
 
     for piece_id in 0..4 {
         player.free_piece(piece_id);
         player.starjump_piece(piece_id, 5);
-        assert_eq!(player.piece(piece_id).borrow().position(), 37);
+        assert_eq!(player.piece(piece_id).borrow().position(), 50);
 
         (1..7).for_each(|i| {
             player.update_piece(piece_id, starvec[i], starvec[i] - 1);
@@ -1034,9 +1033,9 @@ mod player_3_move_tests {
 
     player.move_piece(0, 1);
     player.join_piece(1, 1);
-    assert_eq!(player.piece(0).borrow().position(), 27);
-    assert_eq!(player.piece(1).borrow().position(), 27);
-    assert_eq!(player.board().borrow_mut().outside(27).pieces.len(), 2);
+    assert_eq!(player.piece(0).borrow().position(), 40);
+    assert_eq!(player.piece(1).borrow().position(), 40);
+    assert_eq!(player.board().borrow_mut().outside(40).pieces.len(), 2);
     }
 
     #[test]
@@ -1049,12 +1048,12 @@ mod player_3_move_tests {
 
     player.starjump_piece(0, 5);
     player.join_piece(1, 5);
-    assert_eq!(player.piece(0).borrow().position(), 37);
-    assert_eq!(player.piece(1).borrow().position(), 37);
-    assert_eq!(player.board().borrow_mut().outside(37).pieces.len(), 2);
+    assert_eq!(player.piece(0).borrow().position(), 50);
+    assert_eq!(player.piece(1).borrow().position(), 50);
+    assert_eq!(player.board().borrow_mut().outside(50).pieces.len(), 2);
 
-    player.update_outside(0, 37, 44);
-    player.update_outside(1, 37, 42);
+    player.update_outside(0, 50, 5);
+    player.update_outside(1, 50, 3);
 
     player.join_piece(1, 2);
     }
@@ -1066,14 +1065,14 @@ mod player_3_move_tests {
 
     player.free_piece(0);
     player.free_piece(1);
-    player.update_outside(0, 26, 32);
-    player.update_outside(1, 26, 33);
+    player.update_outside(0, 39, 45);
+    player.update_outside(1, 39, 46);
 
     player.move_piece(0, 2);
     player.join_piece(1, 1);
 
-    assert_eq!(player.piece(0).borrow().position(), 34);
-    assert_eq!(player.piece(1).borrow().position(), 34);
+    assert_eq!(player.piece(0).borrow().position(), 47);
+    assert_eq!(player.piece(1).borrow().position(), 47);
     }
 
     #[test]
@@ -1083,14 +1082,14 @@ mod player_3_move_tests {
 
     player.free_piece(0);
     player.free_piece(1);
-    player.update_outside(0, 26, 37);
-    player.update_outside(1, 26, 38);
+    player.update_outside(0, 39, 50);
+    player.update_outside(1, 39, 51);
 
     player.move_piece(0, 2);
     player.join_piece(1, 1);
 
-    assert_eq!(player.piece(0).borrow().position(), 39);
-    assert_eq!(player.piece(1).borrow().position(), 39);
+    assert_eq!(player.piece(0).borrow().position(), 0);
+    assert_eq!(player.piece(1).borrow().position(), 0);
     }
 
     #[test]
@@ -1105,7 +1104,7 @@ mod player_3_move_tests {
     player.join_piece(1, 1);
 
     player.leave_piece(0, 1);
-    assert_eq!(player.piece(0).borrow().position(), 28);
+    assert_eq!(player.piece(0).borrow().position(), 41);
     }
 
     #[test]
@@ -1120,7 +1119,7 @@ mod player_3_move_tests {
     player.join_piece(1, 8);
 
     player.leave_piece(0, 1);
-    assert_eq!(player.piece(0).borrow().position(), 35);
+    assert_eq!(player.piece(0).borrow().position(), 48);
     }
 
     #[test]
@@ -1131,11 +1130,13 @@ mod player_3_move_tests {
     player.free_piece(0);
     player.free_piece(1);
 
-    player.move_piece(0, 13);
-    player.join_piece(1, 13);
+    player.move_piece(0, 7);
+    player.move_piece(0, 6);
+    player.move_piece(1, 7);
+    player.join_piece(1, 6);
 
     player.leave_piece(0, 1);
-    assert_eq!(player.piece(0).borrow().position(), 40);
+    assert_eq!(player.piece(0).borrow().position(), 1);
     }
 
     #[test]
@@ -1149,10 +1150,10 @@ mod player_3_move_tests {
     other_player.free_piece(2);
     other_player.free_piece(3);
 
-    other_player.update_outside(0, 39, 26);
-    other_player.update_outside(1, 39, 26);
-    other_player.update_outside(2, 39, 26);
-    other_player.update_outside(3, 39, 27);
+    other_player.update_outside(0, 0, 39);
+    other_player.update_outside(1, 0, 39);
+    other_player.update_outside(2, 0, 39);
+    other_player.update_outside(3, 0, 40);
 
     player.kill_piece(0, 6);
     assert_eq!(other_player.piece(0).borrow().position(), -1);
@@ -1177,15 +1178,15 @@ mod player_3_move_tests {
     other_player.free_piece(1);
     player.free_piece(0);
 
-    other_player.update_outside(0, 39, 31);
-    other_player.update_outside(1, 39, 37);
+    other_player.update_outside(0, 0, 44);
+    other_player.update_outside(1, 0, 50);
 
     player.kill_piece(0, 5);
     assert_eq!(other_player.piece(0).borrow().position(), -1);
     assert!(other_player.piece(0).borrow().is_home());
     assert_eq!(other_player.piece(1).borrow().position(), -1);
     assert!(other_player.piece(1).borrow().is_home());
-    assert_eq!(player.piece(0).borrow().position(), 37);
+    assert_eq!(player.piece(0).borrow().position(), 50);
     }
 
     #[test]
@@ -1199,14 +1200,14 @@ mod player_3_move_tests {
         player.free_piece(1);
 
         player.starjump_piece(1, 5);
-        other_player.update_outside(0, 39, 31);
+        other_player.update_outside(0, 0, 44);
 
         player.kill_piece(0, 5);
         assert_eq!(other_player.piece(0).borrow().position(), -1);
         assert!(other_player.piece(0).borrow().is_home());
 
-        assert_eq!(player.piece(0).borrow().position(), 37);
-        assert_eq!(player.piece(1).borrow().position(), 37);
+        assert_eq!(player.piece(0).borrow().position(), 50);
+        assert_eq!(player.piece(1).borrow().position(), 50);
     }
 
     #[test]
@@ -1996,20 +1997,20 @@ mod player_3_play_test {
         dice_number = 1;
         choice = player.valid_choices(0, dice_number, Act::Move);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 27);
+        assert_eq!(player.piece(0).borrow().position(), 40);
 
         dice_number = 4;
         choice = player.valid_choices(0, dice_number, Act::Move);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 27);
+        assert_eq!(player.piece(0).borrow().position(), 40);
         choice = player.valid_choices(0, dice_number, Act::Starjump);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 37);
+        assert_eq!(player.piece(0).borrow().position(), 50);
 
         dice_number = 2;
         choice = player.valid_choices(0, dice_number, Act::Move);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 37);
+        assert_eq!(player.piece(0).borrow().position(), 50);
 
         choice = player.valid_choices(0, dice_number, Act::Die);
         player.make_move(0, dice_number, choice);
@@ -2024,19 +2025,19 @@ mod player_3_play_test {
         dice_number = 6;
         choice = player.valid_choices(0, dice_number, Act::Move);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 32);
+        assert_eq!(player.piece(0).borrow().position(), 45);
 
         dice_number = 2;
         choice = player.valid_choices(0, dice_number, Act::Safe);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 34);
+        assert_eq!(player.piece(0).borrow().position(), 47);
 
         other_player.move_piece(0, 1);
 
         dice_number = 6;
         choice = player.valid_choices(0, dice_number, Act::Kill);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 40);
+        assert_eq!(player.piece(0).borrow().position(), 1);
 
         choice = player.valid_choices(1, dice_number, Act::Free);
         player.make_move(1, dice_number, choice);
@@ -2047,25 +2048,25 @@ mod player_3_play_test {
 
         choice = player.valid_choices(1, dice_number, Act::Move);
         player.make_move(1, dice_number, choice);
-        assert_eq!(player.piece(1).borrow().position(), 26);
+        assert_eq!(player.piece(1).borrow().position(), 39);
 
         choice = player.valid_choices(1, dice_number, Act::Leave);
         player.make_move(1, dice_number, choice);
-        assert_eq!(player.piece(1).borrow().position(), 32);
+        assert_eq!(player.piece(1).borrow().position(), 45);
 
         choice = player.valid_choices(2, dice_number, Act::Move);
         player.make_move(2, dice_number, choice);
-        assert_eq!(player.piece(2).borrow().position(), 26);
+        assert_eq!(player.piece(2).borrow().position(), 39);
 
         choice = player.valid_choices(2, dice_number, Act::Join);
         player.make_move(2, dice_number, choice);
-        assert_eq!(player.piece(2).borrow().position(), 32);
+        assert_eq!(player.piece(2).borrow().position(), 45);
 
-        player.update_outside(0, 40, 23);
+        player.update_outside(0, 1, 36);
 
         choice = player.valid_choices(0, dice_number, Act::Goal);
         player.make_move(0, dice_number, choice);
-        assert_eq!(player.piece(0).borrow().position(), 23);
+        assert_eq!(player.piece(0).borrow().position(), 23+13);
 
         dice_number = 1;
         choice = player.valid_choices(0, dice_number, Act::Goal);
