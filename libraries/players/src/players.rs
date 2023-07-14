@@ -281,6 +281,7 @@ mod players {
                 self.new_position = self.invincible_positions(self.id());
             } else {
                 self.new_position = self.old_position + dice_number;
+                self.new_position = self.circumvent_player_0(self.old_position, self.new_position);
             }
         }
 
@@ -374,7 +375,6 @@ mod players {
         }
 
         pub fn update_outside(&mut self, piece_id: i8, old_position: i8, new_position: i8) {
-            let new_position = self.circumvent_player_0(old_position, new_position);
             self.piece(piece_id).borrow_mut().set_position(new_position);
             self.board().borrow_mut().update_outside(
                 self.id(),
