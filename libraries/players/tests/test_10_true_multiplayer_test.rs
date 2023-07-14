@@ -1,7 +1,431 @@
-// use board::Board;
-// use dice::Dice;
-// use players::{Act, Player};
-// use std::{cell::RefCell, rc::Rc};
+use board::Board;
+use dice::Dice;
+use players::{Act, Player};
+use std::{cell::RefCell, rc::Rc};
+
+
+
+mod multiplayer_tests {
+    use super::*;
+
+    static ACTIONS: [Act; 10] = [
+        Act::Move,
+        Act::Free,
+        Act::Kill,
+        Act::Join,
+        Act::Leave,
+        Act::Die,
+        Act::Goal,
+        Act::Safe,
+        Act::Starjump,
+        Act::Nothing,
+    ];
+
+    #[test]
+    #[ignore = "long test"]
+    fn player_0_vs_1_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player_0 = Player::new(0, board.clone());
+        let mut player1 = Player::new(1, board);
+        
+            player1.take_dice(dice);
+            loop {
+                player1.my_turn();
+                player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 0 wins");
+                break;
+            }
+            player1.give_dice(&mut player_0);
+            player_0.my_turn();
+            player_0.play_random(ACTIONS.to_vec());
+            if player_0.is_finished() {
+                println!("Player 1 wins");
+                break;
+            }
+            player_0.give_dice(&mut player1);
+        }
+        assert!(player_0.is_finished() || player1.is_finished());
+    }
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_0_vs_1_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player_0 = Player::new(0, board.clone());
+        let mut player1 = Player::new(1, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player1.take_dice(dice.clone());
+            loop {
+                player1.my_turn();
+                player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 0 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player1.give_dice(&mut player_0);
+            player_0.my_turn();
+            player_0.play_random(ACTIONS.to_vec());
+            if player_0.is_finished() {
+                println!("Player 1 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player_0.give_dice(&mut player1);
+        }
+        assert!(player_0.is_finished() || player1.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 0 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 1 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn player_0_vs_2_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player0 = Player::new(0, board.clone());
+        let mut player2 = Player::new(2, board);
+        
+            player2.take_dice(dice);
+            loop {
+                player2.my_turn();
+                player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 0 wins");
+                break;
+            }
+            player2.give_dice(&mut player0);
+            player0.my_turn();
+            player0.play_random(ACTIONS.to_vec());
+            if player0.is_finished() {
+                println!("Player 2 wins");
+                break;
+            }
+            player0.give_dice(&mut player2);
+        }
+        assert!(player0.is_finished() || player2.is_finished());
+    }
+
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_0_vs_2_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player0 = Player::new(0, board.clone());
+        let mut player2 = Player::new(2, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player2.take_dice(dice.clone());
+            loop {
+                player2.my_turn();
+                player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 0 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player2.give_dice(&mut player0);
+            player0.my_turn();
+            player0.play_random(ACTIONS.to_vec());
+            if player0.is_finished() {
+                println!("Player 2 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player0.give_dice(&mut player2);
+        }
+        assert!(player0.is_finished() || player2.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 0 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 2 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn player_0_vs_3_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player0 = Player::new(0, board.clone());
+        let mut player3 = Player::new(3, board);
+        
+            player3.take_dice(dice);
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 0 wins");
+                break;
+            }
+            player3.give_dice(&mut player0);
+            player0.my_turn();
+            player0.play_random(ACTIONS.to_vec());
+            if player0.is_finished() {
+                println!("Player 3 wins");
+                break;
+            }
+            player0.give_dice(&mut player3);
+        }
+        assert!(player0.is_finished() || player3.is_finished());
+    }
+
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_0_vs_3_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player0 = Player::new(0, board.clone());
+        let mut player3 = Player::new(3, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player3.take_dice(dice.clone());
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 0 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player3.give_dice(&mut player0);
+            player0.my_turn();
+            player0.play_random(ACTIONS.to_vec());
+            if player0.is_finished() {
+                println!("Player 3 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player0.give_dice(&mut player3);
+        }
+        assert!(player0.is_finished() || player3.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 0 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 3 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+    
+    #[test]
+    #[ignore = "long test"]
+    fn player_1_vs_2_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player1 = Player::new(1, board.clone());
+        let mut player2 = Player::new(2, board);
+        
+            player2.take_dice(dice);
+            loop {
+                player2.my_turn();
+                player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 1 wins");
+                break;
+            }
+            player2.give_dice(&mut player1);
+            player1.my_turn();
+            player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 2 wins");
+                break;
+            }
+            player1.give_dice(&mut player2);
+        }
+        assert!(player1.is_finished() || player2.is_finished());
+    }
+
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_1_vs_2_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player1 = Player::new(1, board.clone());
+        let mut player2 = Player::new(2, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player2.take_dice(dice.clone());
+            loop {
+                player2.my_turn();
+                player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 1 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player2.give_dice(&mut player1);
+            player1.my_turn();
+            player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 2 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player1.give_dice(&mut player2);
+        }
+        assert!(player1.is_finished() || player2.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 1 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 2 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+
+
+    #[test]
+    #[ignore = "long test"]
+    fn player_1_vs_3_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player1 = Player::new(1, board.clone());
+        let mut player3 = Player::new(3, board);
+        
+            player3.take_dice(dice);
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 1 wins");
+                break;
+            }
+            player3.give_dice(&mut player1);
+            player1.my_turn();
+            player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 3 wins");
+                break;
+            }
+            player1.give_dice(&mut player3);
+        }
+        assert!(player1.is_finished() || player3.is_finished());
+    }
+
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_1_vs_3_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player1 = Player::new(1, board.clone());
+        let mut player3 = Player::new(3, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player3.take_dice(dice.clone());
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 1 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player3.give_dice(&mut player1);
+            player1.my_turn();
+            player1.play_random(ACTIONS.to_vec());
+            if player1.is_finished() {
+                println!("Player 2 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player1.give_dice(&mut player3);
+        }
+        assert!(player1.is_finished() || player3.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 1 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 3 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+
+    #[test]
+    #[ignore = "long test"]
+    fn player_2_vs_3_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player2 = Player::new(2, board.clone());
+        let mut player3 = Player::new(3, board);
+        
+            player3.take_dice(dice);
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 2 wins");
+                break;
+            }
+            player3.give_dice(&mut player2);
+            player2.my_turn();
+            player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 3 wins");
+                break;
+            }
+            player2.give_dice(&mut player3);
+        }
+        assert!(player2.is_finished() || player3.is_finished());
+    }
+
+
+    #[test]
+    #[ignore = "very long test"]
+    fn player_2_vs_3_1000_iteration_test() {
+        let board = Rc::new(RefCell::new(Board::new()));
+        let dice = Dice::default();
+
+        let mut player2 = Player::new(2, board.clone());
+        let mut player3 = Player::new(3, board.clone());
+        let mut winrates = [0.0; 2];
+        let max_iter: usize = 1000;
+        for _ in 0..max_iter {
+            player3.take_dice(dice.clone());
+            loop {
+                player3.my_turn();
+                player3.play_random(ACTIONS.to_vec());
+            if player3.is_finished() {
+                println!("Player 1 wins");
+                winrates[0] += 1.0;
+                break;
+            }
+            player3.give_dice(&mut player2);
+            player2.my_turn();
+            player2.play_random(ACTIONS.to_vec());
+            if player2.is_finished() {
+                println!("Player 2 wins");
+                winrates[1] += 1.0;
+                break;
+            }
+            player2.give_dice(&mut player3);
+        }
+        assert!(player2.is_finished() || player3.is_finished());
+        board.borrow_mut().reset();
+    }
+    println!("Player 2 winrate: {}", winrates[0] / (1.0 * max_iter as f32));
+    println!("Player 3 winrate: {}", winrates[1] / (1.0 * max_iter as f32));
+    }
+
+
+    
+}
 
 // #[cfg(test)]
 // mod playstyle_tests {

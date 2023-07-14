@@ -124,8 +124,15 @@ mod players {
             self.dice = Some(dice);
         }
 
-        pub fn give_dice(&mut self) {
+        pub fn drop_dice(&mut self) {
             self.dice = None;
+        }
+
+        pub fn give_dice(&mut self, player: &mut Player) {
+            if let Some(dice) = &self.dice {
+                player.take_dice(dice.clone());
+                self.dice = None;
+            }
         }
 
         pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
@@ -467,9 +474,14 @@ mod players {
             }
         }
 
-        pub fn roll_dice(&mut self) -> i8 {
+        pub fn roll_dice(&mut self) {
             if let Some(dice) = &mut self.dice {
                 dice.roll();
+            }
+        }
+
+        pub fn get_dice_number(&self) -> i8 {
+            if let Some(dice) = &self.dice {
                 dice.get_value()
             } else {
                 0
@@ -525,17 +537,11 @@ mod players {
         }
 
         pub fn play_random(&mut self, actions: Vec<Act>) {
-            let dice_number = self.roll_dice();
+            self.roll_dice();
+            let dice_number = self.get_dice_number();
             let movesets = self.generate_vector_of_random_actions(actions, dice_number);
             self.action = self.select_random_piece(movesets);
-            println!("-------------------");
-            println!("prior play:");
-            self.print_status();
             self.make_move(self.action.1, dice_number, self.action.0);
-            println!("-------------------");
-            println!("posterior play:");
-            self.print_status();
-            println!("\n");
         }
 
         pub fn generate_vector_of_random_actions(
@@ -558,7 +564,8 @@ mod players {
         }
 
         pub fn play_ordered(&mut self, actions: Vec<Act>, take_nearest_piece: bool) {
-            let dice_number = self.roll_dice();
+            self.roll_dice();
+            let dice_number = self.get_dice_number();
             let movesets =
                 self.generate_vector_of_ordered_actions(actions, dice_number, take_nearest_piece);
             self.action = movesets
@@ -841,7 +848,7 @@ mod players {
             let is_star_position_occupied_by_others =
                 self.is_star_occupied_by_others(self.old_position, self.new_position);
             let is_globe = self.board().borrow_mut().is_globe(self.new_position);
-
+            let can_enter_inside = self.can_enter_inside(self.old_position, self.new_position);
             match (
                 is_home,
                 is_invincible_position_occupied_by_others,
@@ -851,13 +858,15 @@ mod players {
                 is_new_position_occupied_by_others.1,
                 is_star_position_occupied_by_others.0,
                 is_star_position_occupied_by_others.1,
+                can_enter_inside,
                 dice_number,
             ) {
-                (false, _, false, false, true, false, _, false, _)
-                | (false, _, false, false, _, false, true, false, _)
-                | (false, _, false, false, true, false, true, _, _)
-                | (true, _, _, _, true, _, _, _, 6) => Act::Kill,
-                (false, true, false, _, true, _, _, _, _) => Act::Nothing,
+                  (false, _, false, false, true, false, _, false, false, _)
+                | (false, _, false, false, _, false, true, false, false, _)
+                | (false, _, false, false, true, false, true, _, false, _)
+                | (true, _, _, _, true, _, _, _, _, 6) => Act::Kill,
+                  (false, true, false, _, true, _, _, _, _, _) |
+                  (_, _, _, _, _, _, _, _, true, _)=> Act::Nothing,
                 _ => Act::Nothing,
             }
         }

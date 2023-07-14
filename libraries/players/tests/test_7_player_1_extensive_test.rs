@@ -590,17 +590,20 @@ mod player_1_move_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
 
-        let result = player.roll_dice();
+        player.roll_dice();
+        let result = player.get_dice_number();
         assert!(result == 0);
 
         let dice = Dice::default();
 
         player.take_dice(dice);
-        let result = player.roll_dice();
+        player.roll_dice();
+        let result = player.get_dice_number();
         assert!(result > 0 && result < 7);
 
-        player.give_dice();
-        let result = player.roll_dice();
+        player.drop_dice();
+        player.roll_dice();
+        let result = player.get_dice_number();
         assert!(result == 0);
     }
 
