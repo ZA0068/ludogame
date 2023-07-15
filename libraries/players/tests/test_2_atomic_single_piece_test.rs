@@ -282,9 +282,8 @@ mod atomic_single_piece_test {
         assert_eq!(player.piece(piece_id).borrow_mut().position(), 52);
         assert!(player.piece(piece_id).borrow_mut().is_free());
         assert_eq!(player.board().borrow_mut().inside(52).pieces.len(), 1);
-    
     }
-    
+
     #[test]
     fn update_inside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -315,12 +314,12 @@ mod atomic_single_piece_test {
         player.update_inside(piece_id, 52, 54);
         assert_eq!(player.piece(piece_id).borrow_mut().position(), 54);
         assert_eq!(player.board().borrow_mut().inside(54).pieces.len(), 1);
-        
+
         player.update_inside(piece_id, 54, 58);
         assert_eq!(player.piece(piece_id).borrow_mut().position(), 56);
         assert_eq!(player.board().borrow_mut().inside(56).pieces.len(), 1);
     }
-    
+
     #[test]
     fn enter_goal_from_outside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -337,10 +336,21 @@ mod atomic_single_piece_test {
         assert!(piece.borrow().is_goal());
         let boardstate = player.board();
         assert_eq!(boardstate.borrow_mut().goal(PLAYER_ID).pieces.len(), 1);
-        assert_eq!(boardstate.borrow_mut().goal(PLAYER_ID).player_id, Some(board::PlayerID::Player0));
-        assert_eq!(boardstate.borrow_mut().goal(PLAYER_ID).piece(piece_id).borrow().color(), pieces::Color::Green);
+        assert_eq!(
+            boardstate.borrow_mut().goal(PLAYER_ID).player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(
+            boardstate
+                .borrow_mut()
+                .goal(PLAYER_ID)
+                .piece(piece_id)
+                .borrow()
+                .color(),
+            pieces::Color::Green
+        );
     }
-    
+
     #[test]
     fn enter_goal_from_inside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -355,20 +365,33 @@ mod atomic_single_piece_test {
         assert!(!player.piece(piece_id).borrow().is_goal());
         let boardstate = player.board();
         assert_eq!(boardstate.borrow_mut().inside(54).pieces.len(), 1);
-        assert_eq!(boardstate.borrow().inside[2].player_id, Some(board::PlayerID::Player0));
-    
+        assert_eq!(
+            boardstate.borrow().inside[2].player_id,
+            Some(board::PlayerID::Player0)
+        );
+
         player.enter_goal(piece_id, 54);
-    
+
         assert_eq!(player.piece(piece_id).borrow().position(), 99);
         assert!(player.piece(piece_id).borrow().is_goal());
-        
+
         let boardstate = player.board();
         assert_eq!(boardstate.borrow_mut().goal(0).pieces.len(), 1);
-        assert_eq!(player.board().borrow().goal[0].player_id, Some(board::PlayerID::Player0));
-        assert_eq!(boardstate.borrow_mut().goal(PLAYER_ID).piece(piece_id).borrow().color(), pieces::Color::Green);
-
+        assert_eq!(
+            player.board().borrow().goal[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+        assert_eq!(
+            boardstate
+                .borrow_mut()
+                .goal(PLAYER_ID)
+                .piece(piece_id)
+                .borrow()
+                .color(),
+            pieces::Color::Green
+        );
     }
-    
+
     #[test]
     fn enter_globe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -382,13 +405,13 @@ mod atomic_single_piece_test {
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
         assert!(player.piece(piece_id).borrow().is_free());
         assert_eq!(player.board().borrow_mut().outside(8).pieces.len(), 1);
-        
+
         player.enter_globe(piece_id, 8, 8);
         assert_eq!(player.piece(piece_id).borrow().position(), 8);
         assert!(player.piece(piece_id).borrow().is_free());
         assert_eq!(player.board().borrow_mut().outside(8).pieces.len(), 1);
     }
-    
+
     #[test]
     fn starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
@@ -405,5 +428,4 @@ mod atomic_single_piece_test {
         assert_eq!(player.piece(piece_id).borrow().position(), 11);
         assert!(player.piece(piece_id).borrow().is_free());
     }
-
 }

@@ -74,7 +74,7 @@ mod atomic_choice_test {
         let result = player.try_to_join(piece_1, dice_number);
         assert_eq!(result, Act::Join);
     }
-    
+
     #[test]
     fn try_to_kill_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
@@ -132,7 +132,7 @@ mod atomic_choice_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board.clone());
         let piece_id = 0;
-       
+
         player.free_piece(piece_id);
         let old_position = player.piece(piece_id).borrow().position();
         let new_position = 52;
@@ -160,18 +160,17 @@ mod atomic_choice_test {
         let dice_number = 1;
         player.move_piece(piece_id1, dice_number);
         player.move_piece(piece_id2, dice_number);
-        
+
         let result = player.try_to_leave(piece_id1, dice_number);
         assert_eq!(result, Act::Leave);
-        
+
         player.move_piece(piece_id1, dice_number);
         let result = player.try_to_leave(piece_id1, dice_number);
         assert_eq!(result, Act::Nothing);
-
     }
 
     #[test]
-    fn try_to_safe_test(){
+    fn try_to_safe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
         let piece_id = 0;
@@ -187,7 +186,7 @@ mod atomic_choice_test {
     }
 
     #[test]
-    fn try_to_starjump_test(){
+    fn try_to_starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID, board);
         let piece_id = 0;

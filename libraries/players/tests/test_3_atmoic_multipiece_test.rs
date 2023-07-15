@@ -38,9 +38,9 @@ mod atomic_multipiece_test {
         assert_eq!(player.piece(0).borrow_mut().position(), 1);
         assert_eq!(player.piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
-        
+
         assert!(player.piece(0).borrow_mut().is_free());
-        
+
         assert_eq!(player.piece(0).borrow_mut().color(), pieces::Color::Green);
         assert_eq!(player.piece(1).borrow_mut().color(), pieces::Color::Green);
 
@@ -50,10 +50,10 @@ mod atomic_multipiece_test {
         assert_eq!(player.piece(0).borrow_mut().position(), 1);
         assert_eq!(player.piece(1).borrow_mut().position(), 1);
         assert_eq!(player.board().borrow_mut().outside(1).pieces.len(), 2);
-        
+
         assert!(player.piece(0).borrow_mut().is_free());
         assert!(player.piece(1).borrow_mut().is_free());
-        
+
         assert_eq!(player.piece(0).borrow_mut().color(), pieces::Color::Green);
         assert_eq!(player.piece(1).borrow_mut().color(), pieces::Color::Green);
     }

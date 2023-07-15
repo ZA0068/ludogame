@@ -54,14 +54,16 @@ mod atomic_multiplayers_tests {
         assert_eq!(player1.piece(0).borrow().position(), 0);
         assert_eq!(player1.piece(0).borrow().color(), pieces::Color::Green);
         assert_eq!(player1.board().borrow().outside[0].pieces.len(), 1);
-        assert_eq!(player1.board().borrow().outside[0].player_id,
-        Some(board::PlayerID::Player0)
-    );
-    
-    assert_eq!(player2.piece(0).borrow().position(), 13);
-    assert_eq!(player2.piece(0).borrow().color(), pieces::Color::Yellow);
+        assert_eq!(
+            player1.board().borrow().outside[0].player_id,
+            Some(board::PlayerID::Player0)
+        );
+
+        assert_eq!(player2.piece(0).borrow().position(), 13);
+        assert_eq!(player2.piece(0).borrow().color(), pieces::Color::Yellow);
         assert_eq!(player2.board().borrow_mut().outside(13).pieces.len(), 1);
-        assert_eq!(player2.board().borrow_mut().outside(13).player_id,
+        assert_eq!(
+            player2.board().borrow_mut().outside(13).player_id,
             Some(board::PlayerID::Player1)
         );
         assert_eq!(
@@ -260,7 +262,16 @@ mod atomic_multiplayers_tests {
         assert_eq!(player.piece(0).borrow().position(), -1);
         assert!(player.piece(0).borrow().is_home());
         assert_eq!(player.board().borrow_mut().home(0).pieces.len(), 4);
-        assert_eq!(player.board().borrow_mut().home(0).piece(0).borrow_mut().color(), pieces::Color::Green);
+        assert_eq!(
+            player
+                .board()
+                .borrow_mut()
+                .home(0)
+                .piece(0)
+                .borrow_mut()
+                .color(),
+            pieces::Color::Green
+        );
         assert!(player
             .board()
             .borrow_mut()
@@ -318,7 +329,16 @@ mod atomic_multiplayers_tests {
 
         assert_eq!(player1.piece(0).borrow().position(), -1);
         assert!(player1.piece(0).borrow().is_home());
-        assert_eq!(player1.board().borrow_mut().home(PLAYER_1).piece(0).borrow_mut().color(), pieces::Color::Yellow);
+        assert_eq!(
+            player1
+                .board()
+                .borrow_mut()
+                .home(PLAYER_1)
+                .piece(0)
+                .borrow_mut()
+                .color(),
+            pieces::Color::Yellow
+        );
 
         assert_eq!(
             player1
@@ -363,7 +383,6 @@ mod atomic_multiplayers_tests {
 
         player1.free_piece(piece_0);
         player1.kill_piece(0, 5);
-        
 
         assert_eq!(player0.piece(piece_0).borrow().position(), -1);
         assert_eq!(player0.piece(piece_1).borrow().position(), -1);
@@ -452,7 +471,6 @@ mod atomic_multiplayers_tests {
 
         player0.free_piece(piece_0);
         player0.enter_globe(piece_0, 0, 21);
-
 
         assert_eq!(player0.piece(piece_0).borrow().position(), 21);
         assert_eq!(player0.board().borrow_mut().outside(21).pieces.len(), 1);

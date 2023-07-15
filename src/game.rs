@@ -17,7 +17,7 @@ mod game {
         Act::Join,
         Act::Free,
         Act::Goal,
-        Act::Skip,
+        Act::Starjump,
         Act::Leave,
         Act::Safe,
         Act::Nothing,

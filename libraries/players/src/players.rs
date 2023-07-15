@@ -30,6 +30,13 @@ mod players {
     }
 
     #[derive(PartialEq, Debug, Copy, Clone)]
+    pub enum Select {
+        Nearest,
+        Furthest,
+        Random,
+    }
+
+    #[derive(PartialEq, Debug, Copy, Clone)]
     pub enum Act {
         Move,
         Free,
@@ -559,11 +566,11 @@ mod players {
             &mut self,
             actions: Vec<Act>,
             dice_number: i8,
-            take_nearest_piece: bool,
+            select_which_piece: Select,
         ) -> Vec<(Act, i8, i8)> {
             let mut movesets: Vec<(Act, i8, i8)> = Vec::new();
             for action in actions {
-                let moveset = self.make_ordered_choice(dice_number, action, take_nearest_piece);
+                let moveset = self.make_ordered_choice(dice_number, action, select_which_piece);
                 if moveset.0 != Act::Nothing {
                     movesets.push(moveset);
                 }
@@ -571,22 +578,43 @@ mod players {
             movesets
         }
 
+        pub fn get_ordered_action(
+            &mut self,
+            actions: Vec<Act>,
+            dice_number: i8,
+            select_which_piece: Select,
+        ) -> (Act, i8, i8) {
+            let action_vector = self.generate_vector_of_ordered_actions(
+                actions,
+                dice_number,
+                select_which_piece,
+            );
+            action_vector
+            .first()
+            .copied()
+            .unwrap_or((Act::Nothing, self.id(), 57))
+        } 
+
         pub fn make_ordered_choice(
             &mut self,
             dice_number: i8,
             action: Act,
-            take_nearest_piece: bool,
+            select_which_piece: Select,
         ) -> (Act, i8, i8) {
             let action_vector = self.generate_action_vector(dice_number, action);
-            self.select_ordered_piece(action_vector, take_nearest_piece)
+            self.select_ordered_piece(action_vector, select_which_piece)
         }
 
         pub fn select_ordered_piece(
             &mut self,
             mut action_vector: Vec<(Act, i8, i8)>,
-            take_closest: bool,
+            select_which_piece: Select,
         ) -> (Act, i8, i8) {
-            action_vector.sort_by(|a, b| self.compare_heuristics(a, b, take_closest));
+            match select_which_piece {
+                Select::Nearest => action_vector.sort_by(|a, b| self.compare_heuristics(a, b, true)),
+                Select::Furthest => action_vector.sort_by(|a, b| self.compare_heuristics(a, b, false)),
+                Select::Random => action_vector.shuffle(&mut rand::thread_rng()),
+            }
             match action_vector.first() {
                 Some(&first_element) => first_element,
                 None => (Act::Nothing, self.id, 57),
@@ -670,7 +698,13 @@ mod players {
             self.correct_position();
             let is_goal_position = self.is_goal_position();
 
-            match (is_globe, is_occupied_by_others.0, can_enter_inside, is_inside, is_goal_position) {
+            match (
+                is_globe,
+                is_occupied_by_others.0,
+                can_enter_inside,
+                is_inside,
+                is_goal_position,
+            ) {
                 (true, false, _, false, _) | (true, false, true, _, false) => Act::Safe,
                 (_, _, true, false, _) => Act::Safe,
                 _ => Act::Nothing,
@@ -835,12 +869,12 @@ mod players {
                 can_enter_inside,
                 dice_number,
             ) {
-                  (false, _, false, false, true, false, _, false, false, _)
+                (false, _, false, false, true, false, _, false, false, _)
                 | (false, _, false, false, _, false, true, false, false, _)
                 | (false, _, false, false, true, false, true, _, false, _)
                 | (true, _, _, _, true, _, _, _, _, 6) => Act::Kill,
-                  (false, true, false, _, true, _, _, _, _, _) |
-                  (_, _, _, _, _, _, _, _, true, _)=> Act::Nothing,
+                (false, true, false, _, true, _, _, _, _, _)
+                | (_, _, _, _, _, _, _, _, true, _) => Act::Nothing,
                 _ => Act::Nothing,
             }
         }
@@ -991,4 +1025,4 @@ mod players {
     }
 }
 
-pub use players::{Act, Player};
+pub use players::{Act, Select, Player};
