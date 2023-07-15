@@ -99,6 +99,10 @@ mod players {
             self.dice = None;
         }
 
+        pub fn dice(&self) -> &Option<Dice> {
+            &self.dice
+        }
+
         pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
             match choice {
                 Act::Move => {
