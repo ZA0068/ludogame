@@ -50,66 +50,30 @@ mod players {
         Nothing,
     }
 
-    // impl fmt::Display for Act {
-    //     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    //         match *self {
-    //             Act::Move => write!(f, "Move"),
-    //             Act::Free => write!(f, "Free"),
-    //             Act::Kill => write!(f, "Kill"),
-    //             Act::Join => write!(f, "Join"),
-    //             Act::Leave => write!(f, "Leave"),
-    //             Act::Die => write!(f, "Die"),
-    //             Act::Goal => write!(f, "Goal"),
-    //             Act::Safe => write!(f, "Safe"),
-    //             Act::Starjump => write!(f, "Starjump"),
-    //             Act::Nothing => write!(f, "Nothing"),
-    //         }
-    //     }
-    // }
-
-    // #[derive(PartialEq, Debug, Clone)]
-    // pub struct ActionSequence(Vec<Act>);
-
-    // impl fmt::Display for ActionSequence {
-    //     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    //         for (index, action) in self.0.iter().enumerate() {
-    //             if index > 0 {
-    //                 write!(f, ", ")?;
-    //             }
-    //             write!(f, "{}", action)?;
-    //         }
-    //         Ok(())
-    //     }
-    // }
-
-    // Playstyles {
-    // [x] aggro_play;
-    // [x] fast_aggro_play
-    // [x] random_play
-    // [x] safe_play
-    // [x] fast_play
-    // }
-
     impl Player {
-        pub fn new(player_id: i8, board: Rc<RefCell<Board>>) -> Player {
-            let pieces = Self::init_pieces(board.clone(), player_id);
+        pub fn new(player_id: i8) -> Player {
             let id = player_id;
             let color = get_color_from_player_id(player_id);
             Player {
                 id,
                 color,
                 turn: false,
-                board,
+                board: Rc::default(),
                 dice: None,
-                pieces,
+                pieces: Vec::default(),
                 action: (Act::Nothing, player_id, 57),
                 old_position: -1,
                 new_position: -1,
             }
         }
 
-        fn init_pieces(board: Rc<RefCell<Board>>, player_id: i8) -> Vec<Rc<RefCell<Piece>>> {
-            board.borrow_mut().home(player_id).pieces.clone()
+        pub fn setup(&mut self, board: Rc<RefCell<Board>>) {
+            self.board = board;
+            self.init_pieces();
+        }
+
+        pub fn init_pieces(&mut self) {
+            self.pieces = self.board.borrow_mut().home(self.id()).pieces.clone();
         }
 
         pub fn id(&self) -> i8 {

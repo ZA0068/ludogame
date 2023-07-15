@@ -16,10 +16,15 @@ mod atomic_multiplayers_tests {
     fn add_all_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let board2 = Rc::new(RefCell::new(Board::new()));
-        let player0 = Player::new(PLAYER_0, board.clone());
-        let player1 = Player::new(PLAYER_1, board.clone());
-        let player2 = Player::new(PLAYER_2, board.clone());
-        let player3 = Player::new(PLAYER_3, board.clone());
+        let mut player0 = Player::new(PLAYER_0);
+        let mut player1 = Player::new(PLAYER_1);
+        let mut player2 = Player::new(PLAYER_2);
+        let mut player3 = Player::new(PLAYER_3);
+
+        player0.setup(board.clone());
+        player1.setup(board.clone());
+        player2.setup(board.clone());
+        player3.setup(board2.clone());
 
         assert_eq!(player0.id(), 0);
         assert_eq!(player1.id(), 1);
@@ -38,15 +43,17 @@ mod atomic_multiplayers_tests {
     #[should_panic]
     fn invalid_player_id_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let player = Player::new(4, board);
+        let player = Player::new(4);
         assert_eq!(player.id(), 4);
     }
 
     #[test]
     fn two_players_free_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player1 = Player::new(PLAYER_0, board.clone());
-        let mut player2 = Player::new(PLAYER_1, board);
+        let mut player1 = Player::new(PLAYER_0);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(PLAYER_1);
+        player2.setup(board.clone());
 
         player1.free_piece(0);
         player2.free_piece(0);
@@ -85,10 +92,14 @@ mod atomic_multiplayers_tests {
     #[test]
     fn all_players_free_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player1 = Player::new(PLAYER_0, board.clone());
-        let mut player2 = Player::new(PLAYER_1, board.clone());
-        let mut player3 = Player::new(PLAYER_2, board.clone());
-        let mut player4 = Player::new(PLAYER_3, board);
+        let mut player1 = Player::new(PLAYER_0);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(PLAYER_1);
+        player2.setup(board.clone());
+        let mut player3 = Player::new(PLAYER_2);
+        player3.setup(board.clone());
+        let mut player4 = Player::new(PLAYER_3);
+        player4.setup(board.clone());
 
         player1.free_piece(0);
         player2.free_piece(0);
@@ -132,8 +143,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn two_players_move_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player1 = Player::new(PLAYER_0, board.clone());
-        let mut player2 = Player::new(PLAYER_1, board);
+        let mut player1 = Player::new(PLAYER_0);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(PLAYER_1);
+        player2.setup(board.clone());
 
         player1.free_piece(0);
         player2.free_piece(0);
@@ -161,10 +174,14 @@ mod atomic_multiplayers_tests {
     #[test]
     fn all_players_move_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player1 = Player::new(PLAYER_0, board.clone());
-        let mut player2 = Player::new(PLAYER_1, board.clone());
-        let mut player3 = Player::new(PLAYER_2, board.clone());
-        let mut player4 = Player::new(PLAYER_3, board);
+        let mut player1 = Player::new(PLAYER_0);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(PLAYER_1);
+        player2.setup(board.clone());
+        let mut player3 = Player::new(PLAYER_2);
+        player3.setup(board.clone());
+        let mut player4 = Player::new(PLAYER_3);
+        player4.setup(board.clone());
 
         player1.free_piece(0);
         player2.free_piece(0);
@@ -210,7 +227,8 @@ mod atomic_multiplayers_tests {
     #[test]
     fn other_player_circumvent_player_1() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player1 = Player::new(PLAYER_1, board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         player1.free_piece(0);
         player1.move_piece(0, 36);
         player1.move_piece(0, 2);
@@ -221,7 +239,8 @@ mod atomic_multiplayers_tests {
         player1.move_piece(1, 6);
         assert_eq!(player1.piece(1).borrow().position(), 3);
 
-        let mut player2 = Player::new(PLAYER_2, board.clone());
+        let mut player2 = Player::new(PLAYER_2);
+        player2.setup(board.clone());
         player2.free_piece(0);
         player2.move_piece(0, 23);
         player2.move_piece(0, 2);
@@ -232,7 +251,8 @@ mod atomic_multiplayers_tests {
         player2.move_piece(1, 6);
         assert_eq!(player2.piece(1).borrow().position(), 3);
 
-        let mut player3 = Player::new(PLAYER_3, board);
+        let mut player3 = Player::new(PLAYER_3);
+        player3.setup(board.clone());
         player3.free_piece(0);
         player3.move_piece(0, 10);
         player3.move_piece(0, 2);
@@ -247,8 +267,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn two_player_kill_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_0, board.clone());
-        let mut opponent = Player::new(PLAYER_1, board);
+        let mut player = Player::new(PLAYER_0);
+        player.setup(board.clone());
+        let mut opponent = Player::new(PLAYER_1);
+        opponent.setup(board.clone());
 
         player.free_piece(0);
         player.move_piece(0, 17);
@@ -290,8 +312,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn suicide_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
 
         player0.free_piece(0);
         player0.free_piece(1);
@@ -367,8 +391,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn two_player_star_kill_tests() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         let piece_0 = 0;
         let piece_1 = 1;
 
@@ -402,8 +428,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn star_sucide_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         let piece_0 = 0;
         let piece_1 = 1;
 
@@ -436,8 +464,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn star_sucide_test_2() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         let piece_0 = 0;
         let piece_1 = 1;
 
@@ -465,8 +495,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn star_sucide_test_3() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         let piece_0 = 0;
 
         player0.free_piece(piece_0);
@@ -490,8 +522,10 @@ mod atomic_multiplayers_tests {
     #[test]
     fn star_sucide_test_4() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
-        let mut player0 = Player::new(PLAYER_0, board.clone());
-        let mut player1 = Player::new(PLAYER_1, board);
+        let mut player0 = Player::new(PLAYER_0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(PLAYER_1);
+        player1.setup(board.clone());
         let piece_0 = 0;
 
         player0.free_piece(piece_0);

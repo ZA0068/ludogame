@@ -25,8 +25,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player_0 = Player::new(0, board.clone());
-        let mut player1 = Player::new(1, board);
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
 
         player1.take_dice(dice);
         loop {
@@ -36,16 +38,16 @@ mod multiplayer_tests {
                 println!("Player 0 wins");
                 break;
             }
-            player1.give_dice(&mut player_0);
-            player_0.my_turn();
-            play_random(&mut player_0, ACTIONS.to_vec());
-            if player_0.is_finished() {
+            player1.give_dice(&mut player0);
+            player0.my_turn();
+            play_random(&mut player0, ACTIONS.to_vec());
+            if player0.is_finished() {
                 println!("Player 1 wins");
                 break;
             }
-            player_0.give_dice(&mut player1);
+            player0.give_dice(&mut player1);
         }
-        assert!(player_0.is_finished() || player1.is_finished());
+        assert!(player0.is_finished() || player1.is_finished());
     }
 
     #[test]
@@ -54,8 +56,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player_0 = Player::new(0, board.clone());
-        let mut player1 = Player::new(1, board.clone());
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -68,17 +72,17 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player1.give_dice(&mut player_0);
-                player_0.my_turn();
-                play_random(&mut player_0, ACTIONS.to_vec());
-                if player_0.is_finished() {
+                player1.give_dice(&mut player0);
+                player0.my_turn();
+                play_random(&mut player0, ACTIONS.to_vec());
+                if player0.is_finished() {
                     println!("Player 1 wins");
                     winrates[1] += 1.0;
                     break;
                 }
-                player_0.give_dice(&mut player1);
+                player0.give_dice(&mut player1);
             }
-            assert!(player_0.is_finished() || player1.is_finished());
+            assert!(player0.is_finished() || player1.is_finished());
             board.borrow_mut().reset();
         }
         println!(
@@ -97,8 +101,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player0 = Player::new(0, board.clone());
-        let mut player2 = Player::new(2, board);
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
 
         player2.take_dice(dice);
         loop {
@@ -126,8 +132,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player0 = Player::new(0, board.clone());
-        let mut player2 = Player::new(2, board.clone());
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -169,8 +177,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player0 = Player::new(0, board.clone());
-        let mut player3 = Player::new(3, board);
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
 
         player3.take_dice(dice);
         loop {
@@ -198,8 +208,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player0 = Player::new(0, board.clone());
-        let mut player3 = Player::new(3, board.clone());
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -241,8 +253,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player1 = Player::new(1, board.clone());
-        let mut player2 = Player::new(2, board);
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
 
         player2.take_dice(dice);
         loop {
@@ -270,8 +284,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player1 = Player::new(1, board.clone());
-        let mut player2 = Player::new(2, board.clone());
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -313,8 +329,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player1 = Player::new(1, board.clone());
-        let mut player3 = Player::new(3, board);
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
 
         player3.take_dice(dice);
         loop {
@@ -342,8 +360,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player1 = Player::new(1, board.clone());
-        let mut player3 = Player::new(3, board.clone());
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -385,8 +405,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player2 = Player::new(2, board.clone());
-        let mut player3 = Player::new(3, board);
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
 
         player3.take_dice(dice);
         loop {
@@ -414,8 +436,10 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player2 = Player::new(2, board.clone());
-        let mut player3 = Player::new(3, board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
@@ -457,10 +481,14 @@ mod multiplayer_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut player0 = Player::new(0, board.clone());
-        let mut player1 = Player::new(1, board.clone());
-        let mut player2 = Player::new(2, board.clone());
-        let mut player3 = Player::new(3, board.clone());
+        let mut player0 = Player::new(0);
+        player0.setup(board.clone());
+        let mut player1 = Player::new(1);
+        player1.setup(board.clone());
+        let mut player2 = Player::new(2);
+        player2.setup(board.clone());
+        let mut player3 = Player::new(3);
+        player3.setup(board.clone());
 
         let mut winrates = [0.0; 4];
         let max_iter: usize = 1000;
@@ -591,8 +619,10 @@ mod playstyle_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut aggressive_player = Player::new(0, board.clone());
-        let mut random_player = Player::new(2, board.clone());
+        let mut aggressive_player = Player::new(0);
+        aggressive_player.setup(board.clone());
+        let mut random_player = Player::new(2);
+        random_player.setup(board.clone());        
         let take_nearest_piece = Select::Nearest;
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
@@ -652,8 +682,10 @@ mod playstyle_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut fast_aggressive_player = Player::new(1, board.clone());
-        let mut random_player = Player::new(3, board.clone());
+        let mut fast_aggressive_player = Player::new(1);
+        fast_aggressive_player.setup(board.clone());
+        let mut random_player = Player::new(3);
+        random_player.setup(board.clone());
         let take_closest = Select::Nearest;
         let mut winrate = [0.0; 2];
         let max_iter: usize = 1000;
@@ -713,8 +745,10 @@ mod playstyle_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut safe_player = Player::new(1, board.clone());
-        let mut random_player = Player::new(3, board.clone());
+        let mut safe_player = Player::new(1);
+        safe_player.setup(board.clone());
+        let mut random_player = Player::new(3);
+        random_player.setup(board.clone());
         let take_closest = Select::Nearest;
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
@@ -770,8 +804,11 @@ mod playstyle_tests {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
 
-        let mut fastest_player = Player::new(1, board.clone());
-        let mut random_player = Player::new(2, board.clone());
+        let mut fastest_player = Player::new(1);
+        fastest_player.setup(board.clone());
+        let mut random_player = Player::new(2);
+        random_player.setup(board.clone());
+
         let take_closest = Select::Nearest;
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
@@ -814,10 +851,14 @@ mod playstyle_tests {
     fn final_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
-        let mut fastest_player = Player::new(0, board.clone());
-        let mut random_player = Player::new(1, board.clone());
-        let mut fast_aggressive_player = Player::new(2, board.clone());
-        let mut aggressive_player = Player::new(3, board.clone());
+        let mut fastest_player = Player::new(0);
+        fastest_player.setup(board.clone());
+        let mut random_player = Player::new(1);
+        random_player.setup(board.clone());
+        let mut fast_aggressive_player = Player::new(2);
+        fast_aggressive_player.setup(board.clone());
+        let mut aggressive_player = Player::new(3);
+        aggressive_player.setup(board.clone());
         let take_closest = Select::Nearest;
         let max_iter: usize = 1000;
         let mut winrate: Vec<f32> = vec![0.0; 4];

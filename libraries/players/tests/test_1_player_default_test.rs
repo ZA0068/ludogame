@@ -10,7 +10,8 @@ mod default_player_tests {
     #[test]
     fn add_player_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let player = Player::new(0, board.clone());
+        let mut player = Player::new(0);
+        player.setup(board.clone());
         assert_eq!(player.id(), 0);
         assert_eq!(player.board().as_ptr(), board.as_ptr());
     }
@@ -19,7 +20,8 @@ mod default_player_tests {
     fn get_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         for player_id in 0..4 {
-            let player = Player::new(player_id, board.clone());
+            let mut player = Player::new(player_id);
+            player.setup(board.clone());
             for i in 0..4 {
                 let piece = player.board().borrow_mut().home(player_id).piece(i);
                 assert_eq!(piece.borrow().id(), i);
@@ -35,8 +37,8 @@ mod default_player_tests {
     #[test]
     fn player_with_dice_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board);
-
+        let mut player = Player::new(0);
+        player.setup(board.clone());
         player.roll_dice();
         let result = player.get_dice_number();
         assert!(result == 0);
@@ -57,8 +59,8 @@ mod default_player_tests {
     #[test]
     fn star_position_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board.clone());
-
+        let mut player = Player::new(0);
+        player.setup(board.clone());
         for i in 0..5 {
             let position = player.star_position(i, 5);
             assert_eq!(position, 11);
@@ -92,7 +94,8 @@ mod default_player_tests {
             assert_eq!(position, 50);
         }
 
-        let mut player = Player::new(1, board);
+        let mut player = Player::new(1);
+        player.setup(board.clone());
         for i in 44..50 {
             let position = player.star_position(i, 50);
             assert_eq!(position, 5);
@@ -102,12 +105,14 @@ mod default_player_tests {
     #[test]
     fn circumvent_player_0_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board.clone());
+        let mut player = Player::new(0);
+        player.setup(board.clone());
 
         let position = player.circumvent_player_0(51, 57);
         assert_eq!(position, 57);
 
-        let mut player = Player::new(1, board);
+        let mut player = Player::new(1);
+        player.setup(board.clone());
         let position = player.circumvent_player_0(51, 57);
         assert_eq!(position, 5);
     }
@@ -115,8 +120,8 @@ mod default_player_tests {
     #[test]
     fn send_pieces_home_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board);
-
+        let mut player = Player::new(0);
+        player.setup(board.clone());
         player.free_piece(0);
 
         player.update_outside(0, 0, 6);

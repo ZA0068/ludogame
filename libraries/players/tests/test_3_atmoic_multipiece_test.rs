@@ -12,7 +12,8 @@ mod atomic_multipiece_test {
     #[test]
     fn free_all_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -27,7 +28,8 @@ mod atomic_multipiece_test {
     #[test]
     fn joining_other_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
 
         player.free_piece(0);
         player.free_piece(1);
@@ -61,7 +63,8 @@ mod atomic_multipiece_test {
     #[test]
     fn leaving_other_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
 
         player.free_piece(0);
         player.free_piece(1);
@@ -87,7 +90,8 @@ mod atomic_multipiece_test {
     #[test]
     fn all_pieces_at_same_place_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(PLAYER_ID, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
 
         player.free_piece(0);
         player.free_piece(1);
@@ -125,7 +129,8 @@ mod atomic_multipiece_test {
     #[test]
     fn all_pieces_in_goal_test_0() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
 
         player.free_piece(0);
         player.free_piece(1);
@@ -176,7 +181,8 @@ mod atomic_multipiece_test {
     #[test]
     fn star_join_test() {
         let board = Rc::new(RefCell::new(Board::new()));
-        let mut player = Player::new(0, board);
+        let mut player = Player::new(PLAYER_ID);
+        player.setup(board.clone());
         player.free_piece(0);
         player.free_piece(1);
 
