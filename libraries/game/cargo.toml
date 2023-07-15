@@ -1,16 +1,18 @@
 [package]
-name = "ai"
+name = "game"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "ai"
-path = "src/ai.rs"
+name = "game"
+path = "src/game.rs"
 
 [dependencies]
+iplayers = { path = "../iplayers" }
 players = { path = "../players" }
-game = { path = "../game" }
+dice = { path = "../dice" }
+board = { path = "../board", version = "1.0.0"}
 rand = "0.8.4"
 prettytable-rs = "0.10.0"

@@ -12,7 +12,7 @@ mod atomic_choice_test {
     fn try_to_free_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         for dice_number in 1..6 {
@@ -35,7 +35,7 @@ mod atomic_choice_test {
     fn try_to_move_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         let dice_number = 1;
@@ -61,7 +61,7 @@ mod atomic_choice_test {
     fn try_to_join_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_0 = 0;
         let piece_1 = 1;
@@ -109,7 +109,7 @@ mod atomic_choice_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
-        
+
         let mut other_player = Player::new(1);
         other_player.setup(board.clone());
 
@@ -139,7 +139,7 @@ mod atomic_choice_test {
     fn try_to_win_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        
+        player.setup(board.clone());
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -160,7 +160,7 @@ mod atomic_choice_test {
     fn try_to_leave_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id1 = 0;
         let piece_id2 = 1;
 
@@ -183,7 +183,7 @@ mod atomic_choice_test {
     fn try_to_safe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -200,7 +200,7 @@ mod atomic_choice_test {
     fn try_to_starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -217,9 +217,9 @@ mod atomic_choice_test {
         let board = Rc::new(RefCell::new(Board::new()));
         let dice = Dice::default();
         let mut player = Player::new(0);
-        player.setup(board.clone());
+        player.setup(board);
 
-        player.take_dice(dice);
+        player.get_dice(dice);
 
         let piece_id: i8 = 0;
         let dice_number: i8 = 6;

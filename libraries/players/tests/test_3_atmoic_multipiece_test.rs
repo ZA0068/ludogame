@@ -13,7 +13,7 @@ mod atomic_multipiece_test {
     fn free_all_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -29,7 +29,7 @@ mod atomic_multipiece_test {
     fn joining_other_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -64,7 +64,7 @@ mod atomic_multipiece_test {
     fn leaving_other_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -91,7 +91,7 @@ mod atomic_multipiece_test {
     fn all_pieces_at_same_place_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -130,7 +130,7 @@ mod atomic_multipiece_test {
     fn all_pieces_in_goal_test_0() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -182,7 +182,7 @@ mod atomic_multipiece_test {
     fn star_join_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         player.free_piece(0);
         player.free_piece(1);
 

@@ -91,19 +91,12 @@ mod players {
             &self.board
         }
 
-        pub fn take_dice(&mut self, dice: Dice) {
+        pub fn get_dice(&mut self, dice: Dice) {
             self.dice = Some(dice);
         }
 
         pub fn drop_dice(&mut self) {
             self.dice = None;
-        }
-
-        pub fn give_dice(&mut self, player: &mut Player) {
-            if let Some(dice) = &self.dice {
-                player.take_dice(dice.clone());
-                self.dice = None;
-            }
         }
 
         pub fn make_move(&mut self, piece_id: i8, dice_number: i8, choice: Act) {
@@ -548,16 +541,13 @@ mod players {
             dice_number: i8,
             select_which_piece: Select,
         ) -> (Act, i8, i8) {
-            let action_vector = self.generate_vector_of_ordered_actions(
-                actions,
-                dice_number,
-                select_which_piece,
-            );
+            let action_vector =
+                self.generate_vector_of_ordered_actions(actions, dice_number, select_which_piece);
             action_vector
-            .first()
-            .copied()
-            .unwrap_or((Act::Nothing, self.id(), 57))
-        } 
+                .first()
+                .copied()
+                .unwrap_or((Act::Nothing, self.id(), 57))
+        }
 
         pub fn make_ordered_choice(
             &mut self,
@@ -575,8 +565,12 @@ mod players {
             select_which_piece: Select,
         ) -> (Act, i8, i8) {
             match select_which_piece {
-                Select::Nearest => action_vector.sort_by(|a, b| self.compare_heuristics(a, b, true)),
-                Select::Furthest => action_vector.sort_by(|a, b| self.compare_heuristics(a, b, false)),
+                Select::Nearest => {
+                    action_vector.sort_by(|a, b| self.compare_heuristics(a, b, true))
+                }
+                Select::Furthest => {
+                    action_vector.sort_by(|a, b| self.compare_heuristics(a, b, false))
+                }
                 Select::Random => action_vector.shuffle(&mut rand::thread_rng()),
             }
             match action_vector.first() {
@@ -940,6 +934,10 @@ mod players {
             self.pieces.iter().all(|piece| piece.borrow_mut().is_goal())
         }
 
+        pub fn are_all_pieces_in_home(&self) -> bool {
+            self.pieces.iter().all(|piece| piece.borrow_mut().is_home())
+        }
+
         pub fn print_status(&mut self) {
             let mut table = Table::new();
             table.add_row(row![
@@ -989,4 +987,4 @@ mod players {
     }
 }
 
-pub use players::{Act, Select, Player};
+pub use players::{Act, Player, Select};

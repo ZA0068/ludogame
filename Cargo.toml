@@ -15,9 +15,11 @@ path = "src/game.rs"
 [dependencies]
 board = { path = "libraries/board" }
 players = { path = "libraries/players" }
+iplayers = { path = "libraries/iplayers" }
 dice = { path = "libraries/dice" }
 pieces = { path = "libraries/pieces" }
-# ai = { path = "libraries/ai" }
+ai = { path = "libraries/ai" }
+game = { path = "libraries/game" }
 rand = "0.8.4"
 yew = "0.20.0"
 csv = "1.1.6"

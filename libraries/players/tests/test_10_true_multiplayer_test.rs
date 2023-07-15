@@ -28,24 +28,25 @@ mod multiplayer_tests {
         let mut player0 = Player::new(0);
         player0.setup(board.clone());
         let mut player1 = Player::new(1);
-        player1.setup(board.clone());
+        player1.setup(board);
 
-        player1.take_dice(dice);
         loop {
+            player1.get_dice(dice.clone());
             player1.my_turn();
             play_random(&mut player1, ACTIONS.to_vec());
             if player1.is_finished() {
                 println!("Player 0 wins");
                 break;
             }
-            player1.give_dice(&mut player0);
+            player1.drop_dice();
+            player1.get_dice(dice.clone());
             player0.my_turn();
             play_random(&mut player0, ACTIONS.to_vec());
             if player0.is_finished() {
                 println!("Player 1 wins");
                 break;
             }
-            player0.give_dice(&mut player1);
+            player0.drop_dice();
         }
         assert!(player0.is_finished() || player1.is_finished());
     }
@@ -63,8 +64,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player1.take_dice(dice.clone());
             loop {
+                player1.get_dice(dice.clone());
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
@@ -72,7 +73,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player1.give_dice(&mut player0);
+                player1.drop_dice();
+                player0.get_dice(dice.clone());
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
@@ -80,7 +82,7 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player0.give_dice(&mut player1);
+                player0.drop_dice();
             }
             assert!(player0.is_finished() || player1.is_finished());
             board.borrow_mut().reset();
@@ -104,24 +106,25 @@ mod multiplayer_tests {
         let mut player0 = Player::new(0);
         player0.setup(board.clone());
         let mut player2 = Player::new(2);
-        player2.setup(board.clone());
+        player2.setup(board);
 
-        player2.take_dice(dice);
         loop {
+            player2.get_dice(dice.clone());
             player2.my_turn();
             play_random(&mut player2, ACTIONS.to_vec());
             if player2.is_finished() {
                 println!("Player 0 wins");
                 break;
             }
-            player2.give_dice(&mut player0);
+            player2.drop_dice();
+            player0.get_dice(dice.clone());
             player0.my_turn();
             play_random(&mut player0, ACTIONS.to_vec());
             if player0.is_finished() {
                 println!("Player 2 wins");
                 break;
             }
-            player0.give_dice(&mut player2);
+            player0.drop_dice();
         }
         assert!(player0.is_finished() || player2.is_finished());
     }
@@ -139,8 +142,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player2.take_dice(dice.clone());
             loop {
+                player2.get_dice(dice.clone());
                 player2.my_turn();
                 play_random(&mut player2, ACTIONS.to_vec());
                 if player2.is_finished() {
@@ -148,7 +151,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player2.give_dice(&mut player0);
+                player2.drop_dice();
+                player2.get_dice(dice.clone());
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
@@ -156,7 +160,7 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player0.give_dice(&mut player2);
+                player0.drop_dice();
             }
             assert!(player0.is_finished() || player2.is_finished());
             board.borrow_mut().reset();
@@ -180,24 +184,25 @@ mod multiplayer_tests {
         let mut player0 = Player::new(0);
         player0.setup(board.clone());
         let mut player3 = Player::new(3);
-        player3.setup(board.clone());
+        player3.setup(board);
 
-        player3.take_dice(dice);
         loop {
+            player3.get_dice(dice.clone());
             player3.my_turn();
             play_random(&mut player3, ACTIONS.to_vec());
             if player3.is_finished() {
                 println!("Player 0 wins");
                 break;
             }
-            player3.give_dice(&mut player0);
+            player3.drop_dice();
+            player0.get_dice(dice.clone());
             player0.my_turn();
             play_random(&mut player0, ACTIONS.to_vec());
             if player0.is_finished() {
                 println!("Player 3 wins");
                 break;
             }
-            player0.give_dice(&mut player3);
+            player0.drop_dice();
         }
         assert!(player0.is_finished() || player3.is_finished());
     }
@@ -215,8 +220,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player3.take_dice(dice.clone());
             loop {
+                player3.get_dice(dice.clone());
                 player3.my_turn();
                 play_random(&mut player3, ACTIONS.to_vec());
                 if player3.is_finished() {
@@ -224,7 +229,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player3.give_dice(&mut player0);
+                player3.drop_dice();
+                player0.get_dice(dice.clone());
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
@@ -232,7 +238,6 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player0.give_dice(&mut player3);
             }
             assert!(player0.is_finished() || player3.is_finished());
             board.borrow_mut().reset();
@@ -256,24 +261,25 @@ mod multiplayer_tests {
         let mut player1 = Player::new(1);
         player1.setup(board.clone());
         let mut player2 = Player::new(2);
-        player2.setup(board.clone());
+        player2.setup(board);
 
-        player2.take_dice(dice);
         loop {
+            player2.get_dice(dice.clone());
             player2.my_turn();
             play_random(&mut player2, ACTIONS.to_vec());
             if player2.is_finished() {
                 println!("Player 1 wins");
                 break;
             }
-            player2.give_dice(&mut player1);
+            player2.drop_dice();
+            player1.get_dice(dice.clone());
             player1.my_turn();
             play_random(&mut player1, ACTIONS.to_vec());
             if player1.is_finished() {
                 println!("Player 2 wins");
                 break;
             }
-            player1.give_dice(&mut player2);
+            player1.drop_dice();
         }
         assert!(player1.is_finished() || player2.is_finished());
     }
@@ -291,8 +297,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player2.take_dice(dice.clone());
             loop {
+                player2.get_dice(dice.clone());
                 player2.my_turn();
                 play_random(&mut player2, ACTIONS.to_vec());
                 if player2.is_finished() {
@@ -300,7 +306,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player2.give_dice(&mut player1);
+                player2.drop_dice();
+                player1.get_dice(dice.clone());
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
@@ -308,7 +315,7 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player1.give_dice(&mut player2);
+                player1.drop_dice();
             }
             assert!(player1.is_finished() || player2.is_finished());
             board.borrow_mut().reset();
@@ -332,24 +339,25 @@ mod multiplayer_tests {
         let mut player1 = Player::new(1);
         player1.setup(board.clone());
         let mut player3 = Player::new(3);
-        player3.setup(board.clone());
+        player3.setup(board);
 
-        player3.take_dice(dice);
         loop {
+            player3.get_dice(dice.clone());
             player3.my_turn();
             play_random(&mut player3, ACTIONS.to_vec());
             if player3.is_finished() {
                 println!("Player 1 wins");
                 break;
             }
-            player3.give_dice(&mut player1);
+            player3.drop_dice();
+            player1.get_dice(dice.clone());
             player1.my_turn();
             play_random(&mut player1, ACTIONS.to_vec());
             if player1.is_finished() {
                 println!("Player 3 wins");
                 break;
             }
-            player1.give_dice(&mut player3);
+            player1.drop_dice();
         }
         assert!(player1.is_finished() || player3.is_finished());
     }
@@ -367,8 +375,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player3.take_dice(dice.clone());
             loop {
+                player3.get_dice(dice.clone());
                 player3.my_turn();
                 play_random(&mut player3, ACTIONS.to_vec());
                 if player3.is_finished() {
@@ -376,7 +384,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player3.give_dice(&mut player1);
+                player3.drop_dice();
+                player1.get_dice(dice.clone());
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
@@ -384,7 +393,7 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player1.give_dice(&mut player3);
+                player1.drop_dice();
             }
             assert!(player1.is_finished() || player3.is_finished());
             board.borrow_mut().reset();
@@ -408,24 +417,25 @@ mod multiplayer_tests {
         let mut player2 = Player::new(2);
         player2.setup(board.clone());
         let mut player3 = Player::new(3);
-        player3.setup(board.clone());
+        player3.setup(board);
 
-        player3.take_dice(dice);
         loop {
+            player3.get_dice(dice.clone());
             player3.my_turn();
             play_random(&mut player3, ACTIONS.to_vec());
             if player3.is_finished() {
                 println!("Player 2 wins");
                 break;
             }
-            player3.give_dice(&mut player2);
+            player3.drop_dice();
+            player2.get_dice(dice.clone());
             player2.my_turn();
             play_random(&mut player2, ACTIONS.to_vec());
             if player2.is_finished() {
                 println!("Player 3 wins");
                 break;
             }
-            player2.give_dice(&mut player3);
+            player2.drop_dice();
         }
         assert!(player2.is_finished() || player3.is_finished());
     }
@@ -443,8 +453,8 @@ mod multiplayer_tests {
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
         for _ in 0..max_iter {
-            player3.take_dice(dice.clone());
             loop {
+                player3.get_dice(dice.clone());
                 player3.my_turn();
                 play_random(&mut player3, ACTIONS.to_vec());
                 if player3.is_finished() {
@@ -452,7 +462,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player3.give_dice(&mut player2);
+                player3.drop_dice();
+                player2.get_dice(dice.clone());
                 player2.my_turn();
                 play_random(&mut player2, ACTIONS.to_vec());
                 if player2.is_finished() {
@@ -460,7 +471,7 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player2.give_dice(&mut player3);
+                player2.drop_dice();
             }
             assert!(player2.is_finished() || player3.is_finished());
             board.borrow_mut().reset();
@@ -494,8 +505,8 @@ mod multiplayer_tests {
         let max_iter: usize = 1000;
 
         for _ in 0..max_iter {
-            player0.take_dice(dice.clone());
             loop {
+                player0.get_dice(dice.clone());
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
@@ -503,7 +514,8 @@ mod multiplayer_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                player0.give_dice(&mut player1);
+                player0.drop_dice();
+                player1.get_dice(dice.clone());
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
@@ -511,7 +523,8 @@ mod multiplayer_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                player1.give_dice(&mut player2);
+                player1.drop_dice();
+                player2.get_dice(dice.clone());
                 player2.my_turn();
                 play_random(&mut player2, ACTIONS.to_vec());
                 if player2.is_finished() {
@@ -519,7 +532,8 @@ mod multiplayer_tests {
                     winrates[2] += 1.0;
                     break;
                 }
-                player2.give_dice(&mut player3);
+                player2.drop_dice();
+                player3.get_dice(dice.clone());
                 player3.my_turn();
                 play_random(&mut player3, ACTIONS.to_vec());
                 if player3.is_finished() {
@@ -527,7 +541,7 @@ mod multiplayer_tests {
                     winrates[3] += 1.0;
                     break;
                 }
-                player3.give_dice(&mut player0);
+                player3.drop_dice();
             }
             assert!(
                 player0.is_finished()
@@ -622,14 +636,14 @@ mod playstyle_tests {
         let mut aggressive_player = Player::new(0);
         aggressive_player.setup(board.clone());
         let mut random_player = Player::new(2);
-        random_player.setup(board.clone());        
+        random_player.setup(board.clone());
         let take_nearest_piece = Select::Nearest;
         let mut winrates = [0.0; 2];
         let max_iter: usize = 1000;
 
         for _ in 0..max_iter {
-            random_player.take_dice(dice.clone());
             loop {
+                random_player.get_dice(dice.clone());
                 random_player.my_turn();
                 play_random(&mut random_player, ACTIONS.to_vec());
                 if random_player.is_finished() {
@@ -637,7 +651,8 @@ mod playstyle_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                random_player.give_dice(&mut aggressive_player);
+                random_player.drop_dice();
+                aggressive_player.get_dice(dice.clone());
                 aggressive_player.my_turn();
                 play_ordered(
                     &mut aggressive_player,
@@ -649,7 +664,7 @@ mod playstyle_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                aggressive_player.give_dice(&mut random_player);
+                aggressive_player.drop_dice();
             }
             assert!(aggressive_player.is_finished() || random_player.is_finished());
             board.borrow_mut().reset();
@@ -691,8 +706,8 @@ mod playstyle_tests {
         let max_iter: usize = 1000;
 
         for _ in 0..max_iter {
-            random_player.take_dice(dice.clone());
             loop {
+                random_player.get_dice(dice.clone());
                 random_player.my_turn();
                 play_random(&mut random_player, ACTIONS.to_vec());
                 if random_player.is_finished() {
@@ -700,7 +715,8 @@ mod playstyle_tests {
                     winrate[0] += 1.0;
                     break;
                 }
-                random_player.give_dice(&mut fast_aggressive_player);
+                random_player.drop_dice();
+                fast_aggressive_player.get_dice(dice.clone());
                 fast_aggressive_player.my_turn();
                 play_ordered(
                     &mut fast_aggressive_player,
@@ -712,7 +728,7 @@ mod playstyle_tests {
                     winrate[1] += 1.0;
                     break;
                 }
-                fast_aggressive_player.give_dice(&mut random_player);
+                fast_aggressive_player.drop_dice();
             }
             assert!(fast_aggressive_player.is_finished() || random_player.is_finished());
             board.borrow_mut().reset();
@@ -754,8 +770,8 @@ mod playstyle_tests {
         let max_iter: usize = 1000;
 
         for _ in 0..max_iter {
-            random_player.take_dice(dice.clone());
             loop {
+                random_player.get_dice(dice.clone());
                 random_player.my_turn();
                 play_random(&mut random_player, ACTIONS.to_vec());
                 if random_player.is_finished() {
@@ -763,7 +779,8 @@ mod playstyle_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                random_player.give_dice(&mut safe_player);
+                random_player.drop_dice();
+                safe_player.get_dice(dice.clone());
                 safe_player.my_turn();
                 play_ordered(&mut safe_player, SAFE_ACTIONS.to_vec(), take_closest);
                 if safe_player.is_finished() {
@@ -771,7 +788,7 @@ mod playstyle_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                safe_player.give_dice(&mut random_player);
+                safe_player.drop_dice();
             }
             assert!(safe_player.is_finished() || random_player.is_finished());
             board.borrow_mut().reset();
@@ -814,8 +831,8 @@ mod playstyle_tests {
         let max_iter: usize = 1000;
 
         for _ in 0..max_iter {
-            random_player.take_dice(dice.clone());
             loop {
+                random_player.get_dice(dice.clone());
                 random_player.my_turn();
                 play_random(&mut random_player, ACTIONS.to_vec());
                 if random_player.is_finished() {
@@ -823,7 +840,8 @@ mod playstyle_tests {
                     winrates[0] += 1.0;
                     break;
                 }
-                random_player.give_dice(&mut fastest_player);
+                random_player.drop_dice();
+                fastest_player.get_dice(dice.clone());
                 fastest_player.my_turn();
                 play_ordered(&mut fastest_player, FAST_ACTIONS.to_vec(), take_closest);
                 if fastest_player.is_finished() {
@@ -831,7 +849,7 @@ mod playstyle_tests {
                     winrates[1] += 1.0;
                     break;
                 }
-                fastest_player.give_dice(&mut random_player);
+                fastest_player.drop_dice();
             }
             assert!(fastest_player.is_finished() || random_player.is_finished());
             board.borrow_mut().reset();
@@ -864,8 +882,8 @@ mod playstyle_tests {
         let mut winrate: Vec<f32> = vec![0.0; 4];
 
         for _ in 0..max_iter {
-            fastest_player.take_dice(dice.clone());
             loop {
+                fastest_player.get_dice(dice.clone());
                 fastest_player.my_turn();
                 play_ordered(&mut fastest_player, FAST_ACTIONS.to_vec(), take_closest);
                 if fastest_player.is_finished() {
@@ -873,7 +891,8 @@ mod playstyle_tests {
                     winrate[0] += 1.0;
                     break;
                 }
-                fastest_player.give_dice(&mut random_player);
+                fastest_player.drop_dice();
+                random_player.get_dice(dice.clone());
                 random_player.my_turn();
                 play_random(&mut random_player, ACTIONS.to_vec());
                 if random_player.is_finished() {
@@ -881,7 +900,8 @@ mod playstyle_tests {
                     winrate[1] += 1.0;
                     break;
                 }
-                random_player.give_dice(&mut fast_aggressive_player);
+                random_player.drop_dice();
+                fast_aggressive_player.get_dice(dice.clone());
                 fast_aggressive_player.my_turn();
                 play_ordered(
                     &mut fast_aggressive_player,
@@ -893,7 +913,8 @@ mod playstyle_tests {
                     winrate[2] += 1.0;
                     break;
                 }
-                fast_aggressive_player.give_dice(&mut aggressive_player);
+                fast_aggressive_player.drop_dice();
+                aggressive_player.get_dice(dice.clone());
                 aggressive_player.my_turn();
                 play_ordered(&mut aggressive_player, AGGRO_ACTIONS.to_vec(), take_closest);
                 if aggressive_player.is_finished() {
@@ -901,7 +922,7 @@ mod playstyle_tests {
                     winrate[3] += 1.0;
                     break;
                 }
-                aggressive_player.give_dice(&mut fastest_player);
+                aggressive_player.drop_dice();
             }
             assert!(
                 fastest_player.is_finished()

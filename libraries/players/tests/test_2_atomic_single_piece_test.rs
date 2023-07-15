@@ -16,7 +16,7 @@ mod atomic_single_piece_test {
 
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece = player.piece(piece_id);
 
         assert!(piece.borrow_mut().is_home());
@@ -79,7 +79,7 @@ mod atomic_single_piece_test {
     fn update_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
         player.free_piece(piece_id);
 
@@ -128,7 +128,7 @@ mod atomic_single_piece_test {
     fn return_home_or_death_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -148,7 +148,7 @@ mod atomic_single_piece_test {
     fn move_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         for position in 1..=6 {
@@ -201,7 +201,7 @@ mod atomic_single_piece_test {
     fn update_piece_state_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id: i8 = 0;
         let mut next_position: i8 = 4;
@@ -251,7 +251,7 @@ mod atomic_single_piece_test {
     fn valid_move_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         let piece_move = player.valid_moves(piece_id, 1);
@@ -276,7 +276,7 @@ mod atomic_single_piece_test {
     fn enter_inside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -295,7 +295,7 @@ mod atomic_single_piece_test {
     fn update_inside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -314,7 +314,7 @@ mod atomic_single_piece_test {
     fn move_back_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -333,7 +333,7 @@ mod atomic_single_piece_test {
     fn enter_goal_from_outside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -365,7 +365,7 @@ mod atomic_single_piece_test {
     fn enter_goal_from_inside_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         player.free_piece(piece_id);
@@ -407,7 +407,7 @@ mod atomic_single_piece_test {
     fn enter_globe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         player.free_piece(piece_id);

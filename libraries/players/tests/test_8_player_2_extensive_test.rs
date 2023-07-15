@@ -17,7 +17,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let result = player.try_to_free(0, 6);
         assert_eq!(result, Act::Free);
@@ -35,7 +35,7 @@ mod player_2_choice_tests {
     fn try_to_move_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let result = player.try_to_move(0, 1);
         assert_eq!(result, Act::Nothing);
@@ -76,7 +76,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -100,7 +100,7 @@ mod player_2_choice_tests {
     fn try_to_join_test() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let result = player.try_to_join(0, 1);
         assert_eq!(result, Act::Nothing);
@@ -152,7 +152,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let result = player.try_to_join(0, 1);
         assert_eq!(result, Act::Nothing);
@@ -181,7 +181,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let result = player.try_to_kill(0, 6);
         assert_eq!(result, Act::Nothing);
@@ -224,7 +224,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -283,7 +283,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let result = player.try_to_die(0, 6);
         assert_eq!(result, Act::Nothing);
@@ -376,7 +376,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -397,7 +397,7 @@ mod player_2_choice_tests {
     fn try_to_leave_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let result = player.try_to_leave(0, 6);
         assert_eq!(result, Act::Nothing);
@@ -448,7 +448,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -468,7 +468,7 @@ mod player_2_choice_tests {
     fn try_to_safe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let result = player.try_to_safe(0, 6);
         assert_eq!(result, Act::Nothing);
@@ -505,7 +505,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         player.free_piece(0);
         other_player.free_piece(0);
@@ -521,7 +521,7 @@ mod player_2_choice_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let result = player.try_to_starjump(0, 6);
         assert_eq!(result, Act::Nothing);
@@ -565,7 +565,7 @@ mod player_2_move_tests {
     fn get_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         (0..4).for_each(|i| {
             let piece = player.piece(i);
             assert_eq!(piece.borrow().id(), i);
@@ -581,7 +581,7 @@ mod player_2_move_tests {
     fn get_pieces_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
         assert_eq!(piece.borrow().color(), Color::Yellow);
@@ -592,7 +592,7 @@ mod player_2_move_tests {
     fn get_pieces_test_3() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 1);
         assert_eq!(piece.borrow().color(), Color::Red);
@@ -602,7 +602,7 @@ mod player_2_move_tests {
     fn get_pieces_test_4() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
         assert_eq!(piece.borrow().color(), Color::Blue);
@@ -613,7 +613,7 @@ mod player_2_move_tests {
     fn get_pieces_test_5() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece = player.piece(0);
         assert_eq!(piece.borrow().id(), 0);
         assert_eq!(piece.borrow().color(), Color::Green);
@@ -623,7 +623,7 @@ mod player_2_move_tests {
     fn player_with_dice_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.roll_dice();
         let result = player.get_dice_number();
@@ -631,7 +631,7 @@ mod player_2_move_tests {
 
         let dice = Dice::default();
 
-        player.take_dice(dice);
+        player.get_dice(dice);
         player.roll_dice();
         let result = player.get_dice_number();
         assert!(result > 0 && result < 7);
@@ -646,7 +646,7 @@ mod player_2_move_tests {
     fn move_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
         player.free_piece(piece_id);
         for i in 26..=75 {
@@ -709,7 +709,7 @@ mod player_2_move_tests {
     fn move_piece_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
         player.free_piece(piece_id);
         for i in 26..76 {
@@ -767,7 +767,7 @@ mod player_2_move_tests {
     fn move_all_pieces_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -812,7 +812,7 @@ mod player_2_move_tests {
     fn move_all_pieces_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -853,7 +853,7 @@ mod player_2_move_tests {
     fn safety_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -871,7 +871,7 @@ mod player_2_move_tests {
     fn safety_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -890,7 +890,7 @@ mod player_2_move_tests {
     fn safety_test_3() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         for piece_id in 0..4 {
             player.free_piece(piece_id);
             for i in 14..=69 {
@@ -913,7 +913,7 @@ mod player_2_move_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let piece_id = 0;
         player.free_piece(piece_id);
@@ -937,7 +937,7 @@ mod player_2_move_tests {
     fn starjump_to_goal_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -960,7 +960,7 @@ mod player_2_move_tests {
     fn starjump_to_goal_test_3() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -986,7 +986,7 @@ mod player_2_move_tests {
     fn enter_goal_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let piece_id = 0;
         player.free_piece(piece_id);
@@ -1001,7 +1001,7 @@ mod player_2_move_tests {
     fn enter_goal_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             player.free_piece(piece_id);
@@ -1045,7 +1045,7 @@ mod player_2_move_tests {
     fn starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let piece_id = 0;
 
         player.free_piece(piece_id);
@@ -1063,7 +1063,7 @@ mod player_2_move_tests {
     fn starjump_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let starvec = vec![31, 37, 44, 50, 5, 11, 18, 24];
         let piece_id = 0;
 
@@ -1093,7 +1093,7 @@ mod player_2_move_tests {
     fn starjump_test_3() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let starvec = vec![31, 37, 44, 50, 5, 11, 18, 24];
 
         for piece_id in 0..4 {
@@ -1120,7 +1120,7 @@ mod player_2_move_tests {
     fn join_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1136,7 +1136,7 @@ mod player_2_move_tests {
     fn join_piece_by_starjump_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1157,7 +1157,7 @@ mod player_2_move_tests {
     fn join_piece_by_globe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1175,7 +1175,7 @@ mod player_2_move_tests {
     fn join_piece_by_invincible_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1193,7 +1193,7 @@ mod player_2_move_tests {
     fn leave_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1209,7 +1209,7 @@ mod player_2_move_tests {
     fn leave_piece_from_globe_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1225,7 +1225,7 @@ mod player_2_move_tests {
     fn leave_piece_from_invincible_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         player.free_piece(0);
         player.free_piece(1);
@@ -1243,7 +1243,7 @@ mod player_2_move_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -1274,7 +1274,7 @@ mod player_2_move_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
         other_player.free_piece(1);
@@ -1297,7 +1297,7 @@ mod player_2_move_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
         player.free_piece(0);
@@ -1318,7 +1318,7 @@ mod player_2_move_tests {
     fn get_playerpiece_heuristics() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             let result = player.get_heuristics(piece_id);
@@ -1362,7 +1362,7 @@ mod player_2_move_tests {
     fn get_playerpiece_heuristics_2() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             let result = player.get_heuristics(piece_id);
@@ -1414,7 +1414,7 @@ mod player_2_move_tests {
     fn get_playerpiece_heuristics_3() {
         let board: Rc<RefCell<Board>> = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         for piece_id in 0..4 {
             let result = player.get_heuristics(piece_id);
@@ -1463,7 +1463,7 @@ mod player_2_valid_choices_tests {
     fn valid_choice_nothing_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
         let mut result: Act;
 
         result = player.valid_choices(0, 1, Act::Nothing);
@@ -1482,7 +1482,7 @@ mod player_2_valid_choices_tests {
     fn valid_choice_test_1() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let mut result = player.valid_choices(0, 0, Act::Free);
         assert_eq!(result, Act::Nothing);
@@ -1600,7 +1600,7 @@ mod player_2_valid_choices_tests {
     fn valid_choice_test_2() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let mut result = player.valid_choices(0, 0, Act::Free);
         assert_eq!(result, Act::Nothing);
@@ -1838,7 +1838,7 @@ mod player_2_valid_choices_tests {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         let mut result: Act;
 
@@ -2089,7 +2089,7 @@ mod player_2_play_test {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let mut other_player = Player::new(OTHER_PLAYER_ID);
-        other_player.setup(board.clone());
+        other_player.setup(board);
 
         other_player.free_piece(0);
 
@@ -2191,7 +2191,7 @@ mod player_2_play_test {
     fn generate_action_vector_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let mut result: Vec<(Act, i8, i8)>;
         let mut dice_number: i8;
@@ -2252,7 +2252,7 @@ mod player_2_play_test {
     fn select_ordered_piece_test() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let mut action_vector: Vec<(Act, i8, i8)>;
         let mut dice_number: i8;
@@ -2351,7 +2351,7 @@ mod player_2_play_test {
     fn make_ordered_choice() {
         let board = Rc::new(RefCell::new(Board::new()));
         let mut player = Player::new(PLAYER_ID);
-        player.setup(board.clone());
+        player.setup(board);
 
         let mut dice_number: i8;
         let mut result: (Act, i8, i8);
@@ -2417,7 +2417,7 @@ mod player_2_play_test {
         let dice = Dice::default();
         let actions = ACTIONS.to_vec();
         player.my_turn();
-        player.take_dice(dice);
+        player.get_dice(dice);
 
         for _ in 0..1000 {
             while !player.is_finished() {
@@ -2436,7 +2436,7 @@ mod player_2_play_test {
         let dice = Dice::default();
         let actions = ACTIONS.to_vec();
         player.my_turn();
-        player.take_dice(dice);
+        player.get_dice(dice);
 
         for _ in 0..100 {
             while !player.is_finished() {

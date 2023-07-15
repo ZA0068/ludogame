@@ -1,0 +1,15 @@
+[package]
+name = "iplayers"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+name = "iplayers"
+path = "src/iplayers.rs"
+
+[dependencies]
+players = { path = "../players" }
+dice = { path = "../dice" }
+board = { path = "../board", version = "1.0.0"}
+rand = "0.8.4"
+prettytable-rs = "0.10.0"
