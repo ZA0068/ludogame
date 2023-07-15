@@ -200,7 +200,7 @@ mod players {
             for piece in pieces {
                 let position = piece.borrow().position();
                 piece.borrow_mut().dead();
-                let (other_player_id, other_piece_id) = get_piece_and_player_id(piece);
+                let (other_player_id, other_piece_id) = get_piece_and_id_from_other_players(piece);
                 self.board()
                     .borrow_mut()
                     .move_into_home(other_player_id, other_piece_id, position);
@@ -536,14 +536,6 @@ mod players {
             )
         }
 
-        pub fn play_random(&mut self, actions: Vec<Act>) {
-            self.roll_dice();
-            let dice_number = self.get_dice_number();
-            let movesets = self.generate_vector_of_random_actions(actions, dice_number);
-            self.action = self.select_random_piece(movesets);
-            self.make_move(self.action.1, dice_number, self.action.0);
-        }
-
         pub fn generate_vector_of_random_actions(
             &mut self,
             actions: Vec<Act>,
@@ -563,25 +555,7 @@ mod players {
                 .unwrap_or(&(Act::Nothing, self.id, 57))
         }
 
-        pub fn play_ordered(&mut self, actions: Vec<Act>, take_nearest_piece: bool) {
-            self.roll_dice();
-            let dice_number = self.get_dice_number();
-            let movesets =
-                self.generate_vector_of_ordered_actions(actions, dice_number, take_nearest_piece);
-            self.action = movesets
-                .first()
-                .copied()
-                .unwrap_or((Act::Nothing, self.id, 57));
-            println!("-------------------");
-            println!("prior play");
-            self.print_status();
-            self.make_move(self.action.1, dice_number, self.action.0);
-            println!("-------------------");
-            println!("posterior play");
-            self.print_status();
-        }
-
-        fn generate_vector_of_ordered_actions(
+        pub fn generate_vector_of_ordered_actions(
             &mut self,
             actions: Vec<Act>,
             dice_number: i8,
@@ -972,11 +946,11 @@ mod players {
             let mut table = Table::new();
             table.add_row(row![
                 "Player",
+                "Piece id",
                 "Dice number",
+                "Act",
                 "Old position",
                 "New position",
-                "Piece id",
-                "Act",
                 "Piece 0",
                 "Piece 1",
                 "Piece 2",
@@ -984,11 +958,11 @@ mod players {
             ]);
             table.add_row(row![
                 format!("{:<8}", self.id()),
+                format!("{:<9}", self.action.1),
                 format!("{:<12}", self.dice.as_ref().unwrap().get_value()),
+                format!("{:<10}", format!("{:?}", self.action.0)),
                 format!("{:<13}", self.old_position),
                 format!("{:<13}", self.new_position),
-                format!("{:<9}", self.action.1),
-                format!("{:<10}", format!("{:?}", self.action.0)),
                 format!("{:<8}", self.piece(0).borrow().position()),
                 format!("{:<8}", self.piece(1).borrow_mut().position()),
                 format!("{:<8}", self.piece(2).borrow_mut().position()),
@@ -1008,7 +982,7 @@ mod players {
         }
     }
 
-    fn get_piece_and_player_id(piece: Rc<RefCell<Piece>>) -> (i8, i8) {
+    fn get_piece_and_id_from_other_players(piece: Rc<RefCell<Piece>>) -> (i8, i8) {
         let (other_player_id, other_piece_id) = {
             let piece_borrow = piece.borrow_mut();
             (piece_borrow.color() as i8, piece_borrow.id())

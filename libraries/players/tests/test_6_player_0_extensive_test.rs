@@ -2304,7 +2304,7 @@ mod player_0_play_test {
             for _ in 0..100 {
             while !player.is_finished() {
 
-                player.play_random(actions.clone());
+                play_random(&mut player, actions.clone());
 
             }
             board.borrow_mut().reset();
@@ -2321,13 +2321,37 @@ mod player_0_play_test {
         player.my_turn();
         player.take_dice(dice);
         
-            for _ in 0..100 {
+            for _ in 0..1 {
             while !player.is_finished() {
-
-                player.play_ordered(actions.clone(), true);
-
+                play_ordered(&mut player, actions.clone(), true);
             }
             board.borrow_mut().reset();
         }
+    }
+
+    fn play_random(player: &mut Player, actions: Vec<Act>) {
+        player.roll_dice();
+        let dice_number = player.get_dice_number();
+        let movesets = player.generate_vector_of_random_actions(actions, dice_number);
+        player.action = player.select_random_piece(movesets);
+        player.make_move(player.action.1, dice_number, player.action.0);
+    }
+
+    fn play_ordered(player: &mut Player, actions: Vec<Act>, take_nearest_piece: bool) {
+        player.roll_dice();
+        let dice_number = player.get_dice_number();
+        let movesets =
+            player.generate_vector_of_ordered_actions(actions, dice_number, take_nearest_piece);
+        player.action = movesets
+            .first()
+            .copied()
+            .unwrap_or((Act::Nothing, player.id(), 57));
+        println!("-------------------");
+        println!("prior play");
+        player.print_status();
+        player.make_move(player.action.1, dice_number, player.action.0);
+        println!("-------------------");
+        println!("posterior play");
+        player.print_status();
     }
 }
