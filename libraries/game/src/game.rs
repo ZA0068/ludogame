@@ -2,8 +2,8 @@ mod game {
     pub use board::Board;
     use dice::Dice;
     use iplayers::{Behavior, IPlayer, Playstyle};
-    use players::{Act, Player};
-    use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
+    
+    
     use std::{cell::RefCell, rc::Rc};
 
     #[derive(Clone, Debug, PartialEq)]

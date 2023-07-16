@@ -1,5 +1,5 @@
 use game::Game;
-use iplayers::{Behavior, IPlayer, Playstyle};
+use iplayers::{Playstyle};
 
 #[cfg(test)]
 mod init_game_test {
