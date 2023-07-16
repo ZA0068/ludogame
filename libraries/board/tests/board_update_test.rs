@@ -787,4 +787,63 @@ mod board_update_test {
             }
         }
     }
+
+
+    #[test]
+    fn reset_board_test_temp() {
+        let mut rng = thread_rng();
+        let mut board = Board::new();
+        for player_id in 0..4 {
+            let new_position: i8 = board.invincible[player_id as usize] as i8;
+            for piece_id in 0..4 {
+                board.move_from_home(player_id, piece_id, new_position);
+                board.outside(new_position).piece(piece_id).borrow_mut().free();
+                board.outside(new_position).piece(piece_id).borrow_mut().set_position(new_position)
+            }
+
+        let mut old_position1 = new_position;
+        let mut old_position2 = new_position;
+        board.enter_goal(player_id, 3, old_position1);
+        board.goal(player_id).piece(3).borrow_mut().goal();
+
+        let new_position = 52 + player_id * 5;
+        board.move_inside(player_id, 0, old_position1, new_position);
+        board.inside(new_position).piece(0).borrow_mut().set_position(new_position);
+        let mut old_inside_position = new_position;
+
+        for _ in 0..10 {
+                let new_position1 = rng.gen_range(0..=51);
+                let new_position2 = rng.gen_range(0..=51);
+                let new_inside_position = rng.gen_range(52..72);
+                board.update_outside(player_id, 1, old_position1, new_position1);
+                board.update_outside(player_id, 2, old_position2, new_position2);
+                board.update_inside(player_id, 0, old_inside_position, new_inside_position);
+                board.outside(new_position1).piece(1).borrow_mut().set_position(new_position1);
+                board.outside(new_position2).piece(2).borrow_mut().set_position(new_position2);
+                board.inside(new_inside_position).piece(0).borrow_mut().set_position(new_inside_position);
+                old_position1 = new_position1;
+                old_position2 = new_position2;
+                old_inside_position = new_inside_position;
+            }
+        }
+
+        board.reset();
+        let player_ids = vec![
+            PlayerID::Player0,
+            PlayerID::Player1,
+            PlayerID::Player2,
+            PlayerID::Player3,
+        ];
+        for i in 0..4 {
+            assert_eq!(board.home(i).pieces.len(), 4);
+            for j in 0..4 {
+                assert_eq!(board.home(i).piece(j).borrow().id(), j);
+                assert_eq!(board.home(i).player_id, Some(player_ids[i as usize].clone()));
+                assert!(board.home(i).piece(j).borrow().is_home());
+                assert!(!board.home(i).piece(j).borrow().is_free());
+                assert!(!board.home(i).piece(j).borrow().is_goal());
+                assert_eq!(board.home(i).piece(j).borrow().position(), -1);
+            }
+        }
+    }
 }

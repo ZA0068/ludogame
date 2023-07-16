@@ -71,18 +71,18 @@ mod board {
         pub globe: [usize; 4],
         pub invincible: [usize; 4],
         pub star: [usize; 8],
+        all_pieces: Vec<Rc<RefCell<Piece>>>,
     }
 
     impl Board {
         pub fn new() -> Self {
-            let home = Self::initialize_home();
+            let (home, pieces) = Self::initialize_home();
             let goal = Self::initialize_goal();
             let mut outside = Self::initialize_outside();
             let inside = Self::initialize_inside();
             let globe = Self::initialize_globe(&mut outside);
             let invincible = Self::initialize_invincible(&mut outside);
             let star = Self::initialize_star(&mut outside);
-
             Self {
                 home,
                 goal,
@@ -91,6 +91,7 @@ mod board {
                 globe,
                 invincible,
                 star,
+                all_pieces: pieces,
             }
         }
 
@@ -104,7 +105,8 @@ mod board {
             }
         }
 
-        fn initialize_home() -> [BoardState; 4] {
+        fn initialize_home() -> ([BoardState; 4], Vec<Rc<RefCell<Piece>>>) {
+            let mut pieces = vec![];
             let mut home: [BoardState; 4] = [
                 BoardState::default(),
                 BoardState::default(),
@@ -132,7 +134,12 @@ mod board {
                     Some(player_id.clone()),
                 );
             }
-            home
+            pieces.append(&mut home[0].pieces.clone());
+            pieces.append(&mut home[1].pieces.clone());
+            pieces.append(&mut home[2].pieces.clone());
+            pieces.append(&mut home[3].pieces.clone());
+            let pieces = pieces.try_into().unwrap();
+            (home, pieces)
         }
 
         fn initialize_goal() -> [BoardState; 4] {
@@ -497,11 +504,47 @@ mod board {
             }
 
             pub fn reset(&mut self) {
-                self.reset_goal();
-                self.reset_inside();
-                self.reset_outside();
+                for piece in self.all_pieces.clone() {
+                    let position = piece.borrow().position();
+                    let player_id = piece.borrow_mut().color() as i8;
+                    self.reset_free_pieces(position, player_id, piece);
+                }
                 self.reset_home();
             }
+
+            fn reset_free_pieces(&mut self, position: i8, player_id: i8, piece: Rc<RefCell<Piece>>) {
+                match position {
+                    99 => {
+                        self.reset_goal(player_id, &piece);
+                    }
+                    0..=51 => {
+                        self.reset_outside(position, &piece, player_id);
+                    }
+                    52..=71 => {
+                        self.reset_inside(position, piece, player_id);
+                    }
+                    _ => (),
+                }
+            }
+
+            fn reset_inside(&mut self, position: i8, piece: Rc<RefCell<Piece>>, player_id: i8) {
+                self.inside(position).pieces.clear();
+                self.inside(position).player_id = None;
+                self.home(player_id).pieces.push(piece);
+            }
+
+            fn reset_outside(&mut self, position: i8, piece: &Rc<RefCell<Piece>>, player_id: i8) {
+                self.outside(position).pieces.clear();
+                self.outside(position).player_id = None;
+                self.home(player_id).pieces.push(piece.clone());
+            }
+
+            fn reset_goal(&mut self, player_id: i8, piece: &Rc<RefCell<Piece>>) {
+                self.goal(player_id).pieces.clear();
+                self.goal(player_id).player_id = None;
+                self.home(player_id).pieces.push(piece.clone());
+            }
+
 
             fn reset_home(&mut self) {
                 for player_id in 0..4 {
@@ -511,46 +554,6 @@ mod board {
                 }
             }
 
-            fn reset_goal(&mut self) {
-                for player_id in 0..4 {
-                    if self.goal(player_id).player_id.is_some() {
-                        let pieces = self.goal(player_id).pieces.clone();
-                        for piece in pieces {
-                            self.home(player_id).pieces.push(piece);
-                        }
-                    }
-                    self.goal(player_id).pieces.clear();
-                    self.goal(player_id).player_id = None;
-                }
-            }
-
-            fn reset_inside(&mut self) {
-                for position in 52..72 {
-                    if self.inside(position).player_id.is_some() {
-                        let pieces = self.inside(position).pieces.clone();
-                        for piece in pieces {
-                            let player_id = piece.borrow_mut().color() as i8;
-                            self.home(player_id).pieces.push(piece);
-                        }
-                    }
-                    self.inside(position).pieces.clear();
-                    self.inside(position).player_id = None;
-                }
-            }
-
-            fn reset_outside(&mut self) {
-                for position in 0..52 {
-                    if !self.outside(position).pieces.is_empty() {
-                        let pieces = self.outside(position).pieces.clone();
-                        for piece in pieces {
-                            let player_id = piece.borrow_mut().color() as i8;
-                            self.home(player_id).pieces.push(piece);
-                        }
-                    }
-                    self.outside(position).pieces.clear();
-                    self.outside(position).player_id = None;
-                }
-            }
     }
 
     fn create_vector_of_pieces(color: Color) -> Vec<Rc<RefCell<Piece>>> {

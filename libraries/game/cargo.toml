@@ -13,6 +13,6 @@ path = "src/game.rs"
 iplayers = { path = "../iplayers" }
 players = { path = "../players" }
 dice = { path = "../dice" }
-board = { path = "../board", version = "1.0.0"}
+board = { path = "../board"}
 rand = "0.8.4"
 prettytable-rs = "0.10.0"

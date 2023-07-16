@@ -89,7 +89,10 @@ mod iplayers {
         player: Player,
         playstyle: Option<Playstyle>,
         actions: Option<Vec<Act>>,
+        wins: u16,
+        winrate: f64,
         dice_number: i8,
+        first_round: bool,
     }
 
     pub trait Behavior {
@@ -97,22 +100,42 @@ mod iplayers {
         fn take_dice(&mut self, dice: Dice);
         fn roll_dice(&mut self);
         fn give_dice(&mut self, iplayer: &mut IPlayer);
+        fn hit_first_round(&mut self);
+        fn my_turn(&mut self);
+        fn is_my_turn(&self) -> bool;
+        fn win(&mut self);
     }
 
     impl Behavior for IPlayer {
         fn play(&mut self, shall_debug: bool) {
-            self.roll_dice();
-            match self.playstyle {
-                Some(Playstyle::Aggressive) => self.aggro(),
-                // Playstyle::Fast => self.fast(),
-                Some(Playstyle::Random) => self.random(),
-                // Playstyle::Safe => self.safe(),
-                Some(Playstyle::FastAggressive) => self.fast_aggro(),
-                // Playstyle::GeneticAlgorithm => self.genetic(),
-                Some(_) => self.random(),
-                None => panic!("Player has no playstyle. Please give it with some playstyle"),
+            while self.is_my_turn() {
+                if self.first_round {
+                    self.hit_first_round();
+                } else {
+                    self.roll_dice();
+                }
+                match self.playstyle {
+                    Some(Playstyle::Aggressive) => self.aggro(),
+                    Some(Playstyle::Fast) => self.fast(),
+                    Some(Playstyle::Random) => self.random(),
+                    Some(Playstyle::Safe) => self.safe(),
+                    Some(Playstyle::FastAggressive) => self.fast_aggro(),
+                    Some(Playstyle::GeneticAlgorithm) => self.genetic(),
+                    None => panic!("Player has no playstyle. Please give it with some playstyle"),
+                }
+                self.take_action(shall_debug);
             }
-            self.take_action(shall_debug);
+        }
+
+        fn hit_first_round(&mut self) {
+            let mut roll_count = 0;
+            while roll_count < 3 {
+                self.roll_dice();
+                if self.dice_number == 6 {
+                    self.first_round = false;
+                }
+                roll_count += 1;
+            }
         }
 
         fn roll_dice(&mut self) {
@@ -135,26 +158,43 @@ mod iplayers {
                 panic!("This player doesn't have the dice!");
             }
         }
+
+        fn my_turn(&mut self) {
+            self.player.my_turn();
+        }
+
+        fn is_my_turn(&self) -> bool {
+            self.player.is_player_turn()
+        }
+
+        fn win(&mut self) {
+            self.wins += 1;
+        }
     }
     
     impl IPlayer {
 
+        pub fn new(id: i8) -> Self {
+            IPlayer {
+                player : Player::new(id),
+                playstyle: None,
+                actions: None,
+                wins: 0,
+                winrate: 0.0,
+                dice_number: 0,
+                first_round: true,
+            }
+        }
+        
         pub fn create(id: i8, playstyle: Playstyle) -> Self {
             IPlayer {
                 player : Player::new(id),
                 playstyle: Some(playstyle.clone()),
                 actions: get_action_from_playstyle(playstyle),
+                wins: 0,
+                winrate: 0.0,
                 dice_number: 0,
-            }
-        }
-
-        pub fn new(id: i8) -> Self {
-            let player = Player::new(id);
-            IPlayer {
-                player,
-                playstyle : None,
-                actions : None,
-                dice_number: 0,
+                first_round: true,
             }
         }
 
@@ -167,9 +207,7 @@ mod iplayers {
             self.playstyle = Some(playstyle);
         }
 
-
-
-        pub fn setup_board(&mut self, board: Rc<RefCell<Board>>) {
+        pub fn setup_iplayer(&mut self, board: Rc<RefCell<Board>>) {
             self.player.setup(board);
         }
 
@@ -193,14 +231,36 @@ mod iplayers {
             }
         }
 
+        pub fn calculate_winrate(&mut self, total_games: u16) {
+            self.winrate = self.wins as f64 / total_games as f64 * 100.0;
+        }
 
+        pub fn print_winrate(&self) {
+            println!("Winrate: {}%", self.winrate);
+        }
+
+        pub fn dice_number(&self) -> i8 {
+            self.dice_number
+        }
+
+        fn genetic(&mut self) {
+            self.choose_random_action();
+        }
+
+        fn safe(&mut self) {
+            self.choose_ordered_action(Select::Furthest);
+        }
+
+        fn fast(&mut self) {
+            self.choose_ordered_action(Select::Nearest);
+        }
 
         fn aggro(&mut self) {
-            self.choose_ordered_action(players::Select::Random);
+            self.choose_ordered_action(Select::Random);
         }
 
         fn fast_aggro(&mut self) {
-            self.choose_ordered_action(players::Select::Nearest);
+            self.choose_ordered_action(Select::Nearest);
         }
 
         fn choose_ordered_action(&mut self, select: Select) {
@@ -247,4 +307,4 @@ mod iplayers {
 
 }
 
-pub use iplayers::{IPlayer, Playstyle, Behavior};
+pub use iplayers::{Behavior, IPlayer, Playstyle};

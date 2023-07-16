@@ -1,5 +1,5 @@
-use iplayers::{IPlayer, Playstyle, Behavior};
 use players::{Act, Player};
+use iplayers::{IPlayer, Playstyle, Behavior};
 use dice::Dice;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -95,7 +95,7 @@ mod iplayer_tests {
         let mut player = IPlayer::new(0);
         let mut simple_player = Player::new(0);
         let board = Rc::new(RefCell::new(Board::new()));
-        player.setup_board(board.clone());
+        player.setup_iplayer(board.clone());
         player.set_playstyle(Playstyle::Random);
         player.take_dice(Dice::default());
         player.play(true);
@@ -112,11 +112,10 @@ mod iplayer_tests {
 
     #[test]
     fn aggro_player_test() {
-        let mut player = IPlayer::new(0);
+        let mut player = IPlayer::create(0, Playstyle::Aggressive);
         let dice = Dice::default();
         let board = Rc::new(RefCell::new(Board::new()));
-        player.setup_board(board);
-        player.set_playstyle(Playstyle::Aggressive);
+        player.setup_iplayer(board);
         player.take_dice(dice);
         player.play(true);
         assert_eq!(player.get_actions(), &AGGRO_ACTIONS.to_vec());
@@ -124,15 +123,36 @@ mod iplayer_tests {
 
     #[test]
     fn fast_aggro_player_test() {
-        let mut player = IPlayer::new(0);
+        let mut player = IPlayer::create(0, Playstyle::FastAggressive);
         let dice = Dice::default();
         let board = Rc::new(RefCell::new(Board::new()));
-        player.setup_board(board);
-        player.set_playstyle(Playstyle::FastAggressive);
+        player.setup_iplayer(board);
         player.take_dice(dice);
         player.play(true);
         assert_eq!(player.get_actions(), &FAST_AGGRO_ACTIONS.to_vec());
     }
 
+    #[test]
+    fn fast_player_test() {
+        let mut player = IPlayer::create(0, Playstyle::Fast);
+        let dice = Dice::default();
+        let board = Rc::new(RefCell::new(Board::new()));
+        player.setup_iplayer(board);
+        player.take_dice(dice);
+        player.play(true);
+        assert_eq!(player.get_actions(), &FAST_ACTIONS.to_vec());
+    }
+
+    #[test]
+    fn safe_player_test() {
+        let mut player = IPlayer::create(0, Playstyle::Safe);
+        let dice = Dice::default();
+        let board = Rc::new(RefCell::new(Board::new()));
+        player.setup_iplayer(board);
+        player.take_dice(dice);
+        player.play(true);
+        assert_eq!(player.get_actions(), &SAFE_ACTIONS .to_vec());
+    }
     
 }
+

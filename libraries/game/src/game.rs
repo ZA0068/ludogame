@@ -1,10 +1,10 @@
 mod game {
-    use board::Board;
+    pub use board::Board;
     use dice::Dice;
+    use iplayers::{Behavior, IPlayer, Playstyle};
     use players::{Act, Player};
     use rand::{rngs::ThreadRng, seq::SliceRandom, Rng};
     use std::{cell::RefCell, rc::Rc};
-    use iplayers::IPlayer;
 
     #[derive(Clone, Debug, PartialEq)]
     pub struct Game {
@@ -12,7 +12,6 @@ mod game {
         board: Rc<RefCell<Board>>,
         dice: Dice,
     }
-
 
     impl Game {
         pub fn new() -> Self {
@@ -30,85 +29,146 @@ mod game {
             }
         }
 
-        pub fn reset(&mut self)
-        {
-            let board = Rc::new(RefCell::new(Board::new()));
-            let dice = Dice::default();
-            self.iplayers = vec![
-                IPlayer::new(0),
-                IPlayer::new(1),
-                IPlayer::new(2),
-                IPlayer::new(3),
-            ];
+        pub fn reset(&mut self) {
+            self.board.borrow_mut().reset();
         }
 
 
-        // fn play_game(&mut self, genetic_action: &[Act]) -> Result<i8, Box<dyn std::error::Error>> {
-        //     loop {
-        //         self.iplayers[0].genetic(genetic_action.to_vec());
-        //         self.iplayers[2].safe();
-        //         self.iplayers[1].fast();
-        //         self.iplayers[3].aggressive();
+        pub fn setup_board(&mut self) {
+            for iplayer in &mut self.iplayers {
+                iplayer.setup_iplayer(self.board.clone());
+            }
+        }
 
-        //         match self
-        //             .iplayers
-        //             .iter_mut()
-        //             .find(|iplayer| iplayer.player.is_finished())
-        //         {
-        //             Some(iplayer) => return Ok(iplayer.player.id()),
-        //             None => continue,
-        //         }
-        //     }
-        // }
+        pub fn get_board(&self) -> Rc<RefCell<Board>> {
+            self.board.clone()
+        }
 
-        // pub fn first_round(&mut self) {
-        //     let mut rng = rand::thread_rng();
-        //     for iplayer in self.iplayers {
-        //         let mut roll_count = 0;
-        //         while roll_count < 3 {
-        //             if iplayer.roll_dice() == 6 {
-        //                 iplayer.free_piece(rng.gen_range(0..4));
-        //                 break;
-        //             }
-        //             roll_count += 1;
-        //         }
-        //     }
-        // }
+        pub fn start_game(&mut self, total_games: u16) {
+            for _ in 0..total_games {
+                self.play_game();
+            }
+            self.iplayers[0].calculate_winrate(total_games);
+            self.iplayers[1].calculate_winrate(total_games);
+            self.iplayers[2].calculate_winrate(total_games);
+            self.iplayers[3].calculate_winrate(total_games);
+            self.iplayers[0].print_winrate();
+            self.iplayers[1].print_winrate();
+            self.iplayers[2].print_winrate();
+            self.iplayers[3].print_winrate();
+        }
 
-        // pub fn beginning(&mut self) {
-        //     let mut scores = Vec::new();
+        fn play_game(&mut self) {
+            self.beginning();
+            self.run();
+            self.reset();
+        }
 
-        //     for (index, iplayer) in self.iplayers.iter_mut().enumerate() {
-        //         scores.push((index, iplayer.player.roll_dice()));
-        //     }
+        pub fn iplayer(&mut self, id: i8) -> &mut IPlayer {
+            &mut self.iplayers[id as usize]
+        }
 
-        //     scores.sort_by(|a, b| b.1.cmp(&a.1));
+        pub fn give_iplayer_a_playstyle(&mut self, id: i8, playstyle: Playstyle) {
+            self.iplayers[id as usize].set_playstyle(playstyle);
+        }
 
-        //     let mut scores_with_duplicates = scores.clone();
+        pub fn run(&mut self) {
+            loop {
+                for player_idx in 0..4 {
+                    self.play_turn(player_idx);
+                    if self.has_player_won(player_idx) {
+                        return;
+                    }
+                    self.next_turn(player_idx);
+                }
+            }
+        }
 
-        //     let mut duplicate_scores = std::collections::HashSet::new();
-        //     for &(_, score) in &scores_with_duplicates {
-        //         if self.count_score_occurrences(&scores_with_duplicates, score) > 1 {
-        //             duplicate_scores.insert(score);
-        //         }
-        //     }
-        //     scores_with_duplicates.retain(|&(_, score)| !duplicate_scores.contains(&score));
+        fn play_turn(&mut self, player_idx: usize) {
+            self.iplayers[player_idx].my_turn();
+            self.iplayers[player_idx].play(false);
+        }
 
-        //     let new_order: Vec<usize> = scores_with_duplicates
-        //         .iter()
-        //         .map(|&(index, _)| index)
-        //         .collect();
+        fn next_turn(&mut self, player_idx: usize) {
+            self.iplayers[player_idx].clone().give_dice(&mut self.iplayers[(player_idx + 1) % 4]);
+        }
 
-        //     self.iplayers.sort_by_key(|iplayer| {
-        //         new_order
-        //             .iter()
-        //             .position(|&x| x == iplayer.player.id() as usize)
-        //             .unwrap_or(0)
-        //     });
-        // }
+        fn has_player_won(&mut self, player_idx: usize) -> bool {
+            if self.iplayers[player_idx].player().is_finished() {
+                self.iplayers[player_idx].win();
+                return true;
+            }
+            false
+        }
 
-        fn count_score_occurrences(&self, scores: &[(usize, i8)], score: i8) -> usize {
-            scores.iter().filter(|&(_, s)| *s == score).count()
+
+        pub fn beginning(&mut self) {
+            let mut scores: Vec<(i8, i32)> = vec![(0, 0), (1, 0), (2, 0), (3, 0)];
+        
+            // Roll the dice for all players initially.
+            self.roll_dice_for_players(&mut scores);
+        
+            // Continue rolling dice and adjusting scores while there are ties.
+            while self.has_ties(&scores) {
+                self.adjust_scores_for_tied_players(&mut scores);
+            }
+        
+            // Sort players by their scores in descending order.
+            self.sort_players_by_scores(&scores);
+            self.iplayers[0].take_dice(self.dice.clone());
+        }
+        
+        fn has_ties(&self, scores: &[(i8, i32)]) -> bool {
+            let max_score = self.get_max_score(scores);
+            scores.iter().filter(|&(_, score)| *score == max_score).count() > 1
+        }
+        
+        fn get_max_score(&self, scores: &[(i8, i32)]) -> i32 {
+            scores.iter().map(|(_, score)| *score).max().unwrap_or(0)
+        }
+        
+        fn roll_dice_for_players(&mut self, scores: &mut [(i8, i32)]) {
+            for (idx, iplayer) in self.iplayers.iter_mut().enumerate() {
+                iplayer.take_dice(self.dice.clone());
+                iplayer.roll_dice();
+                scores[idx].1 += iplayer.player().get_dice_number() as i32;  // Add the new dice roll to the current score.
+            }
+        }
+        
+        
+        fn adjust_scores_for_tied_players(&mut self, scores: &mut Vec<(i8, i32)>) {
+            loop {
+                self.roll_dice_for_players(scores);
+                let (tied_players, _max_score) = self.get_tied_players(scores);
+            
+                // If there is a single max score, break the loop.
+                if tied_players.len() == 1 {
+                    break;
+                }
+            
+                for &player_id in &tied_players {
+                    if let Some((_id, _player_score)) = scores.iter_mut().find(|(id, _)| *id == player_id) {
+                    }
+                }
+                
+            }
+            
+        }
+        
+        fn get_tied_players(&self, scores: &[(i8, i32)]) -> (Vec<i8>, i32) {
+            let max_score = self.get_max_score(scores);
+            let tied_players: Vec<_> = scores
+                .iter()
+                .filter_map(|(id, score)| if *score == max_score { Some(*id) } else { None })
+                .collect();
+            (tied_players, max_score)
+        }
+        
+        fn sort_players_by_scores(&mut self, scores: &[(i8, i32)]) {
+            self.iplayers.sort_by_key(|p| {
+                let player_score = scores.iter().find(|(id, _)| *id == p.player().id()).unwrap().1;
+                -player_score  // use negative to sort in descending order
+            });
         }
     }
 

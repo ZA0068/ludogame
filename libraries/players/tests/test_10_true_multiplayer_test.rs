@@ -2,6 +2,7 @@ use board::Board;
 use dice::Dice;
 use players::{Act, Player, Select};
 use std::{cell::RefCell, rc::Rc};
+use std::time::Instant;
 
 mod multiplayer_tests {
     use super::*;
@@ -69,7 +70,7 @@ mod multiplayer_tests {
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
-                    println!("Player 0 wins");
+                    // println!("Player 0 wins");
                     winrates[0] += 1.0;
                     break;
                 }
@@ -78,7 +79,7 @@ mod multiplayer_tests {
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
-                    println!("Player 1 wins");
+                    // println!("Player 1 wins");
                     winrates[1] += 1.0;
                     break;
                 }
@@ -503,14 +504,14 @@ mod multiplayer_tests {
 
         let mut winrates = [0.0; 4];
         let max_iter: usize = 1000;
-
+        let mut timer: f64 = 0.0;
         for _ in 0..max_iter {
             loop {
                 player0.get_dice(dice.clone());
                 player0.my_turn();
                 play_random(&mut player0, ACTIONS.to_vec());
                 if player0.is_finished() {
-                    println!("Player 0 wins");
+                    // println!("Player 0 wins");
                     winrates[0] += 1.0;
                     break;
                 }
@@ -519,7 +520,7 @@ mod multiplayer_tests {
                 player1.my_turn();
                 play_random(&mut player1, ACTIONS.to_vec());
                 if player1.is_finished() {
-                    println!("Player 1 wins");
+                    // println!("Player 1 wins");
                     winrates[1] += 1.0;
                     break;
                 }
@@ -528,7 +529,7 @@ mod multiplayer_tests {
                 player2.my_turn();
                 play_random(&mut player2, ACTIONS.to_vec());
                 if player2.is_finished() {
-                    println!("Player 2 wins");
+                    // println!("Player 2 wins");
                     winrates[2] += 1.0;
                     break;
                 }
@@ -537,7 +538,7 @@ mod multiplayer_tests {
                 player3.my_turn();
                 play_random(&mut player3, ACTIONS.to_vec());
                 if player3.is_finished() {
-                    println!("Player 3 wins");
+                    // println!("Player 3 wins");
                     winrates[3] += 1.0;
                     break;
                 }
@@ -549,7 +550,11 @@ mod multiplayer_tests {
                     || player2.is_finished()
                     || player3.is_finished()
             );
+            let start = Instant::now();
             board.borrow_mut().reset();
+            let duration = start.elapsed();
+            timer += duration.as_secs_f64();
+            // println!("Time elapsed in expensive_function() is: {:?}", duration);
         }
         println!(
             "Player 0 winrate: {}",
@@ -567,6 +572,7 @@ mod multiplayer_tests {
             "Player 3 winrate: {}",
             winrates[3] / (1.0 * max_iter as f32)
         );
+        println!("Time elapsed in expensive_function() is: {:?}", timer/max_iter as f64);
     }
 
     fn play_random(player: &mut Player, actions: Vec<Act>) {

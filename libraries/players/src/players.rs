@@ -938,10 +938,6 @@ mod players {
             self.pieces.iter().all(|piece| piece.borrow_mut().is_goal())
         }
 
-        pub fn are_all_pieces_in_home(&self) -> bool {
-            self.pieces.iter().all(|piece| piece.borrow_mut().is_home())
-        }
-
         pub fn print_status(&mut self) {
             let mut table = Table::new();
             table.add_row(row![
