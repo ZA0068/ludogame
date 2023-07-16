@@ -138,7 +138,6 @@ mod board {
             pieces.append(&mut home[1].pieces.clone());
             pieces.append(&mut home[2].pieces.clone());
             pieces.append(&mut home[3].pieces.clone());
-            let pieces = pieces.try_into().unwrap();
             (home, pieces)
         }
 

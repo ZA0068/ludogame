@@ -136,7 +136,7 @@ mod game {
         }
         
         
-        fn adjust_scores_for_tied_players(&mut self, scores: &mut Vec<(i8, i32)>) {
+        fn adjust_scores_for_tied_players(&mut self, scores: &mut [(i8, i32)]) {
             loop {
                 self.roll_dice_for_players(scores);
                 let (tied_players, _max_score) = self.get_tied_players(scores);
