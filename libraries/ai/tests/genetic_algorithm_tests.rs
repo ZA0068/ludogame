@@ -4,7 +4,7 @@ use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
 
 #[cfg(test)]
 mod genetic_algorithm_test {
-    use std::borrow::BorrowMut;
+    use rand::seq::SliceRandom;
 
     use super::*;
 
@@ -77,6 +77,7 @@ mod genetic_algorithm_test {
         let mut ga = GeneticAlgorithm::new();
         let mut game = Game::new();
         game.setup_game();
+        game.give_iplayer_a_playstyle(0, Playstyle::GeneticAlgorithm);
         game.give_iplayer_a_playstyle(1, Playstyle::Random);
         game.give_iplayer_a_playstyle(2, Playstyle::Fast);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
@@ -84,6 +85,58 @@ mod genetic_algorithm_test {
         ga.set_population_size(10);
         ga.set_populations();
         ga.evaluate_fitness_for_all_populations();
-
     }
+
+    #[test]
+    fn selection_test() {
+        let mut ga = GeneticAlgorithm::new();
+        let mut game = Game::new();
+        game.setup_game();
+        game.give_iplayer_a_playstyle(0, Playstyle::GeneticAlgorithm);
+        game.give_iplayer_a_playstyle(1, Playstyle::Random);
+        game.give_iplayer_a_playstyle(2, Playstyle::Fast);
+        game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+
+        ga.set_evaluator(game);
+        ga.set_population_size(10);
+        ga.set_elitism_count(2);
+        ga.set_populations();
+        ga.evaluate_fitness_for_all_populations();
+        ga.select_the_best_populations_among_all();
+        assert_eq!(ga.population().len(), 2);
+    }
+
+    #[test]
+    fn crossover_test() {
+        let mut ga = GeneticAlgorithm::default();
+        let mut rng = rand::thread_rng();
+        let action_1 = ACTIONS;
+        let mut action_2 = ACTIONS;
+        action_2.shuffle(&mut rng);
+        let action_3 = ga.try_to_perform_crossover(&action_1, &action_2);
+        let action_3 = ga.remove_duplicates(action_3);
+        for action in &ACTIONS {
+            assert!(action_3.contains(action));
+        }
+    }
+
+    // #[test]
+    // fn recombination_test() {
+    //     let mut ga = GeneticAlgorithm::new();
+    //     let mut game = Game::new();
+    //     game.setup_game();
+    //     game.give_iplayer_a_playstyle(0, Playstyle::GeneticAlgorithm);
+    //     game.give_iplayer_a_playstyle(1, Playstyle::Random);
+    //     game.give_iplayer_a_playstyle(2, Playstyle::Fast);
+    //     game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+
+    //     ga.set_evaluator(game);
+    //     ga.set_population_size(10);
+    //     ga.set_elitism_count(2);
+    //     ga.set_populations();
+    //     ga.evaluate_fitness_for_all_populations();
+    //     ga.select_the_best_populations_among_all();
+    //     ga.create_children_and_replace_bad_populationa();
+    //     assert_eq!(ga.population().len(), 2);
+    // }
 }

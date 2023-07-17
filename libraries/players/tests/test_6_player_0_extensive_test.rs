@@ -2464,15 +2464,15 @@ mod player_0_play_test {
         player.update_outside(3, 0, 48);
 
         let dice_number = 2;
-        result = player.get_ordered_action(ACTIONS.to_vec(), dice_number, Select::Nearest);
+        result = player.get_ordered_action(ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Move);
         assert_eq!(result.1, 2);
 
-        result = player.get_ordered_action(FAST_ACTIONS.to_vec(), dice_number, Select::Nearest);
+        result = player.get_ordered_action(FAST_ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Goal);
         assert_eq!(result.1, 3);
 
-        result = player.get_ordered_action(AGGRO_ACTIONS.to_vec(), dice_number, Select::Nearest);
+        result = player.get_ordered_action(AGGRO_ACTIONS, dice_number, Select::Nearest);
 
         assert_eq!(result.0, Act::Kill);
         assert_eq!(result.1, 0);
@@ -2480,19 +2480,19 @@ mod player_0_play_test {
         other_player.update_outside(1, 13, 50);
 
         result =
-            player.get_ordered_action(FAST_AGGRO_ACTIONS.to_vec(), dice_number, Select::Nearest);
+            player.get_ordered_action(FAST_AGGRO_ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Kill);
         assert_eq!(result.1, 3);
 
-        result = player.get_ordered_action(AGGRO_ACTIONS.to_vec(), dice_number, Select::Nearest);
+        result = player.get_ordered_action(AGGRO_ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Kill);
         assert_eq!(result.1, 3);
 
-        result = player.get_ordered_action(AGGRO_ACTIONS.to_vec(), dice_number, Select::Furthest);
+        result = player.get_ordered_action(AGGRO_ACTIONS, dice_number, Select::Furthest);
         assert_eq!(result.0, Act::Kill);
         assert_eq!(result.1, 0);
 
-        result = player.get_ordered_action(FAST_ACTIONS.to_vec(), dice_number, Select::Nearest);
+        result = player.get_ordered_action(FAST_ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Goal);
         assert_eq!(result.1, 3);
     }
@@ -2504,13 +2504,12 @@ mod player_0_play_test {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
         player.my_turn();
         player.get_dice(dice);
 
         for _ in 0..100 {
             while !player.is_finished() {
-                play_random(&mut player, actions.clone());
+                play_random(&mut player, ACTIONS);
             }
             board.borrow_mut().reset();
         }
@@ -2523,19 +2522,18 @@ mod player_0_play_test {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
         player.my_turn();
         player.get_dice(dice);
 
         for _ in 0..1 {
             while !player.is_finished() {
-                play_ordered(&mut player, actions.clone(), Select::Nearest);
+                play_ordered(&mut player, ACTIONS, Select::Nearest);
             }
             board.borrow_mut().reset();
         }
     }
 
-    fn play_random(player: &mut Player, actions: Vec<Act>) {
+    fn play_random(player: &mut Player, actions: [Act; 10]) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets = player.generate_vector_of_random_actions(actions, dice_number);
@@ -2543,7 +2541,7 @@ mod player_0_play_test {
         player.make_move(player.action.1, dice_number, player.action.0);
     }
 
-    fn play_ordered(player: &mut Player, actions: Vec<Act>, take_piece_in_which_order: Select) {
+    fn play_ordered(player: &mut Player, actions: [Act; 10], take_piece_in_which_order: Select) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets = player.generate_vector_of_ordered_actions(

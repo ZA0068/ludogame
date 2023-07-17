@@ -2417,13 +2417,12 @@ mod player_3_play_test {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
         player.my_turn();
         player.get_dice(dice);
 
         for _ in 0..1000 {
             while !player.is_finished() {
-                play_random(&mut player, actions.clone());
+                play_random(&mut player, ACTIONS);
             }
             board.borrow_mut().reset();
         }
@@ -2436,19 +2435,18 @@ mod player_3_play_test {
         let mut player = Player::new(PLAYER_ID);
         player.setup(board.clone());
         let dice = Dice::default();
-        let actions = ACTIONS.to_vec();
         player.my_turn();
         player.get_dice(dice);
 
         for _ in 0..100 {
             while !player.is_finished() {
-                play_ordered(&mut player, actions.clone(), Select::Nearest);
+                play_ordered(&mut player, ACTIONS, Select::Nearest);
             }
             board.borrow_mut().reset();
         }
     }
 
-    fn play_ordered(player: &mut Player, actions: Vec<Act>, take_nearest_piece: Select) {
+    fn play_ordered(player: &mut Player, actions: [Act; 10], take_nearest_piece: Select) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets =
@@ -2466,7 +2464,7 @@ mod player_3_play_test {
         player.print_status();
     }
 
-    fn play_random(player: &mut Player, actions: Vec<Act>) {
+    fn play_random(player: &mut Player, actions: [Act; 10]) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets = player.generate_vector_of_random_actions(actions, dice_number);

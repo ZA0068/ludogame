@@ -34,7 +34,7 @@ mod multiplayer_tests {
         loop {
             player1.get_dice(dice.clone());
             player1.my_turn();
-            play_random(&mut player1, ACTIONS.to_vec());
+            play_random(&mut player1, ACTIONS);
             if player1.is_finished() {
                 println!("Player 0 wins");
                 break;
@@ -42,7 +42,7 @@ mod multiplayer_tests {
             player1.drop_dice();
             player1.get_dice(dice.clone());
             player0.my_turn();
-            play_random(&mut player0, ACTIONS.to_vec());
+            play_random(&mut player0, ACTIONS);
             if player0.is_finished() {
                 println!("Player 1 wins");
                 break;
@@ -68,7 +68,7 @@ mod multiplayer_tests {
             loop {
                 player1.get_dice(dice.clone());
                 player1.my_turn();
-                play_random(&mut player1, ACTIONS.to_vec());
+                play_random(&mut player1, ACTIONS);
                 if player1.is_finished() {
                     // println!("Player 0 wins");
                     winrates[0] += 1.0;
@@ -77,7 +77,7 @@ mod multiplayer_tests {
                 player1.drop_dice();
                 player0.get_dice(dice.clone());
                 player0.my_turn();
-                play_random(&mut player0, ACTIONS.to_vec());
+                play_random(&mut player0, ACTIONS);
                 if player0.is_finished() {
                     // println!("Player 1 wins");
                     winrates[1] += 1.0;
@@ -112,7 +112,7 @@ mod multiplayer_tests {
         loop {
             player2.get_dice(dice.clone());
             player2.my_turn();
-            play_random(&mut player2, ACTIONS.to_vec());
+            play_random(&mut player2, ACTIONS);
             if player2.is_finished() {
                 println!("Player 0 wins");
                 break;
@@ -120,7 +120,7 @@ mod multiplayer_tests {
             player2.drop_dice();
             player0.get_dice(dice.clone());
             player0.my_turn();
-            play_random(&mut player0, ACTIONS.to_vec());
+            play_random(&mut player0, ACTIONS);
             if player0.is_finished() {
                 println!("Player 2 wins");
                 break;
@@ -146,7 +146,7 @@ mod multiplayer_tests {
             loop {
                 player2.get_dice(dice.clone());
                 player2.my_turn();
-                play_random(&mut player2, ACTIONS.to_vec());
+                play_random(&mut player2, ACTIONS);
                 if player2.is_finished() {
                     println!("Player 0 wins");
                     winrates[0] += 1.0;
@@ -155,7 +155,7 @@ mod multiplayer_tests {
                 player2.drop_dice();
                 player2.get_dice(dice.clone());
                 player0.my_turn();
-                play_random(&mut player0, ACTIONS.to_vec());
+                play_random(&mut player0, ACTIONS);
                 if player0.is_finished() {
                     println!("Player 2 wins");
                     winrates[1] += 1.0;
@@ -190,7 +190,7 @@ mod multiplayer_tests {
         loop {
             player3.get_dice(dice.clone());
             player3.my_turn();
-            play_random(&mut player3, ACTIONS.to_vec());
+            play_random(&mut player3, ACTIONS);
             if player3.is_finished() {
                 println!("Player 0 wins");
                 break;
@@ -198,7 +198,7 @@ mod multiplayer_tests {
             player3.drop_dice();
             player0.get_dice(dice.clone());
             player0.my_turn();
-            play_random(&mut player0, ACTIONS.to_vec());
+            play_random(&mut player0, ACTIONS);
             if player0.is_finished() {
                 println!("Player 3 wins");
                 break;
@@ -224,7 +224,7 @@ mod multiplayer_tests {
             loop {
                 player3.get_dice(dice.clone());
                 player3.my_turn();
-                play_random(&mut player3, ACTIONS.to_vec());
+                play_random(&mut player3, ACTIONS);
                 if player3.is_finished() {
                     println!("Player 0 wins");
                     winrates[0] += 1.0;
@@ -233,7 +233,7 @@ mod multiplayer_tests {
                 player3.drop_dice();
                 player0.get_dice(dice.clone());
                 player0.my_turn();
-                play_random(&mut player0, ACTIONS.to_vec());
+                play_random(&mut player0, ACTIONS);
                 if player0.is_finished() {
                     println!("Player 3 wins");
                     winrates[1] += 1.0;
@@ -267,7 +267,7 @@ mod multiplayer_tests {
         loop {
             player2.get_dice(dice.clone());
             player2.my_turn();
-            play_random(&mut player2, ACTIONS.to_vec());
+            play_random(&mut player2, ACTIONS);
             if player2.is_finished() {
                 println!("Player 1 wins");
                 break;
@@ -275,7 +275,7 @@ mod multiplayer_tests {
             player2.drop_dice();
             player1.get_dice(dice.clone());
             player1.my_turn();
-            play_random(&mut player1, ACTIONS.to_vec());
+            play_random(&mut player1, ACTIONS);
             if player1.is_finished() {
                 println!("Player 2 wins");
                 break;
@@ -301,7 +301,7 @@ mod multiplayer_tests {
             loop {
                 player2.get_dice(dice.clone());
                 player2.my_turn();
-                play_random(&mut player2, ACTIONS.to_vec());
+                play_random(&mut player2, ACTIONS);
                 if player2.is_finished() {
                     println!("Player 1 wins");
                     winrates[0] += 1.0;
@@ -310,7 +310,7 @@ mod multiplayer_tests {
                 player2.drop_dice();
                 player1.get_dice(dice.clone());
                 player1.my_turn();
-                play_random(&mut player1, ACTIONS.to_vec());
+                play_random(&mut player1, ACTIONS);
                 if player1.is_finished() {
                     println!("Player 2 wins");
                     winrates[1] += 1.0;
@@ -345,7 +345,7 @@ mod multiplayer_tests {
         loop {
             player3.get_dice(dice.clone());
             player3.my_turn();
-            play_random(&mut player3, ACTIONS.to_vec());
+            play_random(&mut player3, ACTIONS);
             if player3.is_finished() {
                 println!("Player 1 wins");
                 break;
@@ -353,7 +353,7 @@ mod multiplayer_tests {
             player3.drop_dice();
             player1.get_dice(dice.clone());
             player1.my_turn();
-            play_random(&mut player1, ACTIONS.to_vec());
+            play_random(&mut player1, ACTIONS);
             if player1.is_finished() {
                 println!("Player 3 wins");
                 break;
@@ -379,7 +379,7 @@ mod multiplayer_tests {
             loop {
                 player3.get_dice(dice.clone());
                 player3.my_turn();
-                play_random(&mut player3, ACTIONS.to_vec());
+                play_random(&mut player3, ACTIONS);
                 if player3.is_finished() {
                     println!("Player 1 wins");
                     winrates[0] += 1.0;
@@ -388,7 +388,7 @@ mod multiplayer_tests {
                 player3.drop_dice();
                 player1.get_dice(dice.clone());
                 player1.my_turn();
-                play_random(&mut player1, ACTIONS.to_vec());
+                play_random(&mut player1, ACTIONS);
                 if player1.is_finished() {
                     println!("Player 2 wins");
                     winrates[1] += 1.0;
@@ -423,7 +423,7 @@ mod multiplayer_tests {
         loop {
             player3.get_dice(dice.clone());
             player3.my_turn();
-            play_random(&mut player3, ACTIONS.to_vec());
+            play_random(&mut player3, ACTIONS);
             if player3.is_finished() {
                 println!("Player 2 wins");
                 break;
@@ -431,7 +431,7 @@ mod multiplayer_tests {
             player3.drop_dice();
             player2.get_dice(dice.clone());
             player2.my_turn();
-            play_random(&mut player2, ACTIONS.to_vec());
+            play_random(&mut player2, ACTIONS);
             if player2.is_finished() {
                 println!("Player 3 wins");
                 break;
@@ -457,7 +457,7 @@ mod multiplayer_tests {
             loop {
                 player3.get_dice(dice.clone());
                 player3.my_turn();
-                play_random(&mut player3, ACTIONS.to_vec());
+                play_random(&mut player3, ACTIONS);
                 if player3.is_finished() {
                     println!("Player 2 wins");
                     winrates[0] += 1.0;
@@ -466,7 +466,7 @@ mod multiplayer_tests {
                 player3.drop_dice();
                 player2.get_dice(dice.clone());
                 player2.my_turn();
-                play_random(&mut player2, ACTIONS.to_vec());
+                play_random(&mut player2, ACTIONS);
                 if player2.is_finished() {
                     println!("Player 3 wins");
                     winrates[1] += 1.0;
@@ -509,7 +509,7 @@ mod multiplayer_tests {
             loop {
                 player0.get_dice(dice.clone());
                 player0.my_turn();
-                play_random(&mut player0, ACTIONS.to_vec());
+                play_random(&mut player0, ACTIONS);
                 if player0.is_finished() {
                     // println!("Player 0 wins");
                     winrates[0] += 1.0;
@@ -518,7 +518,7 @@ mod multiplayer_tests {
                 player0.drop_dice();
                 player1.get_dice(dice.clone());
                 player1.my_turn();
-                play_random(&mut player1, ACTIONS.to_vec());
+                play_random(&mut player1, ACTIONS);
                 if player1.is_finished() {
                     // println!("Player 1 wins");
                     winrates[1] += 1.0;
@@ -527,7 +527,7 @@ mod multiplayer_tests {
                 player1.drop_dice();
                 player2.get_dice(dice.clone());
                 player2.my_turn();
-                play_random(&mut player2, ACTIONS.to_vec());
+                play_random(&mut player2, ACTIONS);
                 if player2.is_finished() {
                     // println!("Player 2 wins");
                     winrates[2] += 1.0;
@@ -536,7 +536,7 @@ mod multiplayer_tests {
                 player2.drop_dice();
                 player3.get_dice(dice.clone());
                 player3.my_turn();
-                play_random(&mut player3, ACTIONS.to_vec());
+                play_random(&mut player3, ACTIONS);
                 if player3.is_finished() {
                     // println!("Player 3 wins");
                     winrates[3] += 1.0;
@@ -578,7 +578,7 @@ mod multiplayer_tests {
         );
     }
 
-    fn play_random(player: &mut Player, actions: Vec<Act>) {
+    fn play_random(player: &mut Player, actions: [Act; 10]) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets = player.generate_vector_of_random_actions(actions, dice_number);
@@ -591,7 +591,7 @@ mod multiplayer_tests {
 mod playstyle_tests {
     use super::*;
 
-    fn play_random(player: &mut Player, actions: Vec<Act>) {
+    fn play_random(player: &mut Player, actions: [Act; 10]) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets = player.generate_vector_of_random_actions(actions, dice_number);
@@ -599,7 +599,7 @@ mod playstyle_tests {
         player.make_move(player.action.1, dice_number, player.action.0);
     }
 
-    fn play_ordered(player: &mut Player, actions: Vec<Act>, select_which_piece: Select) {
+    fn play_ordered(player: &mut Player, actions: [Act; 10], select_which_piece: Select) {
         player.roll_dice();
         let dice_number = player.get_dice_number();
         let movesets =
@@ -654,7 +654,7 @@ mod playstyle_tests {
             loop {
                 random_player.get_dice(dice.clone());
                 random_player.my_turn();
-                play_random(&mut random_player, ACTIONS.to_vec());
+                play_random(&mut random_player, ACTIONS);
                 if random_player.is_finished() {
                     println!("random_player wins");
                     winrates[0] += 1.0;
@@ -665,7 +665,7 @@ mod playstyle_tests {
                 aggressive_player.my_turn();
                 play_ordered(
                     &mut aggressive_player,
-                    AGGRO_ACTIONS.to_vec(),
+                    AGGRO_ACTIONS,
                     take_nearest_piece,
                 );
                 if aggressive_player.is_finished() {
@@ -718,7 +718,7 @@ mod playstyle_tests {
             loop {
                 random_player.get_dice(dice.clone());
                 random_player.my_turn();
-                play_random(&mut random_player, ACTIONS.to_vec());
+                play_random(&mut random_player, ACTIONS);
                 if random_player.is_finished() {
                     println!("random_player wins");
                     winrate[0] += 1.0;
@@ -729,7 +729,7 @@ mod playstyle_tests {
                 fast_aggressive_player.my_turn();
                 play_ordered(
                     &mut fast_aggressive_player,
-                    FAST_AGGRO_ACTIONS.to_vec(),
+                    FAST_AGGRO_ACTIONS,
                     take_closest,
                 );
                 if fast_aggressive_player.is_finished() {
@@ -782,7 +782,7 @@ mod playstyle_tests {
             loop {
                 random_player.get_dice(dice.clone());
                 random_player.my_turn();
-                play_random(&mut random_player, ACTIONS.to_vec());
+                play_random(&mut random_player, ACTIONS);
                 if random_player.is_finished() {
                     println!("random_player wins");
                     winrates[0] += 1.0;
@@ -791,7 +791,7 @@ mod playstyle_tests {
                 random_player.drop_dice();
                 safe_player.get_dice(dice.clone());
                 safe_player.my_turn();
-                play_ordered(&mut safe_player, SAFE_ACTIONS.to_vec(), take_closest);
+                play_ordered(&mut safe_player, SAFE_ACTIONS, take_closest);
                 if safe_player.is_finished() {
                     println!("safe player wins");
                     winrates[1] += 1.0;
@@ -843,7 +843,7 @@ mod playstyle_tests {
             loop {
                 random_player.get_dice(dice.clone());
                 random_player.my_turn();
-                play_random(&mut random_player, ACTIONS.to_vec());
+                play_random(&mut random_player, ACTIONS);
                 if random_player.is_finished() {
                     println!("random_player wins");
                     winrates[0] += 1.0;
@@ -852,7 +852,7 @@ mod playstyle_tests {
                 random_player.drop_dice();
                 fastest_player.get_dice(dice.clone());
                 fastest_player.my_turn();
-                play_ordered(&mut fastest_player, FAST_ACTIONS.to_vec(), take_closest);
+                play_ordered(&mut fastest_player, FAST_ACTIONS, take_closest);
                 if fastest_player.is_finished() {
                     println!("fastest player wins");
                     winrates[1] += 1.0;
@@ -894,7 +894,7 @@ mod playstyle_tests {
             loop {
                 fastest_player.get_dice(dice.clone());
                 fastest_player.my_turn();
-                play_ordered(&mut fastest_player, FAST_ACTIONS.to_vec(), take_closest);
+                play_ordered(&mut fastest_player, FAST_ACTIONS, take_closest);
                 if fastest_player.is_finished() {
                     println!("fastest_player wins");
                     winrate[0] += 1.0;
@@ -903,7 +903,7 @@ mod playstyle_tests {
                 fastest_player.drop_dice();
                 random_player.get_dice(dice.clone());
                 random_player.my_turn();
-                play_random(&mut random_player, ACTIONS.to_vec());
+                play_random(&mut random_player, ACTIONS);
                 if random_player.is_finished() {
                     println!("Random player wins");
                     winrate[1] += 1.0;
@@ -914,7 +914,7 @@ mod playstyle_tests {
                 fast_aggressive_player.my_turn();
                 play_ordered(
                     &mut fast_aggressive_player,
-                    FAST_AGGRO_ACTIONS.to_vec(),
+                    FAST_AGGRO_ACTIONS,
                     take_closest,
                 );
                 if fast_aggressive_player.is_finished() {
@@ -925,7 +925,7 @@ mod playstyle_tests {
                 fast_aggressive_player.drop_dice();
                 aggressive_player.get_dice(dice.clone());
                 aggressive_player.my_turn();
-                play_ordered(&mut aggressive_player, AGGRO_ACTIONS.to_vec(), take_closest);
+                play_ordered(&mut aggressive_player, AGGRO_ACTIONS, take_closest);
                 if aggressive_player.is_finished() {
                     println!("aggressive_player wins");
                     winrate[3] += 1.0;

@@ -27,11 +27,11 @@ mod game {
             }
         }
 
-        pub fn reset(&mut self) {
+        pub fn reset_game(&mut self) {
             self.board.borrow_mut().reset();
-            for iplayer in &mut self.iplayers {
-                iplayer.first_round = true;
-            }
+            self.iplayers.iter_mut().for_each(|iplayer| {
+                iplayer.reset_first_round();
+            });
         }
 
         pub fn setup_game(&mut self) {
@@ -44,7 +44,14 @@ mod game {
             self.board.clone()
         }
 
+        pub fn reset_scores(&mut self) {
+            self.iplayers.iter_mut().for_each(|iplayer| {
+                iplayer.reset_scores();
+            });
+        }
+
         pub fn start_game(&mut self, total_games: u16) {
+            self.reset_scores();
             for _ in 0..total_games {
                 self.play_game();
             }
@@ -53,7 +60,7 @@ mod game {
         fn play_game(&mut self) {
             self.beginning();
             self.run();
-            self.reset();
+            self.reset_game();
         }
 
         pub fn iplayer(&mut self, id: i8) -> &mut IPlayer {
@@ -64,8 +71,12 @@ mod game {
             self.iplayers[id as usize].set_playstyle(playstyle);
         }
 
-        pub fn set_iplayer(&mut self, id: i8, iplayer: IPlayer) {
-            self.iplayer(id).replace(iplayer);
+        pub fn set_iplayer(&mut self, id: i8, iplayer: &mut IPlayer) {
+            self.iplayer(id).substitute(iplayer);
+        }
+
+        pub fn get_iplayer(&mut self, id: i8, iplayer: &mut IPlayer) {
+            iplayer.substitute(self.iplayer(id));
         }
 
         pub fn run(&mut self) {

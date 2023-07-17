@@ -506,7 +506,7 @@ mod players {
 
         pub fn generate_vector_of_random_actions(
             &mut self,
-            actions: Vec<Act>,
+            actions: [Act; 10],
             dice_number: i8,
         ) -> Vec<(Act, i8, i8)> {
             let mut movesets: Vec<(Act, i8, i8)> = Vec::new();
@@ -525,7 +525,7 @@ mod players {
 
         pub fn generate_vector_of_ordered_actions(
             &mut self,
-            actions: Vec<Act>,
+            actions: [Act; 10],
             dice_number: i8,
             select_which_piece: Select,
         ) -> Vec<(Act, i8, i8)> {
@@ -541,7 +541,7 @@ mod players {
 
         pub fn get_ordered_action(
             &mut self,
-            actions: Vec<Act>,
+            actions: [Act; 10],
             dice_number: i8,
             select_which_piece: Select,
         ) -> (Act, i8, i8) {

@@ -9,7 +9,7 @@ use std::rc::Rc;
 mod iplayer_tests {
     use super::*;
 
-    static DEFAULT_ACTIONS: [Act; 10] = [
+    static ACTIONS: [Act; 10] = [
         Act::Move,
         Act::Free,
         Act::Kill,
@@ -80,9 +80,8 @@ mod iplayer_tests {
 
         assert_eq!(player.player().id(), 0);
 
-        let actions = DEFAULT_ACTIONS.to_vec();
-        player.set_actions(actions);
-        assert_eq!(player.get_actions(), &DEFAULT_ACTIONS.to_vec());
+        player.set_actions(ACTIONS);
+        assert_eq!(player.get_actions().to_vec(), ACTIONS.to_vec());
 
         let playstyle = Playstyle::Random;
         player.set_playstyle(playstyle);
@@ -101,7 +100,7 @@ mod iplayer_tests {
 
         simple_player.setup(board);
 
-        assert_eq!(iplayer.get_actions(), &DEFAULT_ACTIONS.to_vec());
+        assert_eq!(iplayer.get_actions().to_vec(), ACTIONS.to_vec());
         assert_eq!(
             simple_player.board().as_ptr(),
             iplayer.player().board().as_ptr()
@@ -132,7 +131,7 @@ mod iplayer_tests {
         player.setup_board(board);
         player.take_dice(dice);
         player.play(true);
-        assert_eq!(player.get_actions(), &AGGRO_ACTIONS.to_vec());
+        assert_eq!(player.get_actions().to_owned(), AGGRO_ACTIONS.to_owned());
     }
 
     #[test]
@@ -143,7 +142,7 @@ mod iplayer_tests {
         player.setup_board(board);
         player.take_dice(dice);
         player.play(true);
-        assert_eq!(player.get_actions(), &FAST_AGGRO_ACTIONS.to_vec());
+        assert_eq!(player.get_actions().to_owned(), FAST_AGGRO_ACTIONS.to_owned());
     }
 
     #[test]
@@ -154,7 +153,7 @@ mod iplayer_tests {
         player.setup_board(board);
         player.take_dice(dice);
         player.play(true);
-        assert_eq!(player.get_actions(), &FAST_ACTIONS.to_vec());
+        assert_eq!(player.get_actions().to_owned(), FAST_ACTIONS.to_owned());
     }
 
     #[test]
@@ -165,6 +164,6 @@ mod iplayer_tests {
         player.setup_board(board);
         player.take_dice(dice);
         player.play(true);
-        assert_eq!(player.get_actions(), &SAFE_ACTIONS.to_vec());
+        assert_eq!(player.get_actions().to_owned(), SAFE_ACTIONS.to_owned());
     }
 }

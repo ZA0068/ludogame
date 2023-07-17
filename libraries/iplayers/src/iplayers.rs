@@ -91,11 +91,11 @@ mod iplayers {
         player: Player,
         playstyle: Option<Playstyle>,
         select_which_piece: Select,
-        actions: Option<Vec<Act>>,
-        wins: u16,
-        pub winrate: f64,
+        actions: Option<[Act; 10]>,
         dice_number: i8,
-        pub first_round: bool,
+        wins: u16,
+        winrate: f64,
+        first_round: bool,
     }
 
     pub trait Behavior {
@@ -202,7 +202,7 @@ mod iplayers {
             }
         }
 
-        pub fn replace(&mut self, iplayer: IPlayer) {
+        pub fn substitute(&mut self, iplayer: &mut IPlayer) {
             self.playstyle = iplayer.playstyle;
             self.actions = iplayer.actions;
             self.select_which_piece = iplayer.select_which_piece;
@@ -212,7 +212,7 @@ mod iplayers {
             self.first_round = iplayer.first_round;
         }
 
-        pub fn set_actions(&mut self, actions: Vec<Act>) {
+        pub fn set_actions(&mut self, actions: [Act; 10]) {
             self.actions = Some(actions);
         }
 
@@ -243,7 +243,7 @@ mod iplayers {
             }
         }
 
-        pub fn get_actions(&self) -> &Vec<Act> {
+        pub fn get_actions(&self) -> &[Act; 10] {
             if let Some(actions) = &self.actions {
                 actions
             } else {
@@ -259,8 +259,21 @@ mod iplayers {
             self.winrate = self.wins as f64 / total_games as f64 * 100.0;
         }
 
+        pub fn get_winrate(&self) -> &f64 {
+            &self.winrate
+        }
+
         pub fn print_winrate(&self) {
             println!("Winrate: {}%", self.winrate);
+        }
+
+        pub fn reset_scores(&mut self) {
+            self.wins = 0;
+            self.winrate = 0.0;
+        }
+
+        pub fn reset_first_round(&mut self) {
+            self.first_round = true;
         }
 
         pub fn dice_number(&self) -> i8 {
@@ -332,13 +345,13 @@ mod iplayers {
         }
     }
 
-    fn get_action_from_playstyle(playstyle: Playstyle) -> Option<Vec<Act>> {
+    fn get_action_from_playstyle(playstyle: Playstyle) -> Option<[Act; 10]> {
         match playstyle {
-            Playstyle::Aggressive => Some(AGGRO_ACTIONS.to_vec()),
-            Playstyle::Fast => Some(FAST_ACTIONS.to_vec()),
-            Playstyle::Random => Some(ACTIONS.to_vec()),
-            Playstyle::Safe => Some(SAFE_ACTIONS.to_vec()),
-            Playstyle::FastAggressive => Some(FAST_AGGRO_ACTIONS.to_vec()),
+            Playstyle::Aggressive => Some(AGGRO_ACTIONS),
+            Playstyle::Fast => Some(FAST_ACTIONS),
+            Playstyle::Random => Some(ACTIONS),
+            Playstyle::Safe => Some(SAFE_ACTIONS),
+            Playstyle::FastAggressive => Some(FAST_AGGRO_ACTIONS),
             Playstyle::GeneticAlgorithm => None,
         }
     }

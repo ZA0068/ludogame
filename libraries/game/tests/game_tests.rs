@@ -92,5 +92,14 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(2, Playstyle::Safe);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
         game.start_game(1000);
+        game.iplayer(0).calculate_winrate(1000);
+        game.iplayer(1).calculate_winrate(1000);
+        game.iplayer(2).calculate_winrate(1000);
+        game.iplayer(3).calculate_winrate(1000);
+        game.iplayer(0).print_winrate();
+        game.iplayer(1).print_winrate();
+        game.iplayer(2).print_winrate();
+        game.iplayer(3).print_winrate();
+
     }
 }
