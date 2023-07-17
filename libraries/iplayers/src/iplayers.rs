@@ -70,11 +70,7 @@ mod iplayers {
         Act::Nothing,
     ];
 
-    pub static SELECTIONS: [Select; 3] = [
-        Select::Nearest,
-        Select::Furthest,
-        Select::Random,
-    ];
+    pub static SELECTIONS: [Select; 3] = [Select::Nearest, Select::Furthest, Select::Random];
 
     #[derive(Clone, Copy, Debug, PartialEq)]
     pub enum Playstyle {
@@ -301,11 +297,9 @@ mod iplayers {
         }
 
         fn choose_ordered_action(&mut self, select: Select) {
-            self.player.action = self.player.get_ordered_action(
-                *self.get_actions(),
-                self.dice_number,
-                select,
-            );
+            self.player.action =
+                self.player
+                    .get_ordered_action(*self.get_actions(), self.dice_number, select);
         }
 
         fn random(&mut self) {

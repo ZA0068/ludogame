@@ -8,9 +8,10 @@ edition = "2021"
 members = [
     "libraries/players",
 ]
+
 [lib]
-name = "game"
-path = "src/game.rs"
+name = "main"
+path = "src/main.rs"
 
 [dependencies]
 board = { path = "libraries/board" }

@@ -1,5 +1,5 @@
-use genetic_algorithm::GeneticAlgorithm;
 use game::Game;
+use genetic_algorithm::GeneticAlgorithm;
 use iplayers::{Playstyle, ACTIONS, SELECTIONS};
 
 #[cfg(test)]

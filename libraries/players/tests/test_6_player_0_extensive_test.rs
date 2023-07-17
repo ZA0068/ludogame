@@ -2479,8 +2479,7 @@ mod player_0_play_test {
 
         other_player.update_outside(1, 13, 50);
 
-        result =
-            player.get_ordered_action(FAST_AGGRO_ACTIONS, dice_number, Select::Nearest);
+        result = player.get_ordered_action(FAST_AGGRO_ACTIONS, dice_number, Select::Nearest);
         assert_eq!(result.0, Act::Kill);
         assert_eq!(result.1, 3);
 

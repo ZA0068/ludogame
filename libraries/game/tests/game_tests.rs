@@ -100,6 +100,5 @@ mod init_game_test {
         game.iplayer(1).print_winrate();
         game.iplayer(2).print_winrate();
         game.iplayer(3).print_winrate();
-
     }
 }

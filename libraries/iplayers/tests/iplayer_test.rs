@@ -125,7 +125,7 @@ mod iplayer_tests {
 
     #[test]
     fn aggro_player_test() {
-        let mut player =  IPlayer::create(0, Playstyle::Aggressive);
+        let mut player = IPlayer::create(0, Playstyle::Aggressive);
         let dice = Dice::default();
         let board = Rc::new(RefCell::new(Board::new()));
         player.setup_board(board);
@@ -142,7 +142,10 @@ mod iplayer_tests {
         player.setup_board(board);
         player.take_dice(dice);
         player.play(true);
-        assert_eq!(player.get_actions().to_owned(), FAST_AGGRO_ACTIONS.to_owned());
+        assert_eq!(
+            player.get_actions().to_owned(),
+            FAST_AGGRO_ACTIONS.to_owned()
+        );
     }
 
     #[test]

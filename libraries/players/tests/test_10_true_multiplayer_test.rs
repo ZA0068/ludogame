@@ -663,11 +663,7 @@ mod playstyle_tests {
                 random_player.drop_dice();
                 aggressive_player.get_dice(dice.clone());
                 aggressive_player.my_turn();
-                play_ordered(
-                    &mut aggressive_player,
-                    AGGRO_ACTIONS,
-                    take_nearest_piece,
-                );
+                play_ordered(&mut aggressive_player, AGGRO_ACTIONS, take_nearest_piece);
                 if aggressive_player.is_finished() {
                     println!("aggressive_player wins");
                     winrates[1] += 1.0;
