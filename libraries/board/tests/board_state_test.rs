@@ -1,5 +1,5 @@
 use board::{BoardState, PlayerID};
-use pieces::{Piece, Color};
+use pieces::{Color, Piece};
 use std::any::{Any, TypeId};
 use std::{cell::RefCell, rc::Rc};
 

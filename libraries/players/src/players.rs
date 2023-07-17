@@ -36,7 +36,7 @@ mod players {
         Random,
     }
 
-    #[derive(PartialEq, Debug, Copy, Clone)]
+    #[derive(PartialEq, Eq, Hash, Debug, Copy, Clone)]
     pub enum Act {
         Move,
         Free,

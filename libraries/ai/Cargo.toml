@@ -10,6 +10,7 @@ name = "ai"
 path = "src/ai.rs"
 
 [dependencies]
+iplayers = { path = "../iplayers" }
 players = { path = "../players" }
 game = { path = "../game" }
 rand = "0.8.4"

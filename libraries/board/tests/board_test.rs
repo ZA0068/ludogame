@@ -1,4 +1,4 @@
-use board::{Board};
+use board::Board;
 use std::any::{Any, TypeId};
 #[cfg(test)]
 mod board_tests {

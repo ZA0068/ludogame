@@ -53,7 +53,6 @@ mod pieces_test {
         assert!(piece.is_free());
     }
 
-
     #[test]
     fn death_pieces_test() {
         let mut piece = Piece::new(1, Color::Green);

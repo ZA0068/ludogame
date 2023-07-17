@@ -1,5 +1,5 @@
 use board::{Board, PlayerID};
-use pieces::{Piece, Color};
+use pieces::{Color, Piece};
 use std::{cell::RefCell, rc::Rc};
 
 mod board_space_tests {

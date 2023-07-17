@@ -30,8 +30,8 @@ mod pieces {
                 color,
                 position: -1,
                 state: State::Home,
-                }
             }
+        }
 
         pub fn id(&self) -> i8 {
             self.id
@@ -61,7 +61,6 @@ mod pieces {
             assert!((-1..=71).contains(&position) && position != 99);
             self.position = position;
         }
-
 
         pub fn dead(&mut self) {
             self.home();

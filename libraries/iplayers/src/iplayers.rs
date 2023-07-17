@@ -1,25 +1,24 @@
 mod iplayers {
+    use board::Board;
+    use dice::Dice;
+    use players::{Act, Player, Select};
     use std::cell::RefCell;
     use std::rc::Rc;
-    use board::Board;
-    use players::{Act, Player, Select};
-    use dice::Dice;
 
+    pub static AGGRO_ACTIONS: [Act; 10] = [
+        Act::Kill,
+        Act::Move,
+        Act::Join,
+        Act::Free,
+        Act::Goal,
+        Act::Starjump,
+        Act::Leave,
+        Act::Safe,
+        Act::Nothing,
+        Act::Die,
+    ];
 
-    static AGGRO_ACTIONS: [Act; 10] = [
-        Act::Kill,
-        Act::Move,
-        Act::Join,
-        Act::Free,
-        Act::Goal,
-        Act::Starjump,
-        Act::Leave,
-        Act::Safe,
-        Act::Nothing,
-        Act::Die,
-    ];
-    
-    static FAST_AGGRO_ACTIONS: [Act; 10] = [
+    pub static FAST_AGGRO_ACTIONS: [Act; 10] = [
         Act::Kill,
         Act::Goal,
         Act::Starjump,
@@ -31,8 +30,8 @@ mod iplayers {
         Act::Nothing,
         Act::Die,
     ];
-    
-    static SAFE_ACTIONS: [Act; 10] = [
+
+    pub static SAFE_ACTIONS: [Act; 10] = [
         Act::Join,
         Act::Safe,
         Act::Goal,
@@ -44,8 +43,8 @@ mod iplayers {
         Act::Nothing,
         Act::Die,
     ];
-    
-    static FAST_ACTIONS: [Act; 10] = [
+
+    pub static FAST_ACTIONS: [Act; 10] = [
         Act::Goal,
         Act::Starjump,
         Act::Leave,
@@ -57,8 +56,8 @@ mod iplayers {
         Act::Nothing,
         Act::Die,
     ];
-    
-    static DEFAULT_ACTIONS: [Act; 10] = [
+
+    pub static ACTIONS: [Act; 10] = [
         Act::Move,
         Act::Free,
         Act::Kill,
@@ -71,9 +70,13 @@ mod iplayers {
         Act::Nothing,
     ];
 
+    pub static SELECTIONS: [Select; 3] = [
+        Select::Nearest,
+        Select::Furthest,
+        Select::Random,
+    ];
 
-
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, Copy, Debug, PartialEq)]
     pub enum Playstyle {
         Aggressive,
         Fast,
@@ -83,16 +86,16 @@ mod iplayers {
         GeneticAlgorithm,
     }
 
-
     #[derive(Clone, Debug, PartialEq)]
     pub struct IPlayer {
         player: Player,
         playstyle: Option<Playstyle>,
+        select_which_piece: Select,
         actions: Option<Vec<Act>>,
         wins: u16,
-        winrate: f64,
+        pub winrate: f64,
         dice_number: i8,
-        first_round: bool,
+        pub first_round: bool,
     }
 
     pub trait Behavior {
@@ -171,43 +174,60 @@ mod iplayers {
             self.wins += 1;
         }
     }
-    
-    impl IPlayer {
 
+    impl IPlayer {
         pub fn new(id: i8) -> Self {
             IPlayer {
-                player : Player::new(id),
+                player: Player::new(id),
                 playstyle: None,
                 actions: None,
+                select_which_piece: Select::Random,
                 wins: 0,
                 winrate: 0.0,
                 dice_number: 0,
                 first_round: true,
             }
         }
-        
+
         pub fn create(id: i8, playstyle: Playstyle) -> Self {
             IPlayer {
-                player : Player::new(id),
-                playstyle: Some(playstyle.clone()),
+                player: Player::new(id),
+                playstyle: Some(playstyle),
                 actions: get_action_from_playstyle(playstyle),
+                select_which_piece: Select::Random,
                 wins: 0,
                 winrate: 0.0,
                 dice_number: 0,
                 first_round: true,
             }
+        }
+
+        pub fn replace(&mut self, iplayer: IPlayer) {
+            self.playstyle = iplayer.playstyle;
+            self.actions = iplayer.actions;
+            self.select_which_piece = iplayer.select_which_piece;
+            self.wins = iplayer.wins;
+            self.winrate = iplayer.winrate;
+            self.dice_number = iplayer.dice_number;
+            self.first_round = iplayer.first_round;
         }
 
         pub fn set_actions(&mut self, actions: Vec<Act>) {
             self.actions = Some(actions);
         }
 
+        pub fn select_which_piece(&mut self, select: Select) {
+            self.select_which_piece = select;
+        }
+
         pub fn set_playstyle(&mut self, playstyle: Playstyle) {
-            self.actions = get_action_from_playstyle(playstyle.clone());
+            if let Some(action) = get_action_from_playstyle(playstyle) {
+                self.actions = Some(action);
+            }
             self.playstyle = Some(playstyle);
         }
 
-        pub fn setup_iplayer(&mut self, board: Rc<RefCell<Board>>) {
+        pub fn setup_board(&mut self, board: Rc<RefCell<Board>>) {
             self.player.setup(board);
         }
 
@@ -231,6 +251,10 @@ mod iplayers {
             }
         }
 
+        pub fn get_piece_selector(&self) -> &Select {
+            &self.select_which_piece
+        }
+
         pub fn calculate_winrate(&mut self, total_games: u16) {
             self.winrate = self.wins as f64 / total_games as f64 * 100.0;
         }
@@ -244,7 +268,7 @@ mod iplayers {
         }
 
         fn genetic(&mut self) {
-            self.choose_random_action();
+            self.choose_ordered_action(self.select_which_piece);
         }
 
         fn safe(&mut self) {
@@ -264,7 +288,11 @@ mod iplayers {
         }
 
         fn choose_ordered_action(&mut self, select: Select) {
-            self.player.action = self.player.get_ordered_action(self.get_actions().clone(), self.dice_number, select);
+            self.player.action = self.player.get_ordered_action(
+                self.get_actions().clone(),
+                self.dice_number,
+                select,
+            );
         }
 
         fn random(&mut self) {
@@ -272,7 +300,9 @@ mod iplayers {
         }
 
         fn choose_random_action(&mut self) {
-            let movesets = self.player.generate_vector_of_random_actions(self.get_actions().clone(), self.dice_number);
+            let movesets = self
+                .player
+                .generate_vector_of_random_actions(self.get_actions().clone(), self.dice_number);
             self.player.action = self.player.select_random_piece(movesets);
         }
 
@@ -280,7 +310,11 @@ mod iplayers {
             if debug {
                 self.log_moves();
             } else {
-                self.player.make_move(self.player.action.1, self.dice_number, self.player().action.0);
+                self.player.make_move(
+                    self.player.action.1,
+                    self.dice_number,
+                    self.player().action.0,
+                );
             }
         }
 
@@ -288,7 +322,11 @@ mod iplayers {
             println!("\n\n------------------------");
             println!("Prior play\n");
             self.player.print_status();
-            self.player.make_move(self.player.action.1, self.dice_number, self.player().action.0);
+            self.player.make_move(
+                self.player.action.1,
+                self.dice_number,
+                self.player().action.0,
+            );
             println!("Posterior play\n");
             self.player.print_status();
         }
@@ -298,13 +336,12 @@ mod iplayers {
         match playstyle {
             Playstyle::Aggressive => Some(AGGRO_ACTIONS.to_vec()),
             Playstyle::Fast => Some(FAST_ACTIONS.to_vec()),
-            Playstyle::Random => Some(DEFAULT_ACTIONS.to_vec()),
+            Playstyle::Random => Some(ACTIONS.to_vec()),
             Playstyle::Safe => Some(SAFE_ACTIONS.to_vec()),
             Playstyle::FastAggressive => Some(FAST_AGGRO_ACTIONS.to_vec()),
             Playstyle::GeneticAlgorithm => None,
         }
     }
-
 }
 
-pub use iplayers::{Behavior, IPlayer, Playstyle};
+pub use iplayers::{Behavior, IPlayer, Playstyle, ACTIONS, SELECTIONS};

@@ -1,8 +1,8 @@
 use board::Board;
 use dice::Dice;
 use players::{Act, Player, Select};
-use std::{cell::RefCell, rc::Rc};
 use std::time::Instant;
+use std::{cell::RefCell, rc::Rc};
 
 mod multiplayer_tests {
     use super::*;
@@ -572,7 +572,10 @@ mod multiplayer_tests {
             "Player 3 winrate: {}",
             winrates[3] / (1.0 * max_iter as f32)
         );
-        println!("Time elapsed in expensive_function() is: {:?}", timer/max_iter as f64);
+        println!(
+            "Time elapsed in expensive_function() is: {:?}",
+            timer / max_iter as f64
+        );
     }
 
     fn play_random(player: &mut Player, actions: Vec<Act>) {
