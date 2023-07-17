@@ -22,5 +22,4 @@ pieces = { path = "libraries/pieces" }
 genetic_algorithm = { path = "libraries/genetic_algorithm" }
 game = { path = "libraries/game" }
 rand = "0.8.4"
-yew = "0.20.0"
 csv = "1.1.6"

@@ -84,7 +84,7 @@ mod genetic_algorithm_test {
         ga.set_evaluator(game);
         ga.set_population_size(10);
         ga.initialize_all_populations();
-        ga.evaluate_fitness_for_all_populations();
+        ga.evaluate_fitness_for_all_populations(0);
     }
 
     #[test]
@@ -101,7 +101,7 @@ mod genetic_algorithm_test {
         ga.set_population_size(10);
         ga.set_elitism_count(2);
         ga.initialize_all_populations();
-        ga.evaluate_fitness_for_all_populations();
+        ga.evaluate_fitness_for_all_populations(0);
         ga.select_best_populations();
         assert_eq!(ga.population().len(), 2);
     }
@@ -142,7 +142,7 @@ mod genetic_algorithm_test {
         ga.set_population_size(10);
         ga.set_elitism_count(2);
         ga.initialize_all_populations();
-        ga.evaluate_fitness_for_all_populations();
+        ga.evaluate_fitness_for_all_populations(0);
         ga.select_best_populations();
         ga.create_children_and_replace_bad_populations();
         assert_eq!(ga.population().len(), 10);
@@ -170,6 +170,7 @@ mod genetic_algorithm_test {
     #[test]
     fn genetic_algorithm_test_2() {
         let mut ga = GeneticAlgorithm::default();
+        ga.set_write_to_csv(true);
         ga.initialize_all_populations();
         ga.run_gentic_algorithm();
     }

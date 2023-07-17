@@ -3,7 +3,6 @@ mod genetic_algorithm {
     use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
     use players::{Act, Select};
     use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
-    
 
     pub enum CrossoverType {
         SinglePoint,
@@ -13,6 +12,7 @@ mod genetic_algorithm {
 
     pub struct GeneticAlgorithm {
         population: Vec<IPlayer>,
+        data: Vec<(usize, Vec<IPlayer>)>,
         evaluator: Box<Game>,
         population_size: usize,
         mutation_rate: f64,
@@ -20,6 +20,7 @@ mod genetic_algorithm {
         elitism_count: usize,
         tournament_size: usize,
         total_games: u16,
+        write_to_csv: bool,
         rng: ThreadRng,
     }
 
@@ -27,6 +28,7 @@ mod genetic_algorithm {
         pub fn new() -> GeneticAlgorithm {
             GeneticAlgorithm {
                 population: Vec::new(),
+                data: Vec::new(),
                 evaluator: Box::default(),
                 population_size: 0,
                 mutation_rate: 0.0,
@@ -34,16 +36,21 @@ mod genetic_algorithm {
                 elitism_count: 0,
                 tournament_size: 0,
                 total_games: 100,
+                write_to_csv: false,
                 rng: thread_rng(),
             }
         }
 
         pub fn run_gentic_algorithm(&mut self) {
             self.initialize_all_populations();
-            for _ in 0..self.tournament_size {
-                self.evaluate_fitness_for_all_populations();
+            for tournament_size in 0..self.tournament_size {
+                self.evaluate_fitness_for_all_populations(tournament_size);
                 self.select_best_populations();
                 self.create_children_and_replace_bad_populations();
+            }
+            self.evaluate_fitness_for_all_populations(self.tournament_size);
+            if self.write_to_csv {
+                self.export_2_csv();
             }
         }
 
@@ -123,23 +130,29 @@ mod genetic_algorithm {
             self.elitism_count = elitism_count;
         }
 
+        pub fn set_write_to_csv(&mut self, write_to_csv: bool) {
+            self.write_to_csv = write_to_csv;
+        }
+
         pub fn set_tournament_size(&mut self, tournament_size: usize) {
             self.tournament_size = tournament_size;
         }
 
-        pub fn evaluate_fitness_for_all_populations(&mut self) {
+        pub fn evaluate_fitness_for_all_populations(&mut self, tournament_size: usize) {
             for population in self.population.iter_mut() {
                 self.evaluator.set_iplayer(0, population);
                 self.evaluator.start_game(self.total_games);
                 self.evaluator.get_iplayer(0, population);
                 population.calculate_winrate(self.total_games);
-                population.print_winrate()
+            }
+            if self.write_to_csv {
+                self.data.push((tournament_size, self.population.clone()));
             }
         }
 
         pub fn create_children_and_replace_bad_populations(&mut self) {
             let first_parent = self.population[0].clone();
-            let second_parent = self.population[1].clone();
+            let second_parent = self.population.choose(&mut self.rng).unwrap().clone();
             let mut children: Vec<IPlayer> = Vec::new();
             for _i in 0..(self.population_size - self.elitism_count) {
                 let parent_actions_1 = first_parent.get_actions();
@@ -156,6 +169,19 @@ mod genetic_algorithm {
                 children.push(self.create_child(child_action_mutated, child_selector_mutated));
             }
             self.population.append(&mut children);
+        }
+
+        pub fn export_2_csv(&mut self) {
+            for (tournament_index, iplayers) in &self.data {
+                let filename = format!("data/GA_data_{}.csv", tournament_index);
+                let mut wtr = csv::Writer::from_path(filename).unwrap();
+                for iplayer in iplayers {
+                    let id = iplayer.player().id().to_string();
+                    let winrate = iplayer.get_winrate().to_string();
+                    wtr.write_record(&[id, winrate]).unwrap();
+                }
+                wtr.flush().unwrap();
+            }
         }
 
         pub fn try_to_crossover_selector(
@@ -342,6 +368,7 @@ mod genetic_algorithm {
             let evaluator = Box::new(game);
             GeneticAlgorithm {
                 population: Vec::new(),
+                data: Vec::new(),
                 evaluator,
                 population_size: 10,
                 mutation_rate: 0.01,
@@ -349,6 +376,7 @@ mod genetic_algorithm {
                 elitism_count: 2,
                 tournament_size: 5,
                 total_games: 100,
+                write_to_csv: false,
                 rng: thread_rng(),
             }
         }
