@@ -302,7 +302,7 @@ mod iplayers {
 
         fn choose_ordered_action(&mut self, select: Select) {
             self.player.action = self.player.get_ordered_action(
-                self.get_actions().clone(),
+                *self.get_actions(),
                 self.dice_number,
                 select,
             );
@@ -315,7 +315,7 @@ mod iplayers {
         fn choose_random_action(&mut self) {
             let movesets = self
                 .player
-                .generate_vector_of_random_actions(self.get_actions().clone(), self.dice_number);
+                .generate_vector_of_random_actions(*self.get_actions(), self.dice_number);
             self.player.action = self.player.select_random_piece(movesets);
         }
 

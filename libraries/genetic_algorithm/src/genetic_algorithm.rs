@@ -1,9 +1,15 @@
-mod ai {
+mod genetic_algorithm {
     use game::Game;
     use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
     use players::{Act, Select};
     use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
     use std::collections::HashSet;
+
+    pub enum CrossoverType {
+        SinglePoint,
+        TwoPoint,
+        Uniform,
+    }
 
     pub struct GeneticAlgorithm {
         population: Vec<IPlayer>,
@@ -143,21 +149,92 @@ mod ai {
             evaluator.get_iplayer(0, population);
         }
 
-        pub fn create_children_and_replace_bad_populationa(&mut self) {
+        pub fn create_children_and_replace_bad_populations(&mut self) {
             let first_parent = self.population[0].clone();
             let second_parent = self.population[1].clone();
             let mut children: Vec<IPlayer> = Vec::new();
-            let mut rng = thread_rng();
-
-            for i in 0..(self.population_size - self.elitism_count) {
+            for _i in 0..(self.population_size - self.elitism_count) {
                 let parent_actions_1 = first_parent.get_actions();
+                let parent_selector_1 = first_parent.get_piece_selector();
+                let parent_selector_2 = first_parent.get_piece_selector();
                 let parent_actions_2 = second_parent.get_actions();
 
-                let action3 = self.try_to_perform_crossover(parent_actions_1, parent_actions_2);
+                let child_action = self.try_to_crossover_actions(parent_actions_1, parent_actions_2);
+                let child_action_mutated = self.mutate_actions(child_action);
+                let child_selector = self.try_to_crossover_selector(parent_selector_1, parent_selector_2);
+                let child_selector_mutated = self.try_to_mutate_selector(child_selector);
+                children.push(self.create_child(child_action_mutated, child_selector_mutated));
+            }
+            self.population.append(&mut children);
+        }
+
+        pub fn try_to_crossover_selector(&mut self, selector1: &Select, selector2: &Select) -> Select {
+            let mut rng = thread_rng();
+            let crossover_rate = rng.gen_range(0.0..1.0);
+            if crossover_rate < self.crossover_rate {
+                self.crossover_selector(selector1, selector2)
+            } else {
+                self.inherit_from_parents_selector(selector1, selector2)
             }
         }
 
-        pub fn try_to_perform_crossover(
+        pub fn inherit_from_parents_selector(&mut self, selector1: &Select, selector2: &Select) -> Select {
+            let parent_inheritance = self.rng.gen_bool(0.5);
+            if parent_inheritance {
+                *selector1
+            } else {
+                *selector2
+            }
+        }
+
+        pub fn crossover_selector(&mut self, selector1: &Select, selector2: &Select) -> Select {
+            let crossover_point = self.rng.gen_range(0..3);
+            match crossover_point {
+                0 => *selector1,
+                1 => *selector2,
+                2 => Select::Random,
+                _ => panic!("Invalid crossover point"),
+            }
+        }
+
+        pub fn try_to_mutate_selector(&mut self, selector: Select) -> Select {
+            let mut rng = thread_rng();
+            let mutation_rate = rng.gen_range(0.0..1.0);
+            if mutation_rate < self.mutation_rate {
+                self.mutate_selector(selector)
+            } else {
+                selector
+            }
+        }
+
+        pub fn mutate_selector(&mut self, selector: Select) -> Select {
+            let mut rng = thread_rng();
+            let mut new_selector = selector;
+            loop {
+                let new_selector_int = rng.gen_range(0..=2);
+                new_selector = match new_selector_int {
+                    0 => Select::Nearest,
+                    1 => Select::Furthest,
+                    2 => Select::Random,
+                    _ => panic!("Invalid selector"),
+                };
+                if new_selector != selector {
+                    break;
+                }
+            }
+            new_selector
+        }
+
+
+        pub fn create_child(&mut self, actions: [Act; 10], selector: Select) -> IPlayer {
+            let mut iplayer = IPlayer::new(0);
+            iplayer.set_playstyle(Playstyle::GeneticAlgorithm);
+            iplayer.set_actions(actions);
+            iplayer.select_which_piece(selector);
+            iplayer
+        }
+
+        pub fn try_to_crossover_actions(
             &mut self,
             parent_actions_1: &[Act; 10],
             parent_actions_2: &[Act; 10],
@@ -165,14 +242,14 @@ mod ai {
             let mut rng = thread_rng();
             let crossover_rate = rng.gen_range(0.0..1.0);
             if crossover_rate < self.crossover_rate {
-                self.crossover(parent_actions_1, parent_actions_2)
+                self.crossover_actions(parent_actions_1, parent_actions_2)
             } else {
                 self.inherit_from_parents(parent_actions_2, parent_actions_1)
             }
         }
 
         fn two_point_crossover(&mut self, parent1: &[Act; 10], parent2: &[Act; 10]) -> [Act; 10] {
-            let crossover_point1 = self.rng.gen_range(0..10);
+            let crossover_point1: usize = self.rng.gen_range(0..10);
             let crossover_point2 = self.rng.gen_range(crossover_point1..10);
             let mut child = ACTIONS;
             for i in 0..crossover_point1 {
@@ -203,7 +280,7 @@ mod ai {
             child
         }
 
-        fn uniform_crossover(
+        pub fn uniform_crossover(
             &mut self,
             first_parent_actions: &[Act; 10],
             second_parent_actions: &[Act; 10],
@@ -232,7 +309,7 @@ mod ai {
             result
         }
 
-        fn inherit_from_parents(
+        pub fn inherit_from_parents(
             &mut self,
             parent_actions_2: &[Act; 10],
             parent_actions_1: &[Act; 10],
@@ -245,7 +322,7 @@ mod ai {
             }
         }
 
-        fn crossover(
+        fn crossover_actions(
             &mut self,
             parent_actions_1: &[Act; 10],
             parent_actions_2: &[Act; 10],
@@ -258,20 +335,18 @@ mod ai {
                 _ => panic!("Invalid crossover type"),
             }
         }
-
-        pub fn remove_duplicates(&mut self, actions: [Act; 10]) -> [Act; 10] {
-            let mut actions = actions.to_vec();
-            let mut seen = HashSet::new();
-            actions.retain(|&x| seen.insert(x));
-            if actions.len() < ACTIONS.len() {
-                for action in &ACTIONS {
-                    if !seen.contains(action) {
-                        actions.push(*action);
-                    }
+        
+        pub fn mutate_actions(&mut self, actions: [Act; 10]) -> [Act; 10] {
+            let mut mutated_actions = actions;
+            for i in 0..10 {
+                let mutation_rate = self.rng.gen_range(0.0..1.0);
+                if mutation_rate < self.mutation_rate {
+                    mutated_actions[i] = *ACTIONS.choose(&mut self.rng).unwrap();
                 }
             }
-            actions.try_into().unwrap()
+            mutated_actions
         }
+
     }
 
     impl Default for GeneticAlgorithm {
@@ -290,4 +365,4 @@ mod ai {
     }
 }
 
-pub use ai::GeneticAlgorithm;
+pub use genetic_algorithm::{GeneticAlgorithm, CrossoverType};
