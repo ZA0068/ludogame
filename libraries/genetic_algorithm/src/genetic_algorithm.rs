@@ -3,7 +3,7 @@ mod genetic_algorithm {
     use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
     use players::{Act, Select};
     use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
-    use std::rc::Rc;
+    
 
     pub enum CrossoverType {
         SinglePoint,
@@ -42,7 +42,7 @@ mod genetic_algorithm {
             self.initialize_all_populations();
             for _ in 0..self.tournament_size {
                 self.evaluate_fitness_for_all_populations();
-                self.select_the_n_best_populations();
+                self.select_best_populations();
                 self.create_children_and_replace_bad_populations();
             }
         }
@@ -98,7 +98,7 @@ mod genetic_algorithm {
             }
         }
 
-        pub fn select_the_n_best_populations(&mut self) {
+        pub fn select_best_populations(&mut self) {
             if self.elitism_count == 0 {
                 panic!("Elitism count must be greater than 0");
             }

@@ -102,7 +102,7 @@ mod genetic_algorithm_test {
         ga.set_elitism_count(2);
         ga.initialize_all_populations();
         ga.evaluate_fitness_for_all_populations();
-        ga.select_the_n_best_populations();
+        ga.select_best_populations();
         assert_eq!(ga.population().len(), 2);
     }
 
@@ -143,7 +143,7 @@ mod genetic_algorithm_test {
         ga.set_elitism_count(2);
         ga.initialize_all_populations();
         ga.evaluate_fitness_for_all_populations();
-        ga.select_the_n_best_populations();
+        ga.select_best_populations();
         ga.create_children_and_replace_bad_populations();
         assert_eq!(ga.population().len(), 10);
     }
