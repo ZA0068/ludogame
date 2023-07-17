@@ -3,7 +3,7 @@ mod genetic_algorithm {
     use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
     use players::{Act, Select};
     use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
-    use std::collections::HashSet;
+    
 
     pub enum CrossoverType {
         SinglePoint,
