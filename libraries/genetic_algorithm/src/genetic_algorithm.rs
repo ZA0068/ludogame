@@ -207,21 +207,20 @@ mod genetic_algorithm {
 
         pub fn mutate_selector(&mut self, selector: Select) -> Select {
             let mut rng = thread_rng();
-            let mut new_selector = selector;
             loop {
                 let new_selector_int = rng.gen_range(0..=2);
-                new_selector = match new_selector_int {
+                let new_selector = match new_selector_int {
                     0 => Select::Nearest,
                     1 => Select::Furthest,
                     2 => Select::Random,
                     _ => panic!("Invalid selector"),
                 };
                 if new_selector != selector {
-                    break;
+                    return new_selector;
                 }
             }
-            new_selector
         }
+        
 
         pub fn create_child(&mut self, actions: [Act; 10], selector: Select) -> IPlayer {
             let mut iplayer = IPlayer::new(0);
@@ -249,34 +248,20 @@ mod genetic_algorithm {
             let crossover_point1: usize = self.rng.gen_range(0..10);
             let crossover_point2 = self.rng.gen_range(crossover_point1..10);
             let mut child = ACTIONS;
-            for i in 0..crossover_point1 {
-                child[i] = parent1[i];
-            }
-            for i in crossover_point1..crossover_point2 {
-                child[i] = parent2[i];
-            }
-            for i in crossover_point2..10 {
-                child[i] = parent1[i];
-            }
+            child[0..crossover_point1].copy_from_slice(&parent1[0..crossover_point1]);
+            child[crossover_point1..crossover_point2].copy_from_slice(&parent2[crossover_point1..crossover_point2]);
+            child[crossover_point2..10].copy_from_slice(&parent1[crossover_point2..10]);
             child
         }
-
-        fn single_point_crossover(
-            &mut self,
-            parent1: &[Act; 10],
-            parent2: &[Act; 10],
-        ) -> [Act; 10] {
+        
+        fn single_point_crossover(&mut self, parent1: &[Act; 10], parent2: &[Act; 10]) -> [Act; 10] {
             let crossover_point = self.rng.gen_range(0..10);
             let mut child = ACTIONS;
-            for i in 0..crossover_point {
-                child[i] = parent1[i];
-            }
-            for i in crossover_point..10 {
-                child[i] = parent2[i];
-            }
+            child[0..crossover_point].copy_from_slice(&parent1[0..crossover_point]);
+            child[crossover_point..10].copy_from_slice(&parent2[crossover_point..10]);
             child
         }
-
+        
         pub fn uniform_crossover(
             &mut self,
             first_parent_actions: &[Act; 10],
@@ -335,14 +320,15 @@ mod genetic_algorithm {
 
         pub fn mutate_actions(&mut self, actions: [Act; 10]) -> [Act; 10] {
             let mut mutated_actions = actions;
-            for i in 0..10 {
+            for action in mutated_actions.iter_mut() {
                 let mutation_rate = self.rng.gen_range(0.0..1.0);
                 if mutation_rate < self.mutation_rate {
-                    mutated_actions[i] = *ACTIONS.choose(&mut self.rng).unwrap();
+                    *action = *ACTIONS.choose(&mut self.rng).unwrap();
                 }
             }
             mutated_actions
         }
+        
     }
 
     impl Default for GeneticAlgorithm {
