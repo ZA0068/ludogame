@@ -64,7 +64,8 @@ mod game {
         }
 
         pub fn iplayer(&mut self, id: i8) -> &mut IPlayer {
-            &mut self.iplayers[id as usize]
+            let index = self.iplayers.iter().position(|player| player.player().id() == id).unwrap();
+            &mut self.iplayers[index]
         }
 
         pub fn give_iplayer_a_playstyle(&mut self, id: i8, playstyle: Playstyle) {
@@ -112,16 +113,10 @@ mod game {
 
         pub fn beginning(&mut self) {
             let mut scores: Vec<(i8, i32)> = vec![(0, 0), (1, 0), (2, 0), (3, 0)];
-
-            // Roll the dice for all players initially.
             self.roll_dice_for_players(&mut scores);
-
-            // Continue rolling dice and adjusting scores while there are ties.
             while self.has_ties(&scores) {
                 self.adjust_scores_for_tied_players(&mut scores);
             }
-
-            // Sort players by their scores in descending order.
             self.sort_players_by_scores(&scores);
             self.iplayers[0].take_dice(self.dice.clone());
         }
@@ -143,7 +138,7 @@ mod game {
             for (idx, iplayer) in self.iplayers.iter_mut().enumerate() {
                 iplayer.take_dice(self.dice.clone());
                 iplayer.roll_dice();
-                scores[idx].1 += iplayer.player().get_dice_number() as i32; // Add the new dice roll to the current score.
+                scores[idx].1 += iplayer.player().get_dice_number() as i32;
             }
         }
 
@@ -151,12 +146,9 @@ mod game {
             loop {
                 self.roll_dice_for_players(scores);
                 let (tied_players, _max_score) = self.get_tied_players(scores);
-
-                // If there is a single max score, break the loop.
                 if tied_players.len() == 1 {
                     break;
                 }
-
                 for &player_id in &tied_players {
                     if let Some((_id, _player_score)) =
                         scores.iter_mut().find(|(id, _)| *id == player_id)

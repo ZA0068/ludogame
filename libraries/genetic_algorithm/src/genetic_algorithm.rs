@@ -3,7 +3,7 @@ mod genetic_algorithm {
     use iplayers::{IPlayer, Playstyle, ACTIONS, SELECTIONS};
     use players::{Act, Select};
     use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng, Rng};
-    
+    use std::rc::Rc;
 
     pub enum CrossoverType {
         SinglePoint,
@@ -13,12 +13,13 @@ mod genetic_algorithm {
 
     pub struct GeneticAlgorithm {
         population: Vec<IPlayer>,
-        evaluator: Game,
+        evaluator: Box<Game>,
         population_size: usize,
         mutation_rate: f64,
         crossover_rate: f64,
         elitism_count: usize,
         tournament_size: usize,
+        total_games: u16,
         rng: ThreadRng,
     }
 
@@ -26,13 +27,23 @@ mod genetic_algorithm {
         pub fn new() -> GeneticAlgorithm {
             GeneticAlgorithm {
                 population: Vec::new(),
-                evaluator: Game::new(),
+                evaluator: Box::default(),
                 population_size: 0,
                 mutation_rate: 0.0,
                 crossover_rate: 0.0,
                 elitism_count: 0,
                 tournament_size: 0,
+                total_games: 100,
                 rng: thread_rng(),
+            }
+        }
+
+        pub fn run_gentic_algorithm(&mut self) {
+            self.initialize_all_populations();
+            for _ in 0..self.tournament_size {
+                self.evaluate_fitness_for_all_populations();
+                self.select_the_n_best_populations();
+                self.create_children_and_replace_bad_populations();
             }
         }
 
@@ -61,10 +72,10 @@ mod genetic_algorithm {
         }
 
         pub fn set_evaluator(&mut self, evaluator: Game) {
-            self.evaluator = evaluator;
+            self.evaluator = Box::new(evaluator);
         }
 
-        pub fn set_populations(&mut self) {
+        pub fn initialize_all_populations(&mut self) {
             if self.population_size == 0 {
                 panic!("Population size is 0. Please set the population size");
             }
@@ -87,31 +98,13 @@ mod genetic_algorithm {
             }
         }
 
-        pub fn select_the_best_populations_among_all(&mut self) {
-            let mut best_population: Option<IPlayer> = None;
-            let mut second_best_population: Option<IPlayer> = None;
-
-            for population in &self.population {
-                if best_population.is_none()
-                    || population.get_winrate() > best_population.as_ref().unwrap().get_winrate()
-                {
-                    second_best_population = best_population.take();
-                    best_population = Some(population.clone());
-                } else if second_best_population.is_none()
-                    || population.get_winrate()
-                        > second_best_population.as_ref().unwrap().get_winrate()
-                {
-                    second_best_population = Some(population.clone());
-                }
+        pub fn select_the_n_best_populations(&mut self) {
+            if self.elitism_count == 0 {
+                panic!("Elitism count must be greater than 0");
             }
-
-            self.population.clear();
-            if let Some(best) = best_population {
-                self.population.push(best);
-            }
-            if let Some(second_best) = second_best_population {
-                self.population.push(second_best);
-            }
+            self.population
+                .sort_unstable_by(|a, b| b.get_winrate().partial_cmp(a.get_winrate()).unwrap());
+            self.population.truncate(self.elitism_count);
         }
 
         pub fn set_population_size(&mut self, population_size: usize) {
@@ -135,18 +128,13 @@ mod genetic_algorithm {
         }
 
         pub fn evaluate_fitness_for_all_populations(&mut self) {
-            let total_games = 100;
-            let mut evaluator = std::mem::replace(&mut self.evaluator, Game::new());
             for population in self.population.iter_mut() {
-                Self::evaluate(&mut evaluator, population, total_games);
-                population.calculate_winrate(total_games);
+                self.evaluator.set_iplayer(0, population);
+                self.evaluator.start_game(self.total_games);
+                self.evaluator.get_iplayer(0, population);
+                population.calculate_winrate(self.total_games);
+                population.print_winrate()
             }
-        }
-
-        fn evaluate(evaluator: &mut Game, population: &mut IPlayer, total_games: u16) {
-            evaluator.set_iplayer(0, population);
-            evaluator.start_game(total_games);
-            evaluator.get_iplayer(0, population);
         }
 
         pub fn create_children_and_replace_bad_populations(&mut self) {
@@ -159,16 +147,22 @@ mod genetic_algorithm {
                 let parent_selector_2 = first_parent.get_piece_selector();
                 let parent_actions_2 = second_parent.get_actions();
 
-                let child_action = self.try_to_crossover_actions(parent_actions_1, parent_actions_2);
+                let child_action =
+                    self.try_to_crossover_actions(parent_actions_1, parent_actions_2);
                 let child_action_mutated = self.mutate_actions(child_action);
-                let child_selector = self.try_to_crossover_selector(parent_selector_1, parent_selector_2);
+                let child_selector =
+                    self.try_to_crossover_selector(parent_selector_1, parent_selector_2);
                 let child_selector_mutated = self.try_to_mutate_selector(child_selector);
                 children.push(self.create_child(child_action_mutated, child_selector_mutated));
             }
             self.population.append(&mut children);
         }
 
-        pub fn try_to_crossover_selector(&mut self, selector1: &Select, selector2: &Select) -> Select {
+        pub fn try_to_crossover_selector(
+            &mut self,
+            selector1: &Select,
+            selector2: &Select,
+        ) -> Select {
             let mut rng = thread_rng();
             let crossover_rate = rng.gen_range(0.0..1.0);
             if crossover_rate < self.crossover_rate {
@@ -178,7 +172,11 @@ mod genetic_algorithm {
             }
         }
 
-        pub fn inherit_from_parents_selector(&mut self, selector1: &Select, selector2: &Select) -> Select {
+        pub fn inherit_from_parents_selector(
+            &mut self,
+            selector1: &Select,
+            selector2: &Select,
+        ) -> Select {
             let parent_inheritance = self.rng.gen_bool(0.5);
             if parent_inheritance {
                 *selector1
@@ -224,7 +222,6 @@ mod genetic_algorithm {
             }
             new_selector
         }
-
 
         pub fn create_child(&mut self, actions: [Act; 10], selector: Select) -> IPlayer {
             let mut iplayer = IPlayer::new(0);
@@ -335,7 +332,7 @@ mod genetic_algorithm {
                 _ => panic!("Invalid crossover type"),
             }
         }
-        
+
         pub fn mutate_actions(&mut self, actions: [Act; 10]) -> [Act; 10] {
             let mut mutated_actions = actions;
             for i in 0..10 {
@@ -346,23 +343,30 @@ mod genetic_algorithm {
             }
             mutated_actions
         }
-
     }
 
     impl Default for GeneticAlgorithm {
         fn default() -> Self {
+            let mut game = Game::new();
+            game.setup_game();
+            game.give_iplayer_a_playstyle(0, Playstyle::GeneticAlgorithm);
+            game.give_iplayer_a_playstyle(1, Playstyle::Random);
+            game.give_iplayer_a_playstyle(2, Playstyle::Fast);
+            game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+            let evaluator = Box::new(game);
             GeneticAlgorithm {
                 population: Vec::new(),
-                evaluator: Game::new(),
+                evaluator,
                 population_size: 10,
                 mutation_rate: 0.01,
                 crossover_rate: 0.95,
                 elitism_count: 2,
                 tournament_size: 5,
+                total_games: 100,
                 rng: thread_rng(),
             }
         }
     }
 }
 
-pub use genetic_algorithm::{GeneticAlgorithm, CrossoverType};
+pub use genetic_algorithm::{CrossoverType, GeneticAlgorithm};

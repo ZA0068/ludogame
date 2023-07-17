@@ -101,4 +101,27 @@ mod init_game_test {
         game.iplayer(2).print_winrate();
         game.iplayer(3).print_winrate();
     }
+
+    #[test]
+    fn get_iplayer_id_test() {
+        let mut game = Game::new();
+        game.setup_game();
+        game.give_iplayer_a_playstyle(0, Playstyle::Fast);
+        game.give_iplayer_a_playstyle(1, Playstyle::Random);
+        game.give_iplayer_a_playstyle(2, Playstyle::Safe);
+        game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+
+        for _ in 0..1000{
+            game.beginning();
+            let id0 = game.iplayer(0).player().id();
+            let id1 = game.iplayer(1).player().id();
+            let id2 = game.iplayer(2).player().id();
+            let id3 = game.iplayer(3).player().id();
+            assert_eq!(id0, 0);
+            assert_eq!(id1, 1);
+            assert_eq!(id2, 2);
+            assert_eq!(id3, 3);
+        }
+    }
+
 }
