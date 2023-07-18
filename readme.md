@@ -9,6 +9,12 @@ A Rust implementation of the classic board game Ludo.
 
 ## Installation
 
+Download the rust from their official website: <https://www.rust-lang.org/tools/install>
+
+if you use linux you can install rust using this command:
+
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
 Clone the repo:
 
     git clone https://github.com/your_username/ludo-game.git
