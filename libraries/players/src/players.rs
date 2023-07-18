@@ -5,7 +5,6 @@ mod players {
     use prettytable::{row, Table};
     use rand::prelude::SliceRandom;
     use std::fmt::{Display, Formatter, Result};
-    
 
     use std::{cell::RefCell, rc::Rc};
 
@@ -1009,7 +1008,7 @@ mod players {
             match self {
                 Select::Nearest => write!(f, "Nearest"),
                 Select::Furthest => write!(f, "Furthest"),
-                Select::Random=> write!(f, "Random"),
+                Select::Random => write!(f, "Random"),
             }
         }
     }

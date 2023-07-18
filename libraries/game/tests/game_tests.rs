@@ -111,7 +111,7 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(2, Playstyle::Safe);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
 
-        for _ in 0..1000{
+        for _ in 0..1000 {
             game.beginning();
             let id0 = game.iplayer(0).player().id();
             let id1 = game.iplayer(1).player().id();
@@ -123,5 +123,4 @@ mod init_game_test {
             assert_eq!(id3, 3);
         }
     }
-
 }

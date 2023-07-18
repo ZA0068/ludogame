@@ -1,5 +1,5 @@
-use genetic_algorithm::GeneticAlgorithm;
 use game::Game;
+use genetic_algorithm::GeneticAlgorithm;
 
 fn run_ga_control() {
     let mut ga = GeneticAlgorithm::default();
@@ -82,7 +82,6 @@ fn run_ga_6() {
     ga.total_games(100);
     ga.run_gentic_algorithm();
 }
-
 
 fn main() {
     run_ga_control();

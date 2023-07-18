@@ -56,7 +56,7 @@ mod genetic_algorithm {
             }
         }
 
-        pub fn total_games(&mut self, total_games: u16){
+        pub fn total_games(&mut self, total_games: u16) {
             self.total_games = total_games;
         }
         pub fn population(&self) -> &Vec<IPlayer> {
@@ -182,11 +182,14 @@ mod genetic_algorithm {
         }
 
         pub fn export_2_csv(&mut self) {
-            let mut wtr = csv::Writer::from_path(format!("data/{}.csv", self.csv_name)).unwrap();
+            std::fs::create_dir_all(format!("../../data/{}", self.csv_name)).unwrap();
+
+            let mut wtr = csv::Writer::from_path(format!("../../data/{}/{}_winrates.csv", self.csv_name, self.csv_name)).unwrap();
+            
             let headers: Vec<String> = (0..=self.population_size)
                 .flat_map(|i| {
                     if i == 0 {
-                        vec!["tournament:".to_string()]
+                        vec!["tournament".to_string()]
                     } else {
                         vec![
                             format!("population {} winrate", i),
@@ -217,6 +220,32 @@ mod genetic_algorithm {
             }
         
             wtr.flush().unwrap();
+        
+            // Write the parameters in a separate CSV file
+            let mut param_wtr = csv::Writer::from_path(format!("../../data/{}/{}_params.csv", self.csv_name, self.csv_name)).unwrap();
+        
+            let parameter_names = vec![
+                "Total Generations",
+                "Total Populations",
+                "Total Games",
+                "Mutation Rate",
+                "Crossover Rate",
+                "Number of Elites",
+            ];
+        
+            let parameter_values = vec![
+                format!("{}", self.tournament_size),
+                format!("{}", self.population_size),
+                format!("{}", self.total_games),
+                format!("{}", self.mutation_rate),
+                format!("{}", self.crossover_rate),
+                format!("{}", self.elitism_count),
+            ];
+        
+            param_wtr.write_record(&parameter_names).unwrap();
+            param_wtr.write_record(&parameter_values).unwrap();
+        
+            param_wtr.flush().unwrap();
         }
         
 
@@ -282,7 +311,6 @@ mod genetic_algorithm {
                 }
             }
         }
-        
 
         pub fn create_child(&mut self, actions: [Act; 10], selector: Select) -> IPlayer {
             let mut iplayer = IPlayer::new(0);
@@ -311,19 +339,24 @@ mod genetic_algorithm {
             let crossover_point2 = self.rng.gen_range(crossover_point1..10);
             let mut child = ACTIONS;
             child[0..crossover_point1].copy_from_slice(&parent1[0..crossover_point1]);
-            child[crossover_point1..crossover_point2].copy_from_slice(&parent2[crossover_point1..crossover_point2]);
+            child[crossover_point1..crossover_point2]
+                .copy_from_slice(&parent2[crossover_point1..crossover_point2]);
             child[crossover_point2..10].copy_from_slice(&parent1[crossover_point2..10]);
             child
         }
-        
-        fn single_point_crossover(&mut self, parent1: &[Act; 10], parent2: &[Act; 10]) -> [Act; 10] {
+
+        fn single_point_crossover(
+            &mut self,
+            parent1: &[Act; 10],
+            parent2: &[Act; 10],
+        ) -> [Act; 10] {
             let crossover_point = self.rng.gen_range(0..10);
             let mut child = ACTIONS;
             child[0..crossover_point].copy_from_slice(&parent1[0..crossover_point]);
             child[crossover_point..10].copy_from_slice(&parent2[crossover_point..10]);
             child
         }
-        
+
         pub fn uniform_crossover(
             &mut self,
             first_parent_actions: &[Act; 10],
@@ -390,7 +423,6 @@ mod genetic_algorithm {
             }
             mutated_actions
         }
-        
     }
 
     impl Default for GeneticAlgorithm {

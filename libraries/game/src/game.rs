@@ -64,7 +64,11 @@ mod game {
         }
 
         pub fn iplayer(&mut self, id: i8) -> &mut IPlayer {
-            let index = self.iplayers.iter().position(|player| player.player().id() == id).unwrap();
+            let index = self
+                .iplayers
+                .iter()
+                .position(|player| player.player().id() == id)
+                .unwrap();
             &mut self.iplayers[index]
         }
 

@@ -349,7 +349,6 @@ mod iplayers {
             Playstyle::GeneticAlgorithm => None,
         }
     }
-
 }
 
 pub use iplayers::{Behavior, IPlayer, Playstyle, ACTIONS, SELECTIONS};
