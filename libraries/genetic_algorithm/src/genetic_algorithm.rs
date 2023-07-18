@@ -21,6 +21,7 @@ mod genetic_algorithm {
         tournament_size: usize,
         total_games: u16,
         write_to_csv: bool,
+        csv_name: String,
         rng: ThreadRng,
     }
 
@@ -37,6 +38,7 @@ mod genetic_algorithm {
                 tournament_size: 0,
                 total_games: 100,
                 write_to_csv: false,
+                csv_name: "GA data".to_string(),
                 rng: thread_rng(),
             }
         }
@@ -54,6 +56,9 @@ mod genetic_algorithm {
             }
         }
 
+        pub fn total_games(&mut self, total_games: u16){
+            self.total_games = total_games;
+        }
         pub fn population(&self) -> &Vec<IPlayer> {
             &self.population
         }
@@ -130,6 +135,10 @@ mod genetic_algorithm {
             self.elitism_count = elitism_count;
         }
 
+        pub fn set_csv_name(&mut self, csv_name: &str) {
+            self.csv_name = csv_name.to_string();
+        }
+
         pub fn set_write_to_csv(&mut self, write_to_csv: bool) {
             self.write_to_csv = write_to_csv;
         }
@@ -144,6 +153,7 @@ mod genetic_algorithm {
                 self.evaluator.start_game(self.total_games);
                 self.evaluator.get_iplayer(0, population);
                 population.calculate_winrate(self.total_games);
+                population.print_winrate();
             }
             if self.write_to_csv {
                 self.data.push((tournament_size, self.population.clone()));
@@ -172,17 +182,43 @@ mod genetic_algorithm {
         }
 
         pub fn export_2_csv(&mut self) {
+            let mut wtr = csv::Writer::from_path(format!("data/{}.csv", self.csv_name)).unwrap();
+            let headers: Vec<String> = (0..=self.population_size)
+                .flat_map(|i| {
+                    if i == 0 {
+                        vec!["tournament:".to_string()]
+                    } else {
+                        vec![
+                            format!("population {} winrate", i),
+                            format!("population {} select", i),
+                            format!("population {} actions", i),
+                        ]
+                    }
+                })
+                .collect();
+        
+            wtr.write_record(&headers).unwrap();
+        
+            // Write the data rows
             for (tournament_index, iplayers) in &self.data {
-                let filename = format!("data/GA_data_{}.csv", tournament_index);
-                let mut wtr = csv::Writer::from_path(filename).unwrap();
-                for iplayer in iplayers {
-                    let id = iplayer.player().id().to_string();
-                    let winrate = iplayer.get_winrate().to_string();
-                    wtr.write_record(&[id, winrate]).unwrap();
-                }
-                wtr.flush().unwrap();
+                let row: Vec<String> = std::iter::once(format!("{}:", tournament_index))
+                    .chain(iplayers.iter().flat_map(|iplayer| {
+                        vec![
+                            iplayer.get_winrate().to_string(),
+                            iplayer.select_which_piece.to_string(),
+                            iplayer.actions.as_ref().map(|actions| {
+                                actions.iter().map(Act::to_string).collect::<Vec<_>>().join(", ")
+                            }).unwrap_or_default(),
+                        ]
+                    }))
+                    .collect();
+        
+                wtr.write_record(&row).unwrap();
             }
+        
+            wtr.flush().unwrap();
         }
+        
 
         pub fn try_to_crossover_selector(
             &mut self,
@@ -377,6 +413,7 @@ mod genetic_algorithm {
                 tournament_size: 5,
                 total_games: 100,
                 write_to_csv: false,
+                csv_name: "GA data".to_string(),
                 rng: thread_rng(),
             }
         }

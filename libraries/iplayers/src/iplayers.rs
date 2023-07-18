@@ -86,8 +86,8 @@ mod iplayers {
     pub struct IPlayer {
         player: Player,
         playstyle: Option<Playstyle>,
-        select_which_piece: Select,
-        actions: Option<[Act; 10]>,
+        pub select_which_piece: Select,
+        pub actions: Option<[Act; 10]>,
         dice_number: i8,
         wins: u16,
         winrate: f64,
@@ -349,6 +349,7 @@ mod iplayers {
             Playstyle::GeneticAlgorithm => None,
         }
     }
+
 }
 
 pub use iplayers::{Behavior, IPlayer, Playstyle, ACTIONS, SELECTIONS};

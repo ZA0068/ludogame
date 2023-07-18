@@ -9,10 +9,6 @@ members = [
     "libraries/players",
 ]
 
-[lib]
-name = "main"
-path = "src/main.rs"
-
 [dependencies]
 board = { path = "libraries/board" }
 players = { path = "libraries/players" }

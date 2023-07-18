@@ -4,7 +4,8 @@ mod players {
     use pieces::Piece;
     use prettytable::{row, Table};
     use rand::prelude::SliceRandom;
-    // use std::fmt;
+    use std::fmt::{Display, Formatter, Result};
+    
 
     use std::{cell::RefCell, rc::Rc};
 
@@ -984,6 +985,33 @@ mod players {
             (piece_borrow.color() as i8, piece_borrow.id())
         };
         (other_player_id, other_piece_id)
+    }
+
+    impl Display for Act {
+        fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+            match self {
+                Act::Free => write!(f, "Free"),
+                Act::Move => write!(f, "Move"),
+                Act::Join => write!(f, "Join"),
+                Act::Kill => write!(f, "Kill"),
+                Act::Die => write!(f, "Die"),
+                Act::Goal => write!(f, "Goal"),
+                Act::Leave => write!(f, "Leave"),
+                Act::Safe => write!(f, "Safe"),
+                Act::Starjump => write!(f, "Starjump"),
+                Act::Nothing => write!(f, "Nothing"),
+            }
+        }
+    }
+
+    impl Display for Select {
+        fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+            match self {
+                Select::Nearest => write!(f, "Nearest"),
+                Select::Furthest => write!(f, "Furthest"),
+                Select::Random=> write!(f, "Random"),
+            }
+        }
     }
 }
 

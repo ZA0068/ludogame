@@ -158,8 +158,9 @@ mod genetic_algorithm_test {
         game.give_iplayer_a_playstyle(2, Playstyle::Fast);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
         ga.set_evaluator(game);
-        ga.set_mutation_rate(1.0);
-        ga.set_crossover_rate(1.0);
+        ga.set_mutation_rate(0.1);
+        ga.set_write_to_csv(true);
+        ga.set_crossover_rate(0.9);
         ga.set_population_size(10);
         ga.set_tournament_size(5);
         ga.set_elitism_count(2);
@@ -168,9 +169,31 @@ mod genetic_algorithm_test {
     }
 
     #[test]
-    fn genetic_algorithm_test_2() {
+    fn genetic_algorithm_test_example() {
         let mut ga = GeneticAlgorithm::default();
+
+        ga.set_mutation_rate(0.01);
+        ga.set_crossover_rate(0.95);
+        ga.set_population_size(10);
+        ga.set_tournament_size(50);
+        ga.set_elitism_count(2);
         ga.set_write_to_csv(true);
+        ga.total_games(1000);
+        ga.initialize_all_populations();
+        ga.run_gentic_algorithm();
+    }
+
+    #[test]
+    fn genetic_algorithm_true_test() {
+        let mut ga = GeneticAlgorithm::default();
+        ga.set_mutation_rate(0.01);
+        ga.set_crossover_rate(0.95);
+        ga.set_population_size(10);
+        ga.set_tournament_size(5);
+        ga.set_elitism_count(2);
+        ga.set_write_to_csv(true);
+        ga.total_games(100);
+        ga.set_csv_name("GA data");
         ga.initialize_all_populations();
         ga.run_gentic_algorithm();
     }
