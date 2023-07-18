@@ -1,25 +1,30 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import numpy as np
+import sys
+import os
 
 # Load the winrate data
-winrate_data = pd.read_csv("./data/GA test/GA test_winrates.csv", index_col='tournament')
 
+filename = sys.argv[1]
+
+winrate_data = pd.read_csv(f'./data/{filename}/{filename}_winrates.csv', index_col='tournament')
+os.makedirs(f'./data/{filename}/images', exist_ok=True)
+
+numeric_winrate_data = winrate_data.select_dtypes(include=[np.number])  # assuming you have numpy imported as np
 # Compute the statistics
 data_stats = pd.DataFrame(index=winrate_data.index)
-data_stats['Max'] = winrate_data.max(axis=1)
-data_stats['Upper Quantile'] = winrate_data.quantile(0.75, axis=1)
-data_stats['Median'] = winrate_data.median(axis=1)
-data_stats['Mean'] = winrate_data.mean(axis=1)
-data_stats['Lower Quantile'] = winrate_data.quantile(0.25, axis=1)
-data_stats['Min'] = winrate_data.min(axis=1)
-data_stats['STD'] = winrate_data.std(axis=1)
-
+data_stats['Max'] = numeric_winrate_data.max(axis=1)
+data_stats['Upper Quantile'] = numeric_winrate_data.quantile(0.75, axis=1)
+data_stats['Median'] = numeric_winrate_data.median(axis=1)
+data_stats['Mean'] = numeric_winrate_data.mean(axis=1)
+data_stats['Lower Quantile'] = numeric_winrate_data.quantile(0.25, axis=1)
+data_stats['Min'] = numeric_winrate_data.min(axis=1)
+data_stats['STD'] = numeric_winrate_data.std(axis=1)
 # Load the parameter data
-param_data = pd.read_csv("./data/GA test/GA test_params.csv")
+param_data = pd.read_csv(f'./data/{filename}/{filename}_params.csv')
 total_generations = param_data.loc[0, 'Total Generations']
-filename = 'GA test'
-
 # Brightening the colors and increasing the line thickness
 colors = {
     'Max': 'blue',
@@ -57,5 +62,8 @@ textbox_text = '\n'.join((
 
 plt.text(1.02, 0.5, textbox_text, transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', bbox=props)
 
-plt.savefig('./data/GA test/images/ga_data_plot2.png', dpi=300, bbox_inches='tight')
+
+
+plt.savefig(f'./data/{filename}/images/{filename}_plot.png', dpi=300, bbox_inches='tight')
+plt.tight_layout()
 plt.show()

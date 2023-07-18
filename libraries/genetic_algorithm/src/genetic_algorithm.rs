@@ -182,9 +182,9 @@ mod genetic_algorithm {
         }
 
         pub fn export_2_csv(&mut self) {
-            std::fs::create_dir_all(format!("../../data/{}", self.csv_name)).unwrap();
+            std::fs::create_dir_all(format!("./data/{}", self.csv_name)).unwrap();
 
-            let mut wtr = csv::Writer::from_path(format!("../../data/{}/{}_winrates.csv", self.csv_name, self.csv_name)).unwrap();
+            let mut wtr = csv::Writer::from_path(format!("./data/{}/{}_winrates.csv", self.csv_name, self.csv_name)).unwrap();
             
             let headers: Vec<String> = (0..=self.population_size)
                 .flat_map(|i| {
@@ -204,7 +204,7 @@ mod genetic_algorithm {
         
             // Write the data rows
             for (tournament_index, iplayers) in &self.data {
-                let row: Vec<String> = std::iter::once(format!("{}:", tournament_index))
+                let row: Vec<String> = std::iter::once(format!("{}", tournament_index))
                     .chain(iplayers.iter().flat_map(|iplayer| {
                         vec![
                             iplayer.get_winrate().to_string(),
@@ -222,7 +222,7 @@ mod genetic_algorithm {
             wtr.flush().unwrap();
         
             // Write the parameters in a separate CSV file
-            let mut param_wtr = csv::Writer::from_path(format!("../../data/{}/{}_params.csv", self.csv_name, self.csv_name)).unwrap();
+            let mut param_wtr = csv::Writer::from_path(format!("./data/{}/{}_params.csv", self.csv_name, self.csv_name)).unwrap();
         
             let parameter_names = vec![
                 "Total Generations",
