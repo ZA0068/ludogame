@@ -1,6 +1,6 @@
 **/target/
 **/data/
-**/*.csv
-**/*.png
-**/*.info
-**/*.code-workspace
+*.csv
+*.png
+*.info
+*.code-workspace
