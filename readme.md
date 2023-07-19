@@ -35,7 +35,7 @@ Follow the instructions displayed in the console to play the game.
 
 Game board displayed in the terminal. Rolling of dice and movement of pieces. Multiplayer support for up to four players. Automated testing using Rust's built-in testing framework.
 
-!!! The game will take a long for AI to play because it is implemented on a single thread!!!
+!!! The game will take a long for AI to play because it is implemented on a single thread !!!
 
 ## Contributing
 
