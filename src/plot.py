@@ -65,5 +65,5 @@ plt.text(1.02, 0.5, textbox_text, transform=plt.gca().transAxes, fontsize=14, ve
 
 
 plt.savefig(f'./data/{filename}/images/{filename}_plot.png', dpi=300, bbox_inches='tight')
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()

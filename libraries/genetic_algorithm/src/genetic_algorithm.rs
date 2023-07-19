@@ -56,7 +56,7 @@ mod genetic_algorithm {
             }
         }
 
-        pub fn total_games(&mut self, total_games: u16) {
+        pub fn set_total_games(&mut self, total_games: u16) {
             self.total_games = total_games;
         }
         pub fn population(&self) -> &Vec<IPlayer> {
@@ -254,6 +254,9 @@ mod genetic_algorithm {
             selector1: &Select,
             selector2: &Select,
         ) -> Select {
+            if selector1 == selector2 {
+                return *selector1;
+            }
             let mut rng = thread_rng();
             let crossover_rate = rng.gen_range(0.0..1.0);
             if crossover_rate < self.crossover_rate {
@@ -325,6 +328,9 @@ mod genetic_algorithm {
             parent_actions_1: &[Act; 10],
             parent_actions_2: &[Act; 10],
         ) -> [Act; 10] {
+            if parent_actions_1 == parent_actions_2 {
+                return *parent_actions_1;
+            }
             let mut rng = thread_rng();
             let crossover_rate = rng.gen_range(0.0..1.0);
             if crossover_rate < self.crossover_rate {

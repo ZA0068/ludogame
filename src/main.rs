@@ -1,18 +1,6 @@
 use genetic_algorithm::GeneticAlgorithm;
 use std::process::Command;
 
-fn run_ga_0(filename: &str) {
-    let mut ga = GeneticAlgorithm::default();
-    ga.set_population_size(10);
-    ga.set_mutation_rate(0.5);
-    ga.set_crossover_rate(0.5);
-    ga.set_elitism_count(2);
-    ga.set_tournament_size(10);
-    ga.total_games(10);
-    ga.set_write_to_csv(true);
-    ga.set_csv_name(filename);
-    ga.run_gentic_algorithm();
-}
 
 fn run_ga_control(filename: &str) {
     let mut ga = GeneticAlgorithm::default();
@@ -21,7 +9,20 @@ fn run_ga_control(filename: &str) {
     ga.set_crossover_rate(0.5);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
+    ga.set_write_to_csv(true);
+    ga.set_csv_name(filename);
+    ga.run_gentic_algorithm();
+}
+
+fn run_ga_0(filename: &str) {
+    let mut ga = GeneticAlgorithm::default();
+    ga.set_population_size(10);
+    ga.set_mutation_rate(0.5);
+    ga.set_crossover_rate(0.5);
+    ga.set_elitism_count(2);
+    ga.set_tournament_size(10);
+    ga.set_total_games(10);
     ga.set_write_to_csv(true);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
@@ -34,7 +35,7 @@ fn run_ga_1(filename: &str) {
     ga.set_crossover_rate(0.5);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
     ga.set_write_to_csv(true);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
@@ -47,7 +48,7 @@ fn run_ga_2(filename: &str) {
     ga.set_crossover_rate(0.1);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
     ga.set_write_to_csv(true);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
@@ -60,7 +61,7 @@ fn run_ga_3(filename: &str) {
     ga.set_crossover_rate(1.0);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
     ga.set_write_to_csv(true);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
@@ -73,7 +74,7 @@ fn run_ga_4(filename: &str) {
     ga.set_crossover_rate(0.5);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(200);
+    ga.set_total_games(200);
     ga.set_write_to_csv(true);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
@@ -86,7 +87,7 @@ fn run_ga_5(filename: &str) {
     ga.set_crossover_rate(0.01);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
 }
@@ -98,7 +99,7 @@ fn run_ga_6(filename: &str) {
     ga.set_crossover_rate(0.95);
     ga.set_elitism_count(2);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
 }
@@ -110,15 +111,27 @@ fn run_ga_7(filename: &str) {
     ga.set_crossover_rate(0.5);
     ga.set_elitism_count(10);
     ga.set_tournament_size(100);
-    ga.total_games(100);
+    ga.set_total_games(100);
+    ga.set_csv_name(filename);
+    ga.run_gentic_algorithm();
+}
+
+
+fn run_ga_8(filename: &str) {
+    let mut ga = GeneticAlgorithm::default();
+    ga.set_population_size(100);
+    ga.set_mutation_rate(0.01);
+    ga.set_crossover_rate(0.95);
+    ga.set_elitism_count(10);
+    ga.set_tournament_size(100);
+    ga.set_total_games(1000);
     ga.set_csv_name(filename);
     ga.run_gentic_algorithm();
 }
 
 fn main() {
 
-    let filename = "GA test 
-    control";
+    let filename = "GA control test";
     run_ga_control(filename);
     plot_data(filename);
 
@@ -152,6 +165,11 @@ fn main() {
 
     let filename = "GA test 7 - 10elites";
     run_ga_7(filename);
+    plot_data(filename);
+
+
+    let filename = "GA test 8 - final";
+    run_ga_8(filename);
     plot_data(filename);
 
 }

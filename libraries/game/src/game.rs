@@ -67,7 +67,7 @@ mod game {
             let index = self
                 .iplayers
                 .iter()
-                .position(|player| player.player().id() == id)
+                .position(|player: &IPlayer| player.player().id() == id)
                 .unwrap();
             &mut self.iplayers[index]
         }
@@ -86,12 +86,14 @@ mod game {
 
         pub fn run(&mut self) {
             loop {
+                let mut cnt = 0;
                 for player_idx in 0..4 {
                     self.play_turn(player_idx);
-                    if self.has_player_won(player_idx) {
+                    if self.has_player_won(player_idx) || cnt == 1000 {
                         return;
                     }
                     self.next_turn(player_idx);
+                    cnt += 1;
                 }
             }
         }

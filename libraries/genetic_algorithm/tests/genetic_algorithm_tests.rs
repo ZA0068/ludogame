@@ -163,7 +163,7 @@ mod genetic_algorithm_test {
         ga.set_crossover_rate(1.0);
         ga.set_population_size(10);
         ga.set_tournament_size(10);
-        ga.total_games(10);
+        ga.set_total_games(10);
         ga.set_elitism_count(2);
         ga.set_csv_name("GA test");
         ga.initialize_all_populations();
@@ -180,7 +180,7 @@ mod genetic_algorithm_test {
         ga.set_tournament_size(50);
         ga.set_elitism_count(2);
         ga.set_write_to_csv(true);
-        ga.total_games(1000);
+        ga.set_total_games(1000);
         ga.set_csv_name("GA test");
         ga.initialize_all_populations();
         ga.run_gentic_algorithm();
@@ -195,7 +195,7 @@ mod genetic_algorithm_test {
         ga.set_tournament_size(100);
         ga.set_elitism_count(2);
         ga.set_write_to_csv(true);
-        ga.total_games(100);
+        ga.set_total_games(100);
         ga.set_csv_name("GA data");
         ga.initialize_all_populations();
         ga.run_gentic_algorithm();
