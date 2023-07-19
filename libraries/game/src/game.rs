@@ -85,16 +85,13 @@ mod game {
         }
 
         pub fn run(&mut self) {
-            loop {
-                let mut cnt = 0;
-                for player_idx in 0..4 {
+            for i in 0..1000 {
+                let player_idx = i % 4;
                     self.play_turn(player_idx);
-                    if self.has_player_won(player_idx) || cnt == 1000 {
-                        return;
+                    if self.has_player_won(player_idx) {
+                        break;
                     }
                     self.next_turn(player_idx);
-                    cnt += 1;
-                }
             }
         }
 

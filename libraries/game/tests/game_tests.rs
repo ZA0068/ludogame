@@ -35,6 +35,7 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(1, Playstyle::Random);
         game.give_iplayer_a_playstyle(2, Playstyle::Random);
         game.give_iplayer_a_playstyle(3, Playstyle::Random);
+        game.beginning();
         game.run();
     }
 
@@ -46,6 +47,7 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(1, Playstyle::Aggressive);
         game.give_iplayer_a_playstyle(2, Playstyle::Aggressive);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+        game.beginning();
         game.run();
     }
 
@@ -57,6 +59,7 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(1, Playstyle::Fast);
         game.give_iplayer_a_playstyle(2, Playstyle::Fast);
         game.give_iplayer_a_playstyle(3, Playstyle::Fast);
+        game.beginning();
         game.run();
     }
 
@@ -68,6 +71,7 @@ mod init_game_test {
         game.give_iplayer_a_playstyle(1, Playstyle::Random);
         game.give_iplayer_a_playstyle(2, Playstyle::Safe);
         game.give_iplayer_a_playstyle(3, Playstyle::Aggressive);
+        game.beginning();
         game.run();
     }
 
